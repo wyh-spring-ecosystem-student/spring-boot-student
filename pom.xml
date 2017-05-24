@@ -44,4 +44,7 @@
 		</plugins>
 	</build>
 	
+	<modules>
+		
+	</modules>
 </project>
