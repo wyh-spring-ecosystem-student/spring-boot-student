@@ -8,7 +8,7 @@ import com.xiaolyuh.config.PropertyConfig;
 /**
  * Created by yuhao.wang on 2017/3/9.
  */
-public class PropertyConfigTest extends SpringBootStudentConfigApplicationTests {
+public class ValuePropertyConfigTest extends SpringBootStudentConfigApplicationTests {
 
 	@Autowired
 	PropertyConfig propertyConfig; 
