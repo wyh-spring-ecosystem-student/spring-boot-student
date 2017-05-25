@@ -3,10 +3,10 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-boot-student-xml-config</artifactId>
+	<artifactId>spring-boot-student-config</artifactId>
 	<packaging>jar</packaging>
 
-	<name>spring-boot-student-xml-config</name>
+	<name>spring-boot-student-config</name>
 	<description>Spring boot引入XML配置</description>
 
 	<parent>

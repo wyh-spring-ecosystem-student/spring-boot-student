@@ -45,6 +45,6 @@
 	</build>
 	
 	<modules>
-		<module>spring-boot-student-xml-config</module>
+		<module>spring-boot-student-config</module>
 	</modules>
 </project>
