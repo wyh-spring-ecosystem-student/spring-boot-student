@@ -45,6 +45,6 @@
 	</build>
 	
 	<modules>
-		
+		<module>spring-boot-student-log</module>
 	</modules>
 </project>
