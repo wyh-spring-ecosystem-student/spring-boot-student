@@ -48,6 +48,7 @@
 		<module>spring-boot-student-banner</module>
 		<module>spring-boot-student-config</module>
 		<module>spring-boot-student-log</module>
+		<module>spring-boot-student-profile</module>
 	</modules>
 
 </project>
