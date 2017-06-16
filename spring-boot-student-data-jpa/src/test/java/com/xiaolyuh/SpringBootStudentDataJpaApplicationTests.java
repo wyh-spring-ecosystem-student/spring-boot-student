@@ -64,7 +64,7 @@ public class SpringBootStudentDataJpaApplicationTests {
     	map.put("address", "合肥");
     	map.put("name", "测试");
     	map.put("age", 50);
-    	
+
     	MvcResult result = mockMvc.perform(post("/save").contentType(MediaType.APPLICATION_JSON).content(JSONObject.toJSONString(map)))
     			.andExpect(status().isOk())// 模拟向testRest发送get请求  
     			.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8  
