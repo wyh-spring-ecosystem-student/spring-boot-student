@@ -1,12 +1,11 @@
 package com.xiaolyuh.repository;
 
-import java.util.List;
-
+import com.xiaolyuh.entity.Person;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.xiaolyuh.entity.Person;
+import java.util.List;
 
 public interface PersonRepository extends JpaRepository<Person, Long> {
 	// 使用方法名查询，接受一个name参数，返回值为列表。
