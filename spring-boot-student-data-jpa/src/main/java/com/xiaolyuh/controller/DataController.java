@@ -2,7 +2,6 @@ package com.xiaolyuh.controller;
 
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.repository.PersonRepository;
-import com.xiaolyuh.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
