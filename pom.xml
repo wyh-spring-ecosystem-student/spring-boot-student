@@ -50,6 +50,7 @@
 		<module>spring-boot-student-log</module>
 		<module>spring-boot-student-profile</module>
 		<module>spring-boot-student-data-jpa</module>
-	</modules>
+		<module>spring-boot-student-mybatis</module>
+    </modules>
 
 </project>
