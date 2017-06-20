@@ -28,7 +28,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Page<Person> findByPage(int pageNo, int pageSize) {
-        PageHelper.startPage(pageNo, pageSize, true);
+        PageHelper.startPage(pageNo, pageSize);
         return personMapper.findByPage();
     }
 

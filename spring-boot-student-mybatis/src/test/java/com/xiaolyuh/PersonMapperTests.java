@@ -50,6 +50,7 @@ public class PersonMapperTests {
 		Page<Person> persons = personService.findByPage(1, 2);
 
 		Assert.assertNotNull(persons);
+		logger.debug(persons.toString());
 		logger.debug(JSON.toJSONString(persons));
 	}
 
