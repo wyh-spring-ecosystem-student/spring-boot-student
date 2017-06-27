@@ -57,9 +57,9 @@ public class PersonMapperTests {
 	@Test
 	public void testCacheByPage() {
 		long begin = System.currentTimeMillis();
-		Page<Person> persons = personService.findByPage(1, 20);
+		List<Person> persons = personService.findAll();
 		long ing = System.currentTimeMillis();
-		personService.findByPage(1, 20);
+		personService.findAll();
 		long end = System.currentTimeMillis();
 		logger.debug("第一次请求时间：" + (ing - begin) + "ms");
 		logger.debug("第二次请求时间:" + (end - ing) + "ms");

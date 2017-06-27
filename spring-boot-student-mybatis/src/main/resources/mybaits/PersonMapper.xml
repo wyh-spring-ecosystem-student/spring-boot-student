@@ -114,14 +114,15 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
 
-  <select id="findAll" resultMap="BaseResultMap">
+  <!-- 对这个语句useCache="true"默认是true，可以不写 -->
+  <select id="findAll" resultMap="BaseResultMap" useCache="true">
     select
     <include refid="Base_Column_List" />
     from person
   </select>
 
-  <!-- 对这个语句开启二级缓存 -->
-  <select id="findByPage" resultMap="BaseResultMap" useCache="true">
+  <!-- 对这个语句禁用二级缓存 -->
+  <select id="findByPage" resultMap="BaseResultMap" useCache="false">
     select
     <include refid="Base_Column_List" />
     from person
