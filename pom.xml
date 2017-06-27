@@ -51,6 +51,7 @@
 		<module>spring-boot-student-profile</module>
 		<module>spring-boot-student-data-jpa</module>
 		<module>spring-boot-student-mybatis</module>
+		<module>spring-boot-student-mybatis-ehcache</module>
     </modules>
 
 </project>
