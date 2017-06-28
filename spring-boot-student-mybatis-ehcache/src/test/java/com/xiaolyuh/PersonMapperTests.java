@@ -20,53 +20,53 @@ import java.util.List;
 @SpringBootTest
 public class PersonMapperTests {
 
-	private Logger logger = LoggerFactory.getLogger(PersonMapperTests.class);
+    private Logger logger = LoggerFactory.getLogger(PersonMapperTests.class);
 
-	@Autowired
-	private PersonService personService;
+    @Autowired
+    private PersonService personService;
 
-	@Before
-	public void testInsert() {
-		Person person = new Person();
-		person.setName("测试");
-		person.setAddress("address");
-		person.setAge(10);
-		personService.insert(person);
+    @Before
+    public void testInsert() {
+        Person person = new Person();
+        person.setName("测试");
+        person.setAddress("address");
+        person.setAge(10);
+        personService.insert(person);
 
-		Assert.assertNotNull(person.getId());
-		logger.debug(JSON.toJSONString(person));
-	}
+        Assert.assertNotNull(person.getId());
+        logger.debug(JSON.toJSONString(person));
+    }
 
-	@Test
-	public void testFindAll() {
-		List<Person> persons = personService.findAll();
+    @Test
+    public void testFindAll() {
+        List<Person> persons = personService.findAll();
 
-		Assert.assertNotNull(persons);
-		logger.debug(JSON.toJSONString(persons));
-	}
+        Assert.assertNotNull(persons);
+        logger.debug(JSON.toJSONString(persons));
+    }
 
-	@Test
-	public void testFindByPage() {
-		Page<Person> persons = personService.findByPage(1, 2);
+    @Test
+    public void testFindByPage() {
+        Page<Person> persons = personService.findByPage(1, 2);
 
-		Assert.assertNotNull(persons);
-		logger.debug(persons.toString());
-		logger.debug(JSON.toJSONString(persons));
-	}
+        Assert.assertNotNull(persons);
+        logger.debug(persons.toString());
+        logger.debug(JSON.toJSONString(persons));
+    }
 
-	@Test
-	public void testCacheByPage() {
-		long begin = System.currentTimeMillis();
-		List<Person> persons = personService.findAll();
-		long ing = System.currentTimeMillis();
-		personService.findAll();
-		long end = System.currentTimeMillis();
-		logger.debug("第一次请求时间：" + (ing - begin) + "ms");
-		logger.debug("第二次请求时间:" + (end - ing) + "ms");
+    @Test
+    public void testCacheByPage() {
+        long begin = System.currentTimeMillis();
+        List<Person> persons = personService.findAll();
+        long ing = System.currentTimeMillis();
+        personService.findAll();
+        long end = System.currentTimeMillis();
+        logger.debug("第一次请求时间：" + (ing - begin) + "ms");
+        logger.debug("第二次请求时间:" + (end - ing) + "ms");
 
-		Assert.assertNotNull(persons);
-		logger.debug(persons.toString());
-		logger.debug(JSON.toJSONString(persons));
-	}
+        Assert.assertNotNull(persons);
+        logger.debug(persons.toString());
+        logger.debug(JSON.toJSONString(persons));
+    }
 
 }
