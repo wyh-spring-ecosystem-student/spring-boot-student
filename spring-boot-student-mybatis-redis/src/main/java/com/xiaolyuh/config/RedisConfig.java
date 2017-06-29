@@ -31,6 +31,7 @@ public class RedisConfig {
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);  
         jackson2JsonRedisSerializer.setObjectMapper(om);
+
 		// 设置值（value）的序列化采用Jackson2JsonRedisSerializer。
 		redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
 		// 设置键（key）的序列化采用StringRedisSerializer。
