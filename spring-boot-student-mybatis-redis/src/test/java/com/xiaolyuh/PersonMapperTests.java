@@ -63,6 +63,7 @@ public class PersonMapperTests {
         logger.debug(JSON.toJSONString(persons));
     }
 
+    // 测试mybatis缓存
     @Test
     public void testCache() {
         long begin = System.currentTimeMillis();
@@ -77,6 +78,7 @@ public class PersonMapperTests {
         logger.debug(JSON.toJSONString(persons));
     }
 
+    // 测试Redis存储和获取一个List
     @Test
     public void testRedisCacheSetList() {
         List<Person> persons = new ArrayList<>();
@@ -88,6 +90,7 @@ public class PersonMapperTests {
         System.out.println(JSON.toJSONString(persons));
     }
 
+    // 测试Redis存储和获取一个Object
     @Test
     public void testRedisCacheSetObject() {
         redisTemplate.opsForValue().set(person.getId() + "", person, 2, TimeUnit.MINUTES);
@@ -98,6 +101,7 @@ public class PersonMapperTests {
         }
     }
 
+    // 测试 通过Spring Aware获取Spring容器中的额Bean
     @Test
     public void testApplicationContextAware() {
         RedisTemplate redisTemplate = SpringContextHolder.getBean("redisTemplate");
