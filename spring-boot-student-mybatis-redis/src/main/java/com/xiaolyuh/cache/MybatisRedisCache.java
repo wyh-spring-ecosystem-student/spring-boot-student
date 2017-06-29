@@ -8,7 +8,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -22,14 +24,15 @@ public class MybatisRedisCache implements Cache {
 
     private static final Logger logger = LoggerFactory.getLogger(MybatisRedisCache.class);
 
+    // 读写锁
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(true);
 
     private RedisTemplate<String, Object> redisTemplate = SpringContextHolder.getBean("redisTemplate");
 
     private String id;
 
-    public MybatisRedisCache(final String id){
-        if(id == null){
+    public MybatisRedisCache(final String id) {
+        if (id == null) {
             throw new IllegalArgumentException("Cache instances require an ID");
         }
         logger.info("Redis Cache id " + id);
@@ -43,7 +46,8 @@ public class MybatisRedisCache implements Cache {
 
     @Override
     public void putObject(Object key, Object value) {
-        if(value != null){
+        if (value != null) {
+            // 向Redis中添加数据，有效时间是2天
             redisTemplate.opsForValue().set(key.toString(), value, 2, TimeUnit.DAYS);
         }
     }
@@ -51,7 +55,7 @@ public class MybatisRedisCache implements Cache {
     @Override
     public Object getObject(Object key) {
         try {
-            if(key != null){
+            if (key != null) {
                 Object obj = redisTemplate.opsForValue().get(key.toString());
                 return obj;
             }
@@ -64,8 +68,8 @@ public class MybatisRedisCache implements Cache {
     @Override
     public Object removeObject(Object key) {
         try {
-            if(key != null){
-                redisTemplate.expire(key.toString(), 1, TimeUnit.SECONDS);
+            if (key != null) {
+                redisTemplate.delete(key.toString());
             }
         } catch (Exception e) {
         }
@@ -75,13 +79,18 @@ public class MybatisRedisCache implements Cache {
     @Override
     public void clear() {
         logger.debug("清空缓存");
-        Set<String> keys = redisTemplate.keys("*:" + this.id + "*");
-        redisTemplate.delete(keys);
+        try {
+            Set<String> keys = redisTemplate.keys("*:" + this.id + "*");
+            if (!CollectionUtils.isEmpty(keys)) {
+                redisTemplate.delete(keys);
+            }
+        } catch (Exception e) {
+        }
     }
 
     @Override
     public int getSize() {
-        Long size = (Long) redisTemplate.execute(new RedisCallback<Long>(){
+        Long size = (Long) redisTemplate.execute(new RedisCallback<Long>() {
             @Override
             public Long doInRedis(RedisConnection connection) throws DataAccessException {
                 return connection.dbSize();

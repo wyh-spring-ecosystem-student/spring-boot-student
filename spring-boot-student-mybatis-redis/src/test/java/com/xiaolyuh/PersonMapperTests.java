@@ -78,7 +78,7 @@ public class PersonMapperTests {
     }
 
     @Test
-    public void testRedisCacheSet() {
+    public void testRedisCacheSetList() {
         List<Person> persons = new ArrayList<>();
         persons.add(person);
         persons.add(person);
@@ -89,7 +89,8 @@ public class PersonMapperTests {
     }
 
     @Test
-    public void testRedisCacheGet() {
+    public void testRedisCacheSetObject() {
+        redisTemplate.opsForValue().set(person.getId() + "", person, 2, TimeUnit.MINUTES);
         Object p = redisTemplate.opsForValue().get(person.getId() + "");
         if (p instanceof Person) {
             Person person1 = (Person) p;
