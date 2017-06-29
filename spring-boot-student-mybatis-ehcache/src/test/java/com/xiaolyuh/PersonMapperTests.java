@@ -65,7 +65,6 @@ public class PersonMapperTests {
         logger.debug("第二次请求时间:" + (end - ing) + "ms");
 
         Assert.assertNotNull(persons);
-        logger.debug(persons.toString());
         logger.debug(JSON.toJSONString(persons));
     }
 
