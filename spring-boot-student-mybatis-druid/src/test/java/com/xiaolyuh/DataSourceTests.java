@@ -1,7 +1,6 @@
 package com.xiaolyuh;
 
 import com.alibaba.fastjson.JSON;
-import com.fasterxml.jackson.databind.annotation.JacksonStdImpl;
 import com.xiaolyuh.config.DruidDataSourceProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
