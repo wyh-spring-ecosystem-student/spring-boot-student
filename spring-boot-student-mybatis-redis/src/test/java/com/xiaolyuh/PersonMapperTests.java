@@ -1,10 +1,9 @@
 package com.xiaolyuh;
 
-import com.alibaba.fastjson.JSON;
-import com.github.pagehelper.Page;
-import com.xiaolyuh.domain.model.Person;
-import com.xiaolyuh.holder.SpringContextHolder;
-import com.xiaolyuh.service.PersonService;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,9 +15,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import com.alibaba.fastjson.JSON;
+import com.github.pagehelper.Page;
+import com.xiaolyuh.domain.model.Person;
+import com.xiaolyuh.holder.SpringContextHolder;
+import com.xiaolyuh.service.PersonService;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -79,7 +80,8 @@ public class PersonMapperTests {
     }
 
     // 测试Redis存储和获取一个List
-    @Test
+    @SuppressWarnings("unchecked")
+	@Test
     public void testRedisCacheSetList() {
         List<Person> persons = new ArrayList<>();
         persons.add(person);
@@ -104,7 +106,7 @@ public class PersonMapperTests {
     // 测试 通过Spring Aware获取Spring容器中的额Bean
     @Test
     public void testApplicationContextAware() {
-        RedisTemplate redisTemplate = SpringContextHolder.getBean("redisTemplate");
+        RedisTemplate<String, Object> redisTemplate = SpringContextHolder.getBean("redisTemplate");
         System.out.println(redisTemplate);
     }
 
