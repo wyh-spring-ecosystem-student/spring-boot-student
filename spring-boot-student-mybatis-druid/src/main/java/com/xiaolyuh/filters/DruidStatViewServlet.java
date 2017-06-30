@@ -5,6 +5,11 @@ import javax.servlet.annotation.WebServlet;
 
 import com.alibaba.druid.support.http.StatViewServlet;
 
+//最后在App.Java类上加上注解：@ServletComponentScan是的spring能够扫描到我们自己编写的servlet和filter。
+//
+//注意不要忘记在 SpringBootSampleApplication.java 上添加 @ServletComponentScan 注解，不然就是404了。
+//
+//然后启动项目后访问 http://127.0.0.1:8080/druid/index.html 即可查看数据源及SQL统计等。 
 @WebServlet(urlPatterns = "/druid/*",
         initParams = {
                 @WebInitParam(name = "allow", value = "127.0.0.1,192.168.163.1"),// IP白名单(没有配置或者为空，则允许所有访问)
@@ -16,4 +21,4 @@ import com.alibaba.druid.support.http.StatViewServlet;
 public class DruidStatViewServlet extends StatViewServlet {
     private static final long serialVersionUID = -2688872071445249539L;
 
-}  
+}
