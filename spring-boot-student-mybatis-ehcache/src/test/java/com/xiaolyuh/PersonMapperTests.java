@@ -2,6 +2,7 @@ package com.xiaolyuh;
 
 import com.github.pagehelper.Page;
 import com.xiaolyuh.domain.model.Person;
+import com.xiaolyuh.page.PageInfo;
 import com.xiaolyuh.service.PersonService;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,13 +47,14 @@ public class PersonMapperTests {
     }
 
     @Test
-    public void testFindByPage() {
-        Page<Person> persons = personService.findByPage(1, 2);
-
-        Assert.assertNotNull(persons);
-        logger.debug(persons.toString());
-        logger.debug(JSON.toJSONString(persons));
-    }
+	public void testFindByPage() {
+		Page<Person> persons = personService.findByPage(1, 2);
+		// 需要把Page包装成PageInfo对象才能序列化。该插件也默认实现了一个PageInfo
+		PageInfo<Person> pageInfo = new PageInfo<>(persons);
+		Assert.assertNotNull(persons);
+		logger.debug(pageInfo.toString());
+		logger.debug(JSON.toJSONString(pageInfo));
+	}
 
     @Test
     public void testCacheByPage() {
