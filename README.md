@@ -73,11 +73,13 @@
 - Druid数据源配置
 - Druid监控的配置
 - Spring Boot与Druid集成
-- Spring Boot中Filter和Servlet的配置方式
 
 [Druid简介（Spring Boot + Mybatis + Druid数据源）](http://blog.csdn.net/xiaolyuh123/article/details/74099972)
 
 [maven替换中央仓库- 阿里云](http://blog.csdn.net/xiaolyuh123/article/details/74091268)
 
+## spring-boot-student-encode
+- AES，MD5，SHA1加密算法
 
+[加密算法 AES MD5 SHA1](http://blog.csdn.net/xiaolyuh123/article/details/74344893)
 

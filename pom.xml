@@ -62,6 +62,7 @@
 		<module>spring-boot-student-mybatis-ehcache</module>
 		<module>spring-boot-student-mybatis-redis</module>
 		<module>spring-boot-student-mybatis-druid</module>
+		<module>spring-boot-student-encode</module>
     </modules>
 
 </project>
