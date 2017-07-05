@@ -1,7 +1,7 @@
 package com.xiaolyuh;
 
 import com.alibaba.fastjson.JSON;
-import com.xiaolyuh.config.DruidDataSourceProperty;
+import com.xiaolyuh.druid.DruidDataSourceProperty;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
