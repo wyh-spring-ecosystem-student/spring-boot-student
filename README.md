@@ -68,7 +68,7 @@
 ## spring-boot-student-mybatis-redis
 - Spring Boot集成Mybatis
 - 使用Redis作为Mybatis的二级缓存
-- 通过实现ApplicationContextAware接口获取容器，并获取容器中的Bean
+- 通过实现ApplicationContextAware接口获取Spring容器，并获取容器中的Bean
 
 [Spring Boot + Mybatis + Redis二级缓存实例](http://blog.csdn.net/xiaolyuh123/article/details/73912617)
 
