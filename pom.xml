@@ -63,6 +63,7 @@
 		<module>spring-boot-student-mybatis-redis</module>
 		<module>spring-boot-student-mybatis-druid</module>
 		<module>spring-boot-student-encode</module>
+		<module>spring-boot-student-mybatis-druid-2</module>
     </modules>
 
 </project>
