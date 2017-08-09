@@ -1,30 +1,8 @@
 package com.xiaolyuh.service;
 
 import com.xiaolyuh.entity.Person;
-import com.xiaolyuh.repository.PersonRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.sql.DataSource;
-
-@Service
-public class PersonService {
-    @Autowired
-    PersonRepository personRepository;
-
-    @Autowired
-    ApplicationContext applicationContext;
-
-    @Autowired
-    DataSourceProperties dataSourceProperties;
-
-    // 注入自身代理对象，在本类内部方法调用事务的传递性才会生效
-    @Autowired
-    PersonService selfProxyPersonService;
+public interface  PersonService {
 
     /**
      * 测试事务的传递性
@@ -32,35 +10,11 @@ public class PersonService {
      * @param person
      * @return
      */
-    @Transactional
-    public Person save(Person person) {
-        Person p = personRepository.save(person);
-        try {
-            // 新开事务 独立回滚
-            selfProxyPersonService.delete();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            // 使用当前事务 全部回滚
-            selfProxyPersonService.save2(person);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        personRepository.save(person);
+//    @Transactional
+    Person save(Person person);
 
-        return p;
-    }
+    void save2(Person person);
 
-    @Transactional
-    public void save2(Person person) {
-        personRepository.save(person);
-        throw new RuntimeException();
-    }
+    void delete();
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void delete() {
-        personRepository.delete(1L);
-        throw new RuntimeException();
-    }
 }

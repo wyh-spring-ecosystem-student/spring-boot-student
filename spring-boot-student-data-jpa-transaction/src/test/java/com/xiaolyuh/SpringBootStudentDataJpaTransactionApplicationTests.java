@@ -42,20 +42,7 @@ public class SpringBootStudentDataJpaTransactionApplicationTests {
     @Before // 在测试开始前初始化工作  
     public void setup() {  
         this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();  
-    }  
-  
-    @Test  
-    public void testQ1() throws Exception {  
-    	Map<String, Object> map = new HashMap<>();
-    	map.put("address", "合肥");
-    	
-        MvcResult result = mockMvc.perform(post("/q1?address=合肥").content(JSONObject.toJSONString(map)))
-        		.andExpect(status().isOk())// 模拟向testRest发送get请求  
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8  
-                .andReturn();// 返回执行请求的结果  
-          
-        System.out.println(result.getResponse().getContentAsString());  
-    }  
+    }
 
     @Test  
     public void testSave() throws Exception {  
@@ -70,16 +57,6 @@ public class SpringBootStudentDataJpaTransactionApplicationTests {
     			.andReturn();// 返回执行请求的结果  
     	
     	System.out.println(result.getResponse().getContentAsString());  
-    }  
-
-    @Test  
-    public void testPage() throws Exception {  
-    	MvcResult result = mockMvc.perform(post("/page").param("pageNo", "1").param("pageSize", "2"))
-    			.andExpect(status().isOk())// 模拟向testRest发送get请求  
-    			.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8  
-    			.andReturn();// 返回执行请求的结果  
-    	
-    	System.out.println(result.getResponse().getContentAsString());  
-    }  
+    }
 
 }
