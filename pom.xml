@@ -65,6 +65,7 @@
 		<module>spring-boot-student-encode</module>
 		<module>spring-boot-student-mybatis-druid-2</module>
 		<module>spring-boot-student-data-jpa-transaction</module>
+		<module>spring-boot-student-cache</module>
     </modules>
 
 </project>
