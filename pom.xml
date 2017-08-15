@@ -67,6 +67,7 @@
 		<module>spring-boot-student-data-jpa-transaction</module>
 		<module>spring-boot-student-cache</module>
 		<module>spring-boot-student-cache-ehcache</module>
+		<module>spring-boot-student-cache-redis</module>
     </modules>
 
 </project>
