@@ -68,6 +68,7 @@
 		<module>spring-boot-student-cache</module>
 		<module>spring-boot-student-cache-ehcache</module>
 		<module>spring-boot-student-cache-redis</module>
+		<module>spring-boot-student-data-mongo</module>
     </modules>
 
 </project>
