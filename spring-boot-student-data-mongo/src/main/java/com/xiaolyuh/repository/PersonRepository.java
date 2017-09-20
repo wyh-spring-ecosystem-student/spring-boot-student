@@ -10,7 +10,7 @@ public interface PersonRepository extends MongoRepository<Person, String> {
 
 	Person findByName(String name);
 
-	@Query("{'age': ?0}")
+	@Query("{'age': { '$lt' : ?0}}")
 	List<Person> withQueryFindByAge(Integer age);
 
 }
