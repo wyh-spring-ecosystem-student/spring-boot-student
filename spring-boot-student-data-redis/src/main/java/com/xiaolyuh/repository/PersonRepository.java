@@ -14,7 +14,7 @@ public class PersonRepository {
 	StringRedisTemplate stringRedisTemplate; //1
 
 	@Autowired
-	RedisTemplate<Object, Object> redisTemplate; //2
+	RedisTemplate<String, Object> redisTemplate; //2
 
 	public void stringRedisTemplateDemo(){ //5
 		stringRedisTemplate.opsForValue().set("xx", "yy");
@@ -22,7 +22,7 @@ public class PersonRepository {
 
 
 	public void save(Person person){ //6
-		redisTemplate.opsForSet().add(person.getId(), person);
+		redisTemplate.opsForValue().set(person.getId(), person);
 	}
 
 	public String getString(){//7
