@@ -53,22 +53,40 @@
 	</build>
 
 	<modules>
+		<!-- 设置Spring Boot启动Banner -->
 		<module>spring-boot-student-banner</module>
+		<!-- Spring Boot 读取配置文件 -->
 		<module>spring-boot-student-config</module>
+		<!-- Spring Boot启Banner 日志配置 -->
 		<module>spring-boot-student-log</module>
+		<!-- Spring Boot profile配置 -->
 		<module>spring-boot-student-profile</module>
+		<!-- Spring Boot 使用data-jpa操作数据库 -->
 		<module>spring-boot-student-data-jpa</module>
+		<!-- Spring Boot 使用Mybatis操作数据库 -->
 		<module>spring-boot-student-mybatis</module>
+		<!-- Spring Boot 使用ehcache作为Mybatis的二级缓存 -->
 		<module>spring-boot-student-mybatis-ehcache</module>
+		<!-- Spring Boot 使用redis作为Mybatis的二级缓存 -->
 		<module>spring-boot-student-mybatis-redis</module>
+		<!-- Spring Boot 使用druid连接池连接数据库（自己定制） -->
 		<module>spring-boot-student-mybatis-druid</module>
+		<!-- Spring Boot JAVA中常用的加密算法 -->
 		<module>spring-boot-student-encode</module>
+		<!-- Spring Boot 使用druid连接池连接数据库（官方start） -->
 		<module>spring-boot-student-mybatis-druid-2</module>
+		<!-- Spring Boot Spring事务管理 -->
 		<module>spring-boot-student-data-jpa-transaction</module>
+		<!-- Spring Boot Spring 缓存 -->
 		<module>spring-boot-student-cache</module>
+		<!-- Spring Boot 使用 ehcache作为 Spring 缓存 -->
 		<module>spring-boot-student-cache-ehcache</module>
+		<!-- Spring Boot 使用 redis作为 Spring 缓存 -->
 		<module>spring-boot-student-cache-redis</module>
+		<!-- Spring Boot 使用Spring data mongo 操作mongodb数据库 -->
 		<module>spring-boot-student-data-mongo</module>
+		<!-- Spring Boot 使用Spring data redis 操作redis数据库 -->
+		<module>spring-boot-student-data-redis</module>
     </modules>
 
 </project>
