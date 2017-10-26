@@ -44,7 +44,7 @@ public class SpringBootStudentDataRedisApplicationTests {
     public void testGetStr() throws Exception {
         MvcResult result = mockMvc.perform(post("/getStr"))
         		.andExpect(status().isOk())// 模拟向testRest发送get请求  
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8  
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8
                 .andReturn();// 返回执行请求的结果  
 
 
@@ -65,7 +65,7 @@ public class SpringBootStudentDataRedisApplicationTests {
     public void testSet() throws Exception {
     	MvcResult result = mockMvc.perform(post("/set").contentType(MediaType.APPLICATION_JSON))
     			.andExpect(status().isOk())// 模拟向testRest发送get请求  
-    			.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8  
+//    			.andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;charset=UTF-8
     			.andReturn();// 返回执行请求的结果  
     	
     	System.out.println(result.getResponse().getContentAsString());  
