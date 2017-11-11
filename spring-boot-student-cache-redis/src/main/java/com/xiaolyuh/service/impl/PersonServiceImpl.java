@@ -29,8 +29,14 @@ public class PersonServiceImpl implements PersonService {
         //这里不做实际删除操作
     }
 
+    /**
+     * Cacheable
+     * value：缓存key的前缀。
+     * key：缓存key的后缀。
+     * sync：设置如果缓存过期是不是只放一个请求去请求数据库，其他请求阻塞，默认是false。
+     */
     @Override
-    @Cacheable(value = "people", key = "#person.id")//3
+    @Cacheable(value = "people", key = "#person.id", sync = true)//3
     public Person findOne(Person person) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");

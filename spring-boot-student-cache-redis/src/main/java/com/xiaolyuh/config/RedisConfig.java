@@ -14,7 +14,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Configuration
 public class RedisConfig {
@@ -60,9 +62,13 @@ public class RedisConfig {
 	@Bean
 	public RedisCacheManager cacheManager(RedisTemplate<Object, Object> redisTemplate) {
 		RedisCacheManager redisCacheManager = new RedisCacheManager(redisTemplate);
-		//这里可以设置一个默认的过期时间 单位是秒
 		redisCacheManager.setUsePrefix(true);
+		//这里可以设置一个默认的过期时间 单位是秒
 		redisCacheManager.setDefaultExpiration(redisDefaultExpiration);
+		//针对各各key设置一个过期时间 单位是秒
+		Map<String, Long> expires = new HashMap<String, Long>();
+		expires.put("person:2", 1000L);
+		redisCacheManager.setExpires(expires);
 		return redisCacheManager;
 	}
 
