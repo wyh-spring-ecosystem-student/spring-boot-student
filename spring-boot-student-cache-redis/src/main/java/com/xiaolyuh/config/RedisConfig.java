@@ -67,7 +67,7 @@ public class RedisConfig {
 		redisCacheManager.setDefaultExpiration(redisDefaultExpiration);
 		//针对各各key设置一个过期时间 单位是秒
 		Map<String, Long> expires = new HashMap<String, Long>();
-		expires.put("person:2", 1000L);
+		expires.put("person2", 1000L);
 		redisCacheManager.setExpires(expires);
 		return redisCacheManager;
 	}
