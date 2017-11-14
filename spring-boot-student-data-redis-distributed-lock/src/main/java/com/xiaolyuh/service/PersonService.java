@@ -46,44 +46,20 @@ public class PersonService {
     }
 
     public void redisLock2(int i) {
-        RedisLock2 redisLock2 = new RedisLock2(redisTemplate, "redisLock:"+i % 10, 5*60 , 50000);
+        RedisLock2 redisLock2 = new RedisLock2(redisTemplate, "redisLock:" + i % 10, 5 * 60, 50000);
         try {
             long now = System.currentTimeMillis();
             if (redisLock2.lock()) {
                 logger.info("=" + (System.currentTimeMillis() - now));
                 // TODO 获取到锁要执行的代码块
-                logger.info("j:" + j ++);
+                logger.info("j:" + j++);
             } else {
-                logger.info("k:" + k ++);
+                logger.info("k:" + k++);
             }
         } catch (Exception e) {
             logger.info(e.getMessage(), e);
         } finally {
             redisLock2.unlock();
         }
-
-
-//         if redis.call("get",KEYS[1]) == ARGV[1] then
-//        return redis.call("del",KEYS[1])
-//else
-//        return 0
-//        end
-
-        redisTemplate.execute(new RedisScript() {
-            @Override
-            public String getSha1() {
-                return "";
-            }
-
-            @Override
-            public Class getResultType() {
-                return Long.class;
-            }
-
-            @Override
-            public String getScriptAsString() {
-                return "";
-            }
-        }, new StringRedisSerializer(), new Jackson2JsonRedisSerializer<Object>(Object.class), new ArrayList<>(), "");
     }
 }
