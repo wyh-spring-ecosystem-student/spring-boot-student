@@ -19,7 +19,21 @@ public class TestPersonService {
     PersonService personService;
 
     @Test
-	public void redisLock() {
+    public void redisLock() {
+        while (i++ < 1000) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    personService.redisLock(i);
+                }
+            }).start();
+        }
+
+        sleep();
+    }
+
+    @Test
+    public void redisLock2() {
         while (i++ < 1000) {
             new Thread(new Runnable() {
                 @Override
@@ -29,6 +43,10 @@ public class TestPersonService {
             }).start();
         }
 
+        sleep();
+    }
+
+    private void sleep() {
         try {
             Thread.sleep(999999999999999999L);
         } catch (InterruptedException e) {
