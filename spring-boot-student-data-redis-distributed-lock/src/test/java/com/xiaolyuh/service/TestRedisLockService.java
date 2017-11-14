@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class TestPersonService {
+public class TestRedisLockService {
     public static final Logger logger = LoggerFactory.getLogger(PersonService.class);
 
     static int i = 0;
