@@ -46,6 +46,12 @@ public class TestRedisLockService {
         sleep();
     }
 
+    @Test
+    public void testSet() {
+        Object o = personService.set("lock", "11", "nx", "ex", 100L);
+        System.out.println(o);
+    }
+
     private void sleep() {
         try {
             Thread.sleep(999999999999999999L);
