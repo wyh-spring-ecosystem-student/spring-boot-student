@@ -267,7 +267,7 @@ public class RedisLock3 {
             };
             List<String> keys = new ArrayList<>();
             keys.add(lockKey);
-            Integer result = (Integer) redisTemplate.execute(script, keys, lockValue);
+            Long result = (Long) redisTemplate.execute(script, keys, lockValue);
             if (result == 0) {
                 logger.info("Redis分布式锁，解锁失败！解锁时间：" + System.currentTimeMillis());
             }
