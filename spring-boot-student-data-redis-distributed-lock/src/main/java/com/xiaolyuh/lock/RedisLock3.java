@@ -96,6 +96,11 @@ public class RedisLock3 {
     private String lockKey;
 
     /**
+     * 记录到日志的锁标志对应的key
+     */
+    private String lockKeyLog;
+
+    /**
      * 锁对应的值
      */
     private String lockValue;
@@ -166,13 +171,6 @@ public class RedisLock3 {
     }
 
     /**
-     * @return 获取锁的key
-     */
-    public String getLockKey() {
-        return lockKey;
-    }
-
-    /**
      * 尝试获取锁 超时返回
      *
      * @return
@@ -228,14 +226,6 @@ public class RedisLock3 {
         }
     }
 
-    private void seleep(long millis, int nanos) {
-        try {
-            Thread.sleep(millis, random.nextInt(nanos));
-        } catch (InterruptedException e) {
-            logger.info("获取分布式锁休眠被中断：", e);
-        }
-    }
-
     /**
      * 解锁
      * <p>
@@ -267,8 +257,8 @@ public class RedisLock3 {
             List<String> keys = new ArrayList<>();
             keys.add(lockKey);
             Long result = (Long) redisTemplate.execute(script, keys, lockValue);
-            if (result == 0) {
-                logger.info("Redis分布式锁，解锁失败！解锁时间：" + System.currentTimeMillis());
+            if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
+                logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}" , lockKeyLog, System.currentTimeMillis());
             }
             locked = false;
         }
@@ -289,7 +279,7 @@ public class RedisLock3 {
      * @param seconds 过去时间（秒）
      * @return
      */
-    public String set(final String key, final String value, final long seconds) {
+    private String set(final String key, final String value, final long seconds) {
         Assert.isTrue(!StringUtils.isEmpty(key), "key不能为空");
         return redisTemplate.execute(new RedisCallback<String>() {
             @Override
@@ -304,9 +294,43 @@ public class RedisLock3 {
                 if (result == null) {
                     return null;
                 }
+                if (!StringUtils.isEmpty(lockKeyLog)) {
+                    logger.info("获取锁{}的时间：{}", lockKeyLog, System.currentTimeMillis());
+                }
                 return new String((byte[]) result);
             }
         });
     }
 
+    private void seleep(long millis, int nanos) {
+        try {
+            Thread.sleep(millis, random.nextInt(nanos));
+        } catch (InterruptedException e) {
+            logger.info("获取分布式锁休眠被中断：", e);
+        }
+    }
+
+    public String getLockKeyLog() {
+        return lockKeyLog;
+    }
+
+    public void setLockKeyLog(String lockKeyLog) {
+        this.lockKeyLog = lockKeyLog;
+    }
+
+    public int getExpireTime() {
+        return expireTime;
+    }
+
+    public void setExpireTime(int expireTime) {
+        this.expireTime = expireTime;
+    }
+
+    public long getTimeOut() {
+        return timeOut;
+    }
+
+    public void setTimeOut(long timeOut) {
+        this.timeOut = timeOut;
+    }
 }
