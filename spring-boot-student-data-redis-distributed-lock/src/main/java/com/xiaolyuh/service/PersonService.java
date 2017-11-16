@@ -89,6 +89,7 @@ public class PersonService {
                       final long seconds) {
         Assert.isTrue(!StringUtils.isEmpty(key), "key不能为空");
         return redisTemplate.execute(new RedisCallback<String>() {
+            @Override
             public String doInRedis(RedisConnection connection) throws DataAccessException {
                 String command = Command.SET.name();
                 byte[] keys = SafeEncoder.encode(key);
