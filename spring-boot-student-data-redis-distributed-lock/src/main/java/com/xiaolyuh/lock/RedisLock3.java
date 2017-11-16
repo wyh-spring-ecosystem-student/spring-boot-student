@@ -293,6 +293,7 @@ public class RedisLock3 {
     public String set(final String key, final String value, final long seconds) {
         Assert.isTrue(!StringUtils.isEmpty(key), "key不能为空");
         return redisTemplate.execute(new RedisCallback<String>() {
+            @Override
             public String doInRedis(RedisConnection connection) throws DataAccessException {
                 String command = Protocol.Command.SET.name();
                 byte[] keys = SafeEncoder.encode(key);

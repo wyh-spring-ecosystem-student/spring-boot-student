@@ -196,7 +196,7 @@ public class RedisLock2 {
     /**
      * 解锁
      */
-    public synchronized void unlock() {
+    public void unlock() {
         // 只有加锁成功并且锁还有效才去释放锁
         if (locked && expires > System.currentTimeMillis()) {
             redisTemplate.delete(lockKey);
