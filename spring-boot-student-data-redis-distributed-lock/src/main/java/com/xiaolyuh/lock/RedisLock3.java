@@ -88,7 +88,6 @@ public class RedisLock3 {
         sb.append("    return 0 ");
         sb.append("end ");
         UNLOCK_LUA = sb.toString();
-
     }
 
     /**
@@ -305,7 +304,6 @@ public class RedisLock3 {
                 if (result == null) {
                     return null;
                 }
-                logger.info("获取锁的时间：{}", System.currentTimeMillis());
                 return new String((byte[]) result);
             }
         });

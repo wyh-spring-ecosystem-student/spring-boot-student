@@ -78,6 +78,20 @@ public class TestRedisLockService {
         redisLock3.unlock();
     }
 
+    @Test
+    public void redisLock3() {
+        while (i++ < 10000) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    personService.redisLock3(i);
+                }
+            }).start();
+        }
+
+        sleep(1000 * 60 * 2);
+    }
+
 
     @Test
     public void testUUID() {

@@ -2,6 +2,7 @@ package com.xiaolyuh.service;
 
 import com.xiaolyuh.lock.RedisLock;
 import com.xiaolyuh.lock.RedisLock2;
+import com.xiaolyuh.lock.RedisLock3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,24 @@ public class PersonService {
             logger.info(e.getMessage(), e);
         } finally {
             redisLock2.unlock();
+        }
+    }
+
+    public void redisLock3(int i) {
+        RedisLock3 redisLock3 = new RedisLock3(redisTemplate, "redisLock:" + i % 10, 5 * 60, 50000);
+        try {
+            long now = System.currentTimeMillis();
+            if (redisLock3.tryLock()) {
+                logger.info("=" + (System.currentTimeMillis() - now));
+                // TODO 获取到锁要执行的代码块
+                logger.info("j:" + j++);
+            } else {
+                logger.info("k:" + k++);
+            }
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
+        } finally {
+            redisLock3.unlock();
         }
     }
 
