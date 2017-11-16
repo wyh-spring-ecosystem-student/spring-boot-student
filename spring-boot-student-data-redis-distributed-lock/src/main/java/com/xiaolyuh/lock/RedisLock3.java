@@ -6,13 +6,16 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.SafeEncoder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
+import java.util.UUID;
 
 /**
  * Redis分布式锁
@@ -42,6 +45,25 @@ import java.util.concurrent.TimeUnit;
  */
 public class RedisLock3 {
 
+    private static Logger logger = LoggerFactory.getLogger(RedisLock3.class);
+
+    private StringRedisTemplate redisTemplate;
+
+    /**
+     * 将key 的值设为value ，当且仅当key 不存在，等效于 SETNX。
+     */
+    public static final String NX = "NX";
+
+    /**
+     * seconds — 以秒为单位设置 key 的过期时间，等效于EXPIRE key seconds
+     */
+    public static final String EX = "EX";
+
+    /**
+     * 调用set后的返回值
+     */
+    public static final String OK = "OK";
+
     /**
      * 默认请求锁的超时时间(ms 毫秒)
      */
@@ -52,14 +74,33 @@ public class RedisLock3 {
      */
     public static final int EXPIRE = 60;
 
-    private static Logger logger = LoggerFactory.getLogger(RedisLock3.class);
+    /**
+     * 解锁的lua脚本
+     */
+    public static final String UNLOCK_LUA;
 
-    private StringRedisTemplate redisTemplate;
+    static {
+        StringBuilder sb = new StringBuilder();
+        sb.append("if redis.call(\"get\",KEYS[1]) == ARGV[1] ");
+        sb.append("then ");
+        sb.append("    return redis.call(\"del\",KEYS[1]) ");
+        sb.append("else ");
+        sb.append("    return 0 ");
+        sb.append("end ");
+        UNLOCK_LUA = sb.toString();
+
+    }
 
     /**
      * 锁标志对应的key
      */
     private String lockKey;
+
+    /**
+     * 锁对应的值
+     */
+    private String lockValue;
+
     /**
      * 锁的有效时间(s)
      */
@@ -69,11 +110,6 @@ public class RedisLock3 {
      * 请求锁的超时时间(ms)
      */
     private long timeOut = TIME_OUT;
-
-    /**
-     * 锁的有效时间
-     */
-    private long expires = 0;
 
     /**
      * 锁标记
@@ -138,86 +174,119 @@ public class RedisLock3 {
     }
 
     /**
-     * 获得 lock.
-     * 实现思路: 主要是使用了redis 的setnx命令,缓存了锁.
-     * reids缓存的key是锁的key,所有的共享, value是锁的到期时间(注意:这里把过期时间放在value了,没有时间上设置其超时时间)
-     * 执行过程:
-     * 1.通过setnx尝试设置某个key的值,成功(当前没有这个锁)则返回,成功获得锁
-     * 2.锁已经存在则获取锁的到期时间,和当前时间比较,超时的话,则设置新的值
+     * 尝试获取锁 超时返回
      *
-     * @return true if lock is acquired, false acquire timeouted
-     * @throws InterruptedException in case of thread interruption
+     * @return
      */
-    public boolean lock() {
+    public boolean tryLock() {
+        // 生成随机key
+        lockValue = UUID.randomUUID().toString();
         // 请求锁超时时间，纳秒
         long timeout = timeOut * 1000000;
         // 系统当前时间，纳秒
         long nowTime = System.nanoTime();
-
         while ((System.nanoTime() - nowTime) < timeout) {
-            // 分布式服务器有时差，这里给1秒的误差值
-            expires = System.currentTimeMillis() + expireTime + 1;
-            String expiresStr = String.valueOf(expires); //锁到期时间
-
-            if (redisTemplate.opsForValue().setIfAbsent(lockKey, expiresStr)) {
+            if (OK.equalsIgnoreCase(this.set(lockKey, lockValue, expireTime))) {
                 locked = true;
-                // 设置锁的有效期，也是锁的自动释放时间，也是一个客户端在其他客户端能抢占锁之前可以执行任务的时间
-                // 可以防止因异常情况无法释放锁而造成死锁情况的发生
-                redisTemplate.expire(lockKey, expireTime, TimeUnit.SECONDS);
-
                 // 上锁成功结束请求
                 return true;
             }
 
-            String currentValueStr = redisTemplate.opsForValue().get(lockKey); //redis里的时间
-            if (currentValueStr != null && Long.parseLong(currentValueStr) < System.currentTimeMillis()) {
-                //判断是否为空，不为空的情况下，如果被其他线程设置了值，则第二个条件判断是过不去的
-                // lock is expired
-
-                String oldValueStr = redisTemplate.opsForValue().getAndSet(lockKey, expiresStr);
-                //获取上一个锁到期时间，并设置现在的锁到期时间，
-                //只有一个线程才能获取上一个线上的设置时间，因为jedis.getSet是同步的
-                if (oldValueStr != null && oldValueStr.equals(currentValueStr)) {
-                    //防止误删（覆盖，因为key是相同的）了他人的锁——这里达不到效果，这里值会被覆盖，但是因为什么相差了很少的时间，所以可以接受
-
-                    //[分布式的情况下]:如过这个时候，多个线程恰好都到了这里，但是只有一个线程的设置值和当前值相同，他才有权利获取锁
-                    // lock acquired
-                    locked = true;
-                    return true;
-                }
-            }
-
-            /*
-                延迟10 毫秒,  这里使用随机时间可能会好一点,可以防止饥饿进程的出现,即,当同时到达多个进程,
-                只会有一个进程获得锁,其他的都用同样的频率进行尝试,后面有来了一些进行,也以同样的频率申请锁,这将可能导致前面来的锁得不到满足.
-                使用随机的等待时间可以一定程度上保证公平性
-             */
-            try {
-                Thread.sleep(10, random.nextInt(50000));
-            } catch (InterruptedException e) {
-                logger.error("获取分布式锁休眠被中断：", e);
-            }
-
+            // 每次请求等待一段时间
+            seleep(10, 50000);
         }
         return locked;
     }
 
+    /**
+     * 尝试获取锁 立即返回
+     *
+     * @return 是否成功获得锁
+     */
+    public boolean lock() {
+        lockValue = UUID.randomUUID().toString();
+        //不存在则添加 且设置过期时间（单位ms）
+        String result = set(lockKey, lockValue, expireTime);
+        return OK.equalsIgnoreCase(result);
+    }
+
+    /**
+     * 以阻塞方式的获取锁
+     *
+     * @return 是否成功获得锁
+     */
+    public boolean lockBlock() {
+        lockValue = UUID.randomUUID().toString();
+        while (true) {
+            //不存在则添加 且设置过期时间（单位ms）
+            String result = set(lockKey, lockValue, expireTime);
+            if (OK.equalsIgnoreCase(result)) {
+                return true;
+            }
+
+            // 每次请求等待一段时间
+            seleep(10, 50000);
+        }
+    }
+
+    private void seleep(long millis, int nanos) {
+        try {
+            Thread.sleep(millis, random.nextInt(nanos));
+        } catch (InterruptedException e) {
+            logger.info("获取分布式锁休眠被中断：", e);
+        }
+    }
 
     /**
      * 解锁
+     * <p>
+     * 可以通过以下修改，让这个锁实现更健壮：
+     * <p>
+     * 不使用固定的字符串作为键的值，而是设置一个不可猜测（non-guessable）的长随机字符串，作为口令串（token）。
+     * 不使用 DEL 命令来释放锁，而是发送一个 Lua 脚本，这个脚本只在客户端传入的值和键的口令串相匹配时，才对键进行删除。
+     * 这两个改动可以防止持有过期锁的客户端误删现有锁的情况出现。
      */
-    public synchronized void unlock() {
+    public void unlock() {
         // 只有加锁成功并且锁还有效才去释放锁
-        if (locked && expires > System.currentTimeMillis()) {
-            redisTemplate.delete(lockKey);
+        if (locked) {
+            RedisScript script = new RedisScript() {
+                @Override
+                public String getSha1() {
+                    return UNLOCK_LUA;
+                }
+
+                @Override
+                public Class getResultType() {
+                    return Integer.class;
+                }
+
+                @Override
+                public String getScriptAsString() {
+                    return UNLOCK_LUA;
+                }
+            };
+            List<String> keys = new ArrayList<>();
+            keys.add(lockKey);
+            Integer result = (Integer) redisTemplate.execute(script, keys, lockValue);
+            if (result == 0) {
+                logger.info("Redis分布式锁，解锁失败！解锁时间：" + System.currentTimeMillis());
+            }
             locked = false;
         }
     }
 
     /**
      * 重写redisTemplate的set方法
-     * @param key 锁的Key
-     * @param value 锁里面的值
+     * <p>
+     * 命令 SET resource-name anystring NX EX max-lock-time 是一种在 Redis 中实现锁的简单方法。
+     * <p>
+     * 客户端执行以上的命令：
+     * <p>
+     * 如果服务器返回 OK ，那么这个客户端获得锁。
+     * 如果服务器返回 NIL ，那么客户端获取锁失败，可以在稍后再重试。
+     *
+     * @param key     锁的Key
+     * @param value   锁里面的值
      * @param seconds 过去时间（秒）
      * @return
      */
@@ -228,13 +297,14 @@ public class RedisLock3 {
                 String command = Protocol.Command.SET.name();
                 byte[] keys = SafeEncoder.encode(key);
                 byte[] values = SafeEncoder.encode(value);
-                byte[] nxs = SafeEncoder.encode("NX");
-                byte[] exs = SafeEncoder.encode("EX");
+                byte[] nxs = SafeEncoder.encode(NX);
+                byte[] exs = SafeEncoder.encode(EX);
                 byte[] secondsByte = SafeEncoder.encode(String.valueOf(seconds));
                 Object result = connection.execute(command, keys, values, nxs, exs, secondsByte);
                 if (result == null) {
                     return null;
                 }
+                logger.info("获取锁的时间：{}", System.currentTimeMillis());
                 return new String((byte[]) result);
             }
         });
