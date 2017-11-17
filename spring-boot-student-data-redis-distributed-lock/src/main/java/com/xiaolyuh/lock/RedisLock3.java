@@ -287,16 +287,21 @@ public class RedisLock3 {
             @Override
             public String doInRedis(RedisConnection connection) throws DataAccessException {
                 Object nativeConnection = connection.getNativeConnection();
+                String result = null;
                 // 集群模式
                 if (nativeConnection instanceof  JedisCluster) {
-                    return ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
+                    result = ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
                 }
                 // 单机模式
                 if (nativeConnection instanceof  Jedis) {
-                    return ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
+                    result =  ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
                 }
 
-                return null;
+                if (!StringUtils.isEmpty(lockKeyLog) && !StringUtils.isEmpty(result)) {
+                    logger.info("获取锁{}的时间：{}", lockKeyLog, System.currentTimeMillis());
+                }
+
+                return result;
             }
         });
     }
