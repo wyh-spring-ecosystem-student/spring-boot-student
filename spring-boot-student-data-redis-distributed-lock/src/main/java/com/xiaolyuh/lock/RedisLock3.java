@@ -98,7 +98,7 @@ public class RedisLock3 {
     /**
      * 记录到日志的锁标志对应的key
      */
-    private String lockKeyLog;
+    private String lockKeyLog = "";
 
     /**
      * 锁对应的值
@@ -238,15 +238,15 @@ public class RedisLock3 {
     public void unlock() {
         // 只有加锁成功并且锁还有效才去释放锁
         if (locked) {
-            RedisScript script = new RedisScript() {
+            RedisScript<Long> script = new RedisScript<Long>() {
                 @Override
                 public String getSha1() {
                     return UNLOCK_LUA;
                 }
 
                 @Override
-                public Class getResultType() {
-                    return Integer.class;
+                public Class<Long> getResultType() {
+                    return Long.class;
                 }
 
                 @Override
@@ -256,7 +256,7 @@ public class RedisLock3 {
             };
             List<String> keys = new ArrayList<>();
             keys.add(lockKey);
-            Long result = (Long) redisTemplate.execute(script, keys, lockValue);
+            Long result = redisTemplate.execute(script, keys, lockValue);
             if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
                 logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}" , lockKeyLog, System.currentTimeMillis());
             }
