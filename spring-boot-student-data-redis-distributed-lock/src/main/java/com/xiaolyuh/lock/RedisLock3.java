@@ -237,33 +237,42 @@ public class RedisLock3 {
      * 不使用 DEL 命令来释放锁，而是发送一个 Lua 脚本，这个脚本只在客户端传入的值和键的口令串相匹配时，才对键进行删除。
      * 这两个改动可以防止持有过期锁的客户端误删现有锁的情况出现。
      */
-    public void unlock() {
+    public Boolean unlock() {
+        // 只有加锁成功并且锁还有效才去释放锁
         // 只有加锁成功并且锁还有效才去释放锁
         if (locked) {
-            RedisScript<Long> script = new RedisScript<Long>() {
+            return redisTemplate.execute(new RedisCallback<Boolean>() {
                 @Override
-                public String getSha1() {
-                    return UNLOCK_LUA;
-                }
+                public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                    Object nativeConnection = connection.getNativeConnection();
+                    Long result = 0L;
 
-                @Override
-                public Class<Long> getResultType() {
-                    return Long.class;
-                }
+                    List<String> keys = new ArrayList<>();
+                    keys.add(lockKey);
+                    List<String> values = new ArrayList<>();
+                    values.add(lockValue);
 
-                @Override
-                public String getScriptAsString() {
-                    return UNLOCK_LUA;
+                    // 集群模式
+                    if (nativeConnection instanceof JedisCluster) {
+                        result = (Long) ((JedisCluster) nativeConnection).eval(UNLOCK_LUA, keys, values);
+                    }
+
+                    // 单机模式
+                    if (nativeConnection instanceof Jedis) {
+                        result = (Long) ((Jedis) nativeConnection).eval(UNLOCK_LUA, keys, values);
+                    }
+
+                    if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
+                        logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}", lockKeyLog, System.currentTimeMillis());
+                    }
+
+                    locked = result == 0;
+                    return result == 1;
                 }
-            };
-            List<String> keys = new ArrayList<>();
-            keys.add(lockKey);
-            Long result = redisTemplate.execute(script, keys, lockValue);
-            if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
-                logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}" , lockKeyLog, System.currentTimeMillis());
-            }
-            locked = false;
+            });
         }
+
+        return true;
     }
 
     /**
@@ -289,12 +298,12 @@ public class RedisLock3 {
                 Object nativeConnection = connection.getNativeConnection();
                 String result = null;
                 // 集群模式
-                if (nativeConnection instanceof  JedisCluster) {
+                if (nativeConnection instanceof JedisCluster) {
                     result = ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
                 }
                 // 单机模式
-                if (nativeConnection instanceof  Jedis) {
-                    result =  ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
+                if (nativeConnection instanceof Jedis) {
+                    result = ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
                 }
 
                 if (!StringUtils.isEmpty(lockKeyLog) && !StringUtils.isEmpty(result)) {
@@ -307,11 +316,10 @@ public class RedisLock3 {
     }
 
     /**
-     *
+     * @param millis 毫秒
+     * @param nanos  纳秒
      * @Title: seleep
      * @Description: 线程等待时间
-     * @param millis 毫秒
-     * @param nanos 纳秒
      * @author yuhao.wang
      */
     private void seleep(long millis, int nanos) {
