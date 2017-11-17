@@ -9,6 +9,8 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.Protocol;
 import redis.clients.util.SafeEncoder;
 
@@ -284,20 +286,16 @@ public class RedisLock3 {
         return redisTemplate.execute(new RedisCallback<String>() {
             @Override
             public String doInRedis(RedisConnection connection) throws DataAccessException {
-                String command = Protocol.Command.SET.name();
-                byte[] keys = SafeEncoder.encode(key);
-                byte[] values = SafeEncoder.encode(value);
-                byte[] nxs = SafeEncoder.encode(NX);
-                byte[] exs = SafeEncoder.encode(EX);
-                byte[] secondsByte = SafeEncoder.encode(String.valueOf(seconds));
-                Object result = connection.execute(command, keys, values, nxs, exs, secondsByte);
-                if (result == null) {
-                    return null;
+                Object nativeConnection = connection.getNativeConnection();
+                if (nativeConnection instanceof  JedisCluster) {
+                    return ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
                 }
-                if (!StringUtils.isEmpty(lockKeyLog)) {
-                    logger.info("获取锁{}的时间：{}", lockKeyLog, System.currentTimeMillis());
+
+                if (nativeConnection instanceof  Jedis) {
+                    return ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
                 }
-                return new String((byte[]) result);
+
+                return null;
             }
         });
     }

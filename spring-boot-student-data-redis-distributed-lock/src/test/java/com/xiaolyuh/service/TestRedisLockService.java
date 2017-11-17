@@ -43,7 +43,7 @@ public class TestRedisLockService {
 
     @Test
     public void redisLock2() {
-        while (i++ < 1000) {
+        while (i++ < 1) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -74,7 +74,7 @@ public class TestRedisLockService {
             logger.info("没有获取到锁");
         }
 
-        sleep(1000 * 3);
+        sleep(1000 * 30);
         redisLock3.unlock();
     }
 

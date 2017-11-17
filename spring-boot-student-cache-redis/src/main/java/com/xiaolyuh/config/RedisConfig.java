@@ -42,15 +42,15 @@ public class RedisConfig {
 		Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
 		ObjectMapper om = new ObjectMapper();
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);  
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
 
 		// 设置值（value）的序列化采用Jackson2JsonRedisSerializer。
 		redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
 		redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
 		// 设置键（key）的序列化采用StringRedisSerializer。
-		redisTemplate.setKeySerializer(new StringRedisSerializer());
-		redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+		redisTemplate.setKeySerializer(jackson2JsonRedisSerializer);
+		redisTemplate.setHashKeySerializer(jackson2JsonRedisSerializer);
 
 		redisTemplate.afterPropertiesSet();
 		return redisTemplate;
@@ -69,7 +69,8 @@ public class RedisConfig {
 		redisCacheManager.setDefaultExpiration(redisDefaultExpiration);
 		//针对各各key设置一个过期时间 单位是秒
 		Map<String, Long> expires = new HashMap<String, Long>();
-		expires.put("person2", 1000L);
+
+		expires.put("person:2", 1000L);
 		redisCacheManager.setExpires(expires);
 		return redisCacheManager;
 	}
