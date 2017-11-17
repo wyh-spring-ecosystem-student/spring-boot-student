@@ -287,10 +287,11 @@ public class RedisLock3 {
             @Override
             public String doInRedis(RedisConnection connection) throws DataAccessException {
                 Object nativeConnection = connection.getNativeConnection();
+                // 集群模式
                 if (nativeConnection instanceof  JedisCluster) {
                     return ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
                 }
-
+                // 单机模式
                 if (nativeConnection instanceof  Jedis) {
                     return ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
                 }
