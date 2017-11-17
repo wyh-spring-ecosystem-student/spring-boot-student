@@ -302,6 +302,14 @@ public class RedisLock3 {
         });
     }
 
+    /**
+     *
+     * @Title: seleep
+     * @Description: 线程等待时间
+     * @param millis 毫秒
+     * @param nanos 纳秒
+     * @author yuhao.wang
+     */
     private void seleep(long millis, int nanos) {
         try {
             Thread.sleep(millis, random.nextInt(nanos));

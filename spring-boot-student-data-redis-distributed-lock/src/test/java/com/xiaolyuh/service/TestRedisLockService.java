@@ -102,8 +102,6 @@ public class TestRedisLockService {
         System.out.println(System.nanoTime() - nowTime);
     }
 
-
-
     private void sleep(long millis) {
         try {
             Thread.sleep(millis);
