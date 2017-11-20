@@ -206,7 +206,8 @@ public class RedisLock3 {
         lockValue = UUID.randomUUID().toString();
         //不存在则添加 且设置过期时间（单位ms）
         String result = set(lockKey, lockValue, expireTime);
-        return OK.equalsIgnoreCase(result);
+        locked = OK.equalsIgnoreCase(result);
+        return locked;
     }
 
     /**
@@ -220,7 +221,8 @@ public class RedisLock3 {
             //不存在则添加 且设置过期时间（单位ms）
             String result = set(lockKey, lockValue, expireTime);
             if (OK.equalsIgnoreCase(result)) {
-                return true;
+                locked = true;
+                return locked;
             }
 
             // 每次请求等待一段时间
