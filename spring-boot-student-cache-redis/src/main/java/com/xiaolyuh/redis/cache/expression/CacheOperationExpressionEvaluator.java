@@ -27,7 +27,7 @@ import org.springframework.expression.Expression;
  * @author Stephane Nicoll
  * @since 3.1
  */
-class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
+public class CacheOperationExpressionEvaluator extends CachedExpressionEvaluator {
 
 	/**
 	 * Indicate that there is no result variable.

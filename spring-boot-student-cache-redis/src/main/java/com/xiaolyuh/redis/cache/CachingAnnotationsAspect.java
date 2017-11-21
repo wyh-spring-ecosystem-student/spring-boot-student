@@ -80,7 +80,7 @@ public class CachingAnnotationsAspect {
         String cacheKey = null;
         for (Cacheable cacheables : annotations) {
             cacheSet.addAll(Arrays.asList(cacheables.value()));
-            cacheKey = cacheables.keyGenerator();
+            cacheKey = cacheables.key();
         }
         cacheRefreshSupport.registerInvocation(joinPoint.getTarget(), method, joinPoint.getArgs(), cacheSet, cacheKey);
         return joinPoint.proceed();
