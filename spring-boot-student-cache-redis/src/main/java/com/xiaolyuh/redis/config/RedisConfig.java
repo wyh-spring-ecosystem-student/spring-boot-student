@@ -1,10 +1,5 @@
 package com.xiaolyuh.redis.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
@@ -13,8 +8,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
 
 @Configuration
 public class RedisConfig {
@@ -22,9 +21,6 @@ public class RedisConfig {
 	// redis缓存的有效时间单位是秒
 	@Value("${redis.default.expiration:3600}")
 	private long redisDefaultExpiration;
-
-	@Autowired
-	private StringRedisTemplate stringRedisTemplate;
 
 	/**
 	 * 重写Redis序列化方式，使用Json方式:
