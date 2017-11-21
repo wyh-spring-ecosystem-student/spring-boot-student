@@ -1,4 +1,4 @@
-package com.xiaolyuh.cache;
+package com.xiaolyuh.redis.cache;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;

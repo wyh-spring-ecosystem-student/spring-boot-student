@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.xiaolyuh.domain.mapper.PersonMapper">
 
-    <cache type="com.xiaolyuh.cache.MybatisRedisCache">
+    <cache type="com.xiaolyuh.redis.cache.MybatisRedisCache">
         <property name="eviction" value="LRU" />
         <property name="flushInterval" value="6000000" />
         <property name="size" value="1024" />

@@ -1,6 +1,6 @@
 package com.xiaolyuh.service;
 
-import com.xiaolyuh.lock.RedisLock3;
+import com.xiaolyuh.redis.lock.RedisLock3;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;

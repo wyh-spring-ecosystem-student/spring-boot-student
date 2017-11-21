@@ -1,4 +1,4 @@
-package com.xiaolyuh.config;
+package com.xiaolyuh.redis.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;

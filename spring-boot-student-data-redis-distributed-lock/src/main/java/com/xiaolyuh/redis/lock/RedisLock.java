@@ -1,4 +1,4 @@
-package com.xiaolyuh.lock;
+package com.xiaolyuh.redis.lock;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.xiaolyuh.lock;
+package com.xiaolyuh.redis.lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -6,13 +6,10 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.connection.RedisConnection;
 import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.data.redis.core.script.RedisScript;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
-import redis.clients.jedis.Protocol;
-import redis.clients.util.SafeEncoder;
 
 import java.util.ArrayList;
 import java.util.List;

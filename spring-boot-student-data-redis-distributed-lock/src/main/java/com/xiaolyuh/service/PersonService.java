@@ -1,8 +1,8 @@
 package com.xiaolyuh.service;
 
-import com.xiaolyuh.lock.RedisLock;
-import com.xiaolyuh.lock.RedisLock2;
-import com.xiaolyuh.lock.RedisLock3;
+import com.xiaolyuh.redis.lock.RedisLock;
+import com.xiaolyuh.redis.lock.RedisLock2;
+import com.xiaolyuh.redis.lock.RedisLock3;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

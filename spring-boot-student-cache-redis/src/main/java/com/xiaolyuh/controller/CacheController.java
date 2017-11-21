@@ -25,7 +25,7 @@ public class CacheController {
 
     @RequestMapping("/able")
     public Person cacheable(Person person) {
-        System.out.println(cacheManager.toString());
+
         return personService.findOne(person);
     }
 
