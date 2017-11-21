@@ -58,14 +58,12 @@ public class CustomizedRedisCache extends RedisCache {
                 @Override
                 public void run() {
                     Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(key);
-                    logger.info("key:{} ttl:{} preloadSecondTime:{}", key, ttl, preloadSecondTime);
                     if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
                         // 加一个分布式锁，只放一个请求去刷新缓存
                         RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, key.toString() + "_lock");
                         try {
                             if (redisLock.lock()) {
                                 //重新加载数据
-                                logger.info("refresh key:{}", key);
                                 CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
                             }
                         } catch (Exception e) {
