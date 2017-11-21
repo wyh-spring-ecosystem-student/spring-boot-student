@@ -58,7 +58,13 @@ public class RedisConfig {
     }
 
     /**
-     * 通过CacheManager设置缓存的有效时间
+     * 重写RedisCacheManager的getCache方法，实现设置key的有效时间
+     * 重写RedisCache的get方法，实现触发式自动刷新
+     * <p>
+     * 自动刷新方案：
+     * 1、获取缓存后再获取一次有效时间，拿这个时间和我们配置的自动刷新时间比较，如果小于这个时间就刷新。
+     * 2、每次创建缓存的时候维护一个Map，存放key和方法信息（反射）。当要刷新缓存的时候，根据key获取方法信息。
+     * 通过获取其代理对象执行方法，刷新缓存。
      *
      * @param redisTemplate
      * @return
@@ -75,6 +81,7 @@ public class RedisConfig {
 
     /**
      * 显示声明缓存key生成器
+     *
      * @return
      */
     @Bean
