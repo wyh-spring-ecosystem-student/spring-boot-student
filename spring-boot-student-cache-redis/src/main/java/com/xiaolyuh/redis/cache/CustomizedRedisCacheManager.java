@@ -91,7 +91,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
             return cache;
         }
 
-        logger.debug("expirationSecondTime:{}", expirationSecondTime);
+        logger.info("缓存 cacheName：{}，过期时间:{}, 自动刷新时间:{}", cacheName, expirationSecondTime, preloadSecondTime);
         CustomizedRedisCache redisCache = new CustomizedRedisCache(
                 cacheName,
                 (this.isUsePrefix() ? this.getCachePrefix().prefix(cacheName) : null),

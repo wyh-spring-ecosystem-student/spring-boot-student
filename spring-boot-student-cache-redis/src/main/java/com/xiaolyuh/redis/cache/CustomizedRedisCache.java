@@ -11,7 +11,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 
 /**
  * 自定义的redis缓存
- * Created by jiang on 2017/3/5.
+ * @author yuhao.wang
  */
 public class CustomizedRedisCache extends RedisCache {
 
@@ -21,7 +21,7 @@ public class CustomizedRedisCache extends RedisCache {
         return SpringContextHolder.getBean(CacheSupport.class);
     }
 
-    private RedisOperations redisOperations;
+    private final RedisOperations redisOperations;
 
     /**
      * 缓存主动在失效前强制刷新缓存的时间
@@ -64,6 +64,7 @@ public class CustomizedRedisCache extends RedisCache {
                         try {
                             if (redisLock.lock()) {
                                 //重新加载数据
+                                logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
                                 CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
                             }
                         } catch (Exception e) {
