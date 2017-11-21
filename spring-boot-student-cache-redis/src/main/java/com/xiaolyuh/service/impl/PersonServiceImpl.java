@@ -36,7 +36,7 @@ public class PersonServiceImpl implements PersonService {
      * sync：设置如果缓存过期是不是只放一个请求去请求数据库，其他请求阻塞，默认是false。
      */
     @Override
-    @Cacheable(value = "people#5#3", key = "#person.id", sync = true)//3
+    @Cacheable(value = "people#120#90", key = "#person.id", sync = true)//3
     public Person findOne(Person person) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");

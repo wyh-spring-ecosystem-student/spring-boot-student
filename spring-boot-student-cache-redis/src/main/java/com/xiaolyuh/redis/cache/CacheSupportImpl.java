@@ -124,30 +124,11 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		}
 	}
 
-	private Class<?> getTargetClass(Object target) {
-		Class<?> targetClass = AopProxyUtils.ultimateTargetClass(target);
-		if (targetClass == null && target != null) {
-			targetClass = target.getClass();
-		}
-		return targetClass;
-	}
-
-	public Collection<? extends Cache> getCache(Collection<String> cacheNames) {
-		if (cacheNames == null) {
-			return Collections.emptyList();
-		} else {
-			Collection<Cache> result = new ArrayList<Cache>();
-			for (String cacheName : cacheNames) {
-				Cache cache = this.cacheManager.getCache(cacheName);
-				if (cache == null) {
-					throw new IllegalArgumentException("Cannot find cache named '" + cacheName + "' for ");
-				}
-				result.add(cache);
-			}
-			return result;
-		}
-	}
-
+    /**
+     * 解析SpEL表达式获取key
+     * 直接扣的Spring解析表达式部分代码
+     * @return
+     */
 	protected Object generateKey(Collection<? extends Cache> caches, String key, Method method, Object[] args,
 			Object target, Class<?> targetClass, Object result) {
 
@@ -160,5 +141,39 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		}
 		return this.keyGenerator.generate(target, method, args);
 	}
+
+    /**
+     * 获取类信息
+     * @param target
+     * @return
+     */
+    private Class<?> getTargetClass(Object target) {
+        Class<?> targetClass = AopProxyUtils.ultimateTargetClass(target);
+        if (targetClass == null && target != null) {
+            targetClass = target.getClass();
+        }
+        return targetClass;
+    }
+
+    /**
+     * 通过cache名称获取cache列表
+     * @param cacheNames
+     * @return
+     */
+    public Collection<? extends Cache> getCache(Collection<String> cacheNames) {
+        if (cacheNames == null) {
+            return Collections.emptyList();
+        } else {
+            Collection<Cache> result = new ArrayList<Cache>();
+            for (String cacheName : cacheNames) {
+                Cache cache = this.cacheManager.getCache(cacheName);
+                if (cache == null) {
+                    throw new IllegalArgumentException("Cannot find cache named '" + cacheName + "' for ");
+                }
+                result.add(cache);
+            }
+            return result;
+        }
+    }
 
 }
