@@ -74,24 +74,25 @@ public class RedisConfig {
     }
 
     /**
-     * 重写缓存key生成生器
+     * zhiding缓存密钥发生器
      * @return
      */
     @Bean
     public KeyGenerator keyGenerator() {
 
-        return new KeyGenerator() {
-            @Override
-            public String generate(Object target, Method method, Object... params) {
-                StringBuilder sb = new StringBuilder();
-                sb.append(target.getClass().getName());
-                sb.append(method.getName());
-                for (Object obj : params) {
-                    sb.append(obj.toString());
-                }
-                return sb.toString();
-            }
-        };
+//        return new KeyGenerator() {
+//            @Override
+//            public Object generate(Object target, Method method, Object... params) {
+//                StringBuilder sb = new StringBuilder();
+//                sb.append(target.getClass().getName());
+//                sb.append(method.getName());
+//                for (Object obj : params) {
+//                    sb.append(obj.toString());
+//                }
+//                return sb.toString();
+//            }
+//        };
+        return new SimpleKeyGenerator();
     }
 
 }
