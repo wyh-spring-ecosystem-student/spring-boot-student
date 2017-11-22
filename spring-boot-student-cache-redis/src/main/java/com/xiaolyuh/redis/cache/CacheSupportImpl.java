@@ -14,6 +14,8 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.annotation.PostConstruct;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -29,9 +31,11 @@ import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
 
 /**
  * 手动刷新缓存实现类
+ * @author yuhao.wang
  */
 @Component
 public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
+	private static final Logger logger = LoggerFactory.getLogger(CacheSupportImpl.class);
 
 	private final CacheOperationExpressionEvaluator evaluator = new CacheOperationExpressionEvaluator();
 
@@ -118,6 +122,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		if (!CollectionUtils.isEmpty(cacheToInvocationsMap.get(cacheName))) {
 			for (final CachedInvocation invocation : cacheToInvocationsMap.get(cacheName)) {
 				if (!StringUtils.isBlank(cacheKey) && invocation.getKey().toString().equals(cacheKey)) {
+					logger.info("缓存：{}-{}，重新加载数据", cacheName, cacheKey.getBytes());
 					refreshCache(invocation, cacheName);
 				}
 			}

@@ -91,8 +91,7 @@ public class CustomizedRedisCache extends RedisCache {
                             // 获取锁之后再判断一下过期时间，看是否需要加载数据
                             Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
                             if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                                // 通过获取代理方法信息重新加载数据
-                                logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
+                                // 通过获取代理方法信息重新加载缓存数据
                                 CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
                             }
                         }
