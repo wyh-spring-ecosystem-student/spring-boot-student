@@ -54,11 +54,12 @@ public class CustomizedRedisCache extends RedisCache {
 
         ValueWrapper valueWrapper = super.get(key);
         if (null != valueWrapper) {
-            ThreadTaskHelper.run(new Runnable() {
-                @Override
-                public void run() {
-                    Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(key);
-                    if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(key);
+            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                // 尽量少的去开启线程，因为线程池是有限的
+                ThreadTaskHelper.run(new Runnable() {
+                    @Override
+                    public void run() {
                         // 加一个分布式锁，只放一个请求去刷新缓存
                         RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, key.toString() + "_lock");
                         try {
@@ -73,8 +74,9 @@ public class CustomizedRedisCache extends RedisCache {
                             redisLock.unlock();
                         }
                     }
-                }
-            });
+                });
+            }
+
         }
         return valueWrapper;
     }
