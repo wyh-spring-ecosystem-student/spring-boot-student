@@ -63,23 +63,28 @@ public class CustomizedRedisCache extends RedisCache {
     @Override
     public ValueWrapper get(final Object key) {
         RedisCacheKey cacheKey = getRedisCacheKey(key);
+        String cacheKeyStr = new String(cacheKey.getKeyBytes());
         // 调用重写后的get方法
         ValueWrapper valueWrapper = this.get(cacheKey);
 
         if (null != valueWrapper) {
-            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(new String(cacheKey.getKeyBytes()));
+            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
             if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
                 // 尽量少的去开启线程，因为线程池是有限的
                 ThreadTaskHelper.run(new Runnable() {
                     @Override
                     public void run() {
                         // 加一个分布式锁，只放一个请求去刷新缓存
-                        RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, key.toString() + "_lock");
+                        RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
                         try {
                             if (redisLock.lock()) {
-                                //重新加载数据
-                                logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
-                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
+                                // 获取锁之后再判断一下过期时间，看是否需要加载数据
+                                Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
+                                if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                                    //重新加载数据
+                                    logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
+                                    CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
+                                }
                             }
                         } catch (Exception e) {
                             logger.info(e.getMessage(), e);

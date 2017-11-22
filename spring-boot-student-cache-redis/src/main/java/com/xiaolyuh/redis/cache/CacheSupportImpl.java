@@ -76,8 +76,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
 	@PostConstruct
 	public void initialize() {
-		cacheToInvocationsMap = new ConcurrentHashMap<String, Set<CachedInvocation>>(
-				cacheManager.getCacheNames().size());
+		cacheToInvocationsMap = new ConcurrentHashMap<String, Set<CachedInvocation>>(cacheManager.getCacheNames().size());
 		for (final String cacheName : cacheManager.getCacheNames()) {
 			cacheToInvocationsMap.put(cacheName, new CopyOnWriteArraySet<CachedInvocation>());
 		}
@@ -86,25 +85,23 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 	@Override
 	public void registerInvocation(Object targetBean, Method targetMethod, Object[] arguments,
 			Set<String> annotatedCacheNames, String cacheKey) {
+
+		// 获取注解上真实的value值
+		Collection<String> cacheNames = generateValue(annotatedCacheNames);
+
+		// 获取注解上的key属性值
 		Class<?> targetClass = getTargetClass(targetBean);
-		Collection<String> cacheNames = new HashSet<>();
-		for (final String cacheName : annotatedCacheNames) {
-			String[] cacheParams = cacheName.split(SEPARATOR);
-			String realCacheName = cacheParams[0];
-			cacheNames.add(realCacheName);
-		}
 		Collection<? extends Cache> caches = getCache(cacheNames);
 		Object key = generateKey(caches, cacheKey, targetMethod, arguments, targetBean, targetClass,
 				CacheOperationExpressionEvaluator.NO_RESULT);
 
+		// 新建一个代理对象（记录了缓存注解的方法类信息）
 		final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod, arguments);
-		for (final String cacheName : annotatedCacheNames) {
-			String[] cacheParams = cacheName.split(SEPARATOR);
-			String realCacheName = cacheParams[0];
-			if (!cacheToInvocationsMap.containsKey(realCacheName)) {
+		for (final String cacheName : cacheNames) {
+			if (!cacheToInvocationsMap.containsKey(cacheName)) {
 				this.initialize();
 			}
-			cacheToInvocationsMap.get(realCacheName).add(invocation);
+			cacheToInvocationsMap.get(cacheName).add(invocation);
 		}
 	}
 
@@ -124,8 +121,24 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		}
 	}
 
+	/**
+	 * 获取注解上的value属性值（cacheNames）
+	 * @param annotatedCacheNames
+	 * @return
+	 */
+	private Collection<String> generateValue(Set<String> annotatedCacheNames) {
+		Collection<String> cacheNames = new HashSet<>();
+		for (final String cacheName : annotatedCacheNames) {
+			String[] cacheParams = cacheName.split(SEPARATOR);
+			// 截取名称获取真实的value值
+			String realCacheName = cacheParams[0];
+			cacheNames.add(realCacheName);
+		}
+		return  cacheNames;
+	}
+
     /**
-     * 解析SpEL表达式获取key
+     * 解析SpEL表达式，获取注解上的key属性值
      * 直接扣的Spring解析表达式部分代码
      * @return
      */
