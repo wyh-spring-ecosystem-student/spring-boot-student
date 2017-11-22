@@ -14,11 +14,6 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
-import org.springframework.util.MethodInvoker;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 
 /**
  * 自定义的redis缓存
@@ -67,11 +62,12 @@ public class CustomizedRedisCache extends RedisCache {
      */
     @Override
     public ValueWrapper get(final Object key) {
+        RedisCacheKey cacheKey = getRedisCacheKey(key);
         // 调用重写后的get方法
-        ValueWrapper valueWrapper = this.get(getRedisCacheKey(key));
-        
+        ValueWrapper valueWrapper = this.get(cacheKey);
+
         if (null != valueWrapper) {
-            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(key);
+            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(new String(cacheKey.getKeyBytes()));
             if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
                 // 尽量少的去开启线程，因为线程池是有限的
                 ThreadTaskHelper.run(new Runnable() {
