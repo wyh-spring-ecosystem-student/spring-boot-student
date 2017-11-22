@@ -45,9 +45,10 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 	private final String SEPARATOR = "#";
 
 	/**
-	 * 记录容器与所有执行方法信息
+	 * 记录容器与所有执行方法信息。
+	 * 如果有很多无用的缓存数据的话，有可能会照成内存溢出。
 	 */
-	private Map<String, Set<CachedInvocation>> cacheToInvocationsMap;
+	private Map<String, Set<CachedInvocation>> cacheToInvocationsMap = new ConcurrentHashMap<>();
 
 	@Autowired
 	private CacheManager cacheManager;
@@ -57,34 +58,32 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		boolean invocationSuccess;
 		Object computed = null;
 		try {
+			// 通过代理调用方法，并记录返回值
 			computed = invoke(invocation);
 			invocationSuccess = true;
 		} catch (Exception ex) {
 			invocationSuccess = false;
 		}
 		if (invocationSuccess) {
-			if (cacheToInvocationsMap.get(cacheName) != null) {
-				cacheManager.getCache(cacheName).put(invocation.getKey(), computed);
+			if (!CollectionUtils.isEmpty(cacheToInvocationsMap.get(cacheName))) {
+				// 通过cacheManager获取操作缓存的cache对象
+				Cache cache = cacheManager.getCache(cacheName);
+				// 通过Cache对象更新缓存
+				cache.put(invocation.getKey(), computed);
 			}
 		}
 	}
 
 	private Object invoke(CachedInvocation invocation)
 			throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
 		final MethodInvoker invoker = new MethodInvoker();
 		invoker.setTargetObject(invocation.getTargetBean());
 		invoker.setArguments(invocation.getArguments());
 		invoker.setTargetMethod(invocation.getTargetMethod().getName());
 		invoker.prepare();
-		return invoker.invoke();
-	}
 
-	@PostConstruct
-	public void initialize() {
-		cacheToInvocationsMap = new ConcurrentHashMap<String, Set<CachedInvocation>>(cacheManager.getCacheNames().size());
-		for (final String cacheName : cacheManager.getCacheNames()) {
-			cacheToInvocationsMap.put(cacheName, new CopyOnWriteArraySet<CachedInvocation>());
-		}
+		return invoker.invoke();
 	}
 
 	@Override
@@ -104,7 +103,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 		final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod, arguments);
 		for (final String cacheName : cacheNames) {
 			if (!cacheToInvocationsMap.containsKey(cacheName)) {
-				this.initialize();
+				cacheToInvocationsMap.put(cacheName, new CopyOnWriteArraySet<>());
 			}
 			cacheToInvocationsMap.get(cacheName).add(invocation);
 		}
