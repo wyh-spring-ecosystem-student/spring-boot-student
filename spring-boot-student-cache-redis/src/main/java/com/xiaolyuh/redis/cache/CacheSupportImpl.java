@@ -22,6 +22,7 @@ import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
 
 import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
@@ -112,7 +113,9 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
 	@Override
 	public void refreshCacheByKey(String cacheName, String cacheKey) {
-		if (cacheToInvocationsMap.get(cacheName) != null) {
+		// 如果根据缓存名称没有找到代理信息类的set集合就不执行刷新操作。
+		// 只有等缓存有效时间过了，再走到切面哪里然后把代理方法信息注册到这里来。
+		if (!CollectionUtils.isEmpty(cacheToInvocationsMap.get(cacheName))) {
 			for (final CachedInvocation invocation : cacheToInvocationsMap.get(cacheName)) {
 				if (!StringUtils.isBlank(cacheKey) && invocation.getKey().toString().equals(cacheKey)) {
 					refreshCache(invocation, cacheName);

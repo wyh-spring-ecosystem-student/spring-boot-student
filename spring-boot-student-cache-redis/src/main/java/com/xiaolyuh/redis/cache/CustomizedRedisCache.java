@@ -68,37 +68,43 @@ public class CustomizedRedisCache extends RedisCache {
         ValueWrapper valueWrapper = this.get(cacheKey);
 
         if (null != valueWrapper) {
-            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
-            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                // 尽量少的去开启线程，因为线程池是有限的
-                ThreadTaskHelper.run(new Runnable() {
-                    @Override
-                    public void run() {
-                        // 加一个分布式锁，只放一个请求去刷新缓存
-                        RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
-                        try {
-                            if (redisLock.lock()) {
-                                // 获取锁之后再判断一下过期时间，看是否需要加载数据
-                                Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
-                                if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                                    //重新加载数据
-                                    logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
-                                    CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
-                                }
-                            }
-                        } catch (Exception e) {
-                            logger.info(e.getMessage(), e);
-                        } finally {
-                            redisLock.unlock();
-                        }
-                    }
-                });
-            }
-
+            // 刷新缓存数据
+            refreshCache(key, cacheKeyStr);
         }
         return valueWrapper;
     }
 
+    /**
+     * 刷新缓存数据
+     */
+    private void refreshCache(Object key, String cacheKeyStr) {
+        Long ttl = this.redisOperations.getExpire(cacheKeyStr);
+        if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+            // 尽量少的去开启线程，因为线程池是有限的
+            ThreadTaskHelper.run(new Runnable() {
+                @Override
+                public void run() {
+                    // 加一个分布式锁，只放一个请求去刷新缓存
+                    RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
+                    try {
+                        if (redisLock.lock()) {
+                            // 获取锁之后再判断一下过期时间，看是否需要加载数据
+                            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
+                            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                                // 通过获取代理方法信息重新加载数据
+                                logger.info("缓存：{}，重新加载数据", CustomizedRedisCache.super.getName());
+                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.info(e.getMessage(), e);
+                    } finally {
+                        redisLock.unlock();
+                    }
+                }
+            });
+        }
+    }
 
     /**
      * 重写父类的get函数。

@@ -42,4 +42,12 @@ public class PersonServiceImpl implements PersonService {
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
+
+    @Override
+    @Cacheable(value = "people1#120#90", key = "#person.id + ''", sync = true)//3
+    public Person findOne1(Person person) {
+        Person p = personRepository.findOne(person.getId());
+        System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
+        return p;
+    }
 }

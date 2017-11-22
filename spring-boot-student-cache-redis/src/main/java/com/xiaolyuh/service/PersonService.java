@@ -9,4 +9,6 @@ public interface PersonService {
     void remove(Long id);
 
     Person findOne(Person person);
+
+    Person findOne1(Person person);
 }
