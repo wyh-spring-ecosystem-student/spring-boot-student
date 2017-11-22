@@ -1,5 +1,10 @@
 package com.xiaolyuh.redis.config;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
+import com.xiaolyuh.redis.serializer.StringRedisSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
@@ -9,14 +14,6 @@ import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.lang.reflect.Method;
 
 @Configuration
 public class RedisConfig {
@@ -36,8 +33,8 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
@@ -70,7 +67,7 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
+    public RedisCacheManager cacheManager(RedisTemplate<Object, Object> redisTemplate) {
         RedisCacheManager redisCacheManager = new CustomizedRedisCacheManager(redisTemplate);
         redisCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
