@@ -5,12 +5,24 @@ import com.xiaolyuh.redis.cache.helper.ThreadTaskHelper;
 import com.xiaolyuh.redis.lock.RedisLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.cache.RedisCache;
+import org.springframework.data.redis.cache.RedisCacheElement;
+import org.springframework.data.redis.cache.RedisCacheKey;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.util.Assert;
+import org.springframework.util.MethodInvoker;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * 自定义的redis缓存
+ *
  * @author yuhao.wang
  */
 public class CustomizedRedisCache extends RedisCache {
@@ -23,6 +35,8 @@ public class CustomizedRedisCache extends RedisCache {
 
     private final RedisOperations redisOperations;
 
+    private final byte[] prefix;
+
     /**
      * 缓存主动在失效前强制刷新缓存的时间
      * 单位：秒
@@ -33,26 +47,29 @@ public class CustomizedRedisCache extends RedisCache {
         super(name, prefix, redisOperations, expiration);
         this.redisOperations = redisOperations;
         this.preloadSecondTime = preloadSecondTime;
+        this.prefix = prefix;
     }
 
     public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime, boolean allowNullValues) {
         super(name, prefix, redisOperations, expiration, allowNullValues);
         this.redisOperations = redisOperations;
         this.preloadSecondTime = preloadSecondTime;
+        this.prefix = prefix;
     }
 
     /**
      * 重写get方法，获取到缓存后再次取缓存剩余的时间，如果时间小余我们配置的刷新时间就手动刷新缓存。
      * 为了不影响get的性能，启用后台线程去完成缓存的刷。
-     * 并且只放一个线程去刷新数据
+     * 并且只放一个线程去刷新数据。
      *
      * @param key
      * @return
      */
     @Override
     public ValueWrapper get(final Object key) {
-
-        ValueWrapper valueWrapper = super.get(key);
+        // 调用重写后的get方法
+        ValueWrapper valueWrapper = this.get(getRedisCacheKey(key));
+        
         if (null != valueWrapper) {
             Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(key);
             if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
@@ -79,5 +96,49 @@ public class CustomizedRedisCache extends RedisCache {
 
         }
         return valueWrapper;
+    }
+
+
+    /**
+     * 重写父类的get函数。
+     * 父类的get方法，是先使用exists判断key是否存在，不存在返回null，存在再到redis缓存中去取值。这样会导致并发问题，
+     * 假如有一个请求调用了exists函数判断key存在，但是在下一时刻这个缓存过期了，或者被删掉了。
+     * 这时候再去缓存中获取值的时候返回的就是null了。
+     * 可以先获取缓存的值，再去判断key是否存在。
+     *
+     * @param cacheKey
+     * @return
+     */
+    @Override
+    public RedisCacheElement get(final RedisCacheKey cacheKey) {
+
+        Assert.notNull(cacheKey, "CacheKey must not be null!");
+
+        RedisCacheElement redisCacheElement = new RedisCacheElement(cacheKey, fromStoreValue(lookup(cacheKey)));
+        Boolean exists = (Boolean) redisOperations.execute(new RedisCallback<Boolean>() {
+
+            @Override
+            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+                return connection.exists(cacheKey.getKeyBytes());
+            }
+        });
+
+        if (!exists.booleanValue()) {
+            return null;
+        }
+
+        return redisCacheElement;
+    }
+
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    private RedisCacheKey getRedisCacheKey(Object key) {
+        return new RedisCacheKey(key).usePrefix(this.prefix)
+                .withKeySerializer(redisOperations.getKeySerializer());
     }
 }
