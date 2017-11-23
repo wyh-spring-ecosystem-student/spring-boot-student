@@ -2,7 +2,7 @@ package com.xiaolyuh.redis.cache;
 
 /**
  * 主动刷新缓存接口
- * @author wyh
+ * @author yuhao.wang
  */
 public interface CacheSupport {
 

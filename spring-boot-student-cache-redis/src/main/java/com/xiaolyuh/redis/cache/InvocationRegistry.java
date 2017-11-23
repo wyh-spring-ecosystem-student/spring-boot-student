@@ -5,6 +5,7 @@ import java.util.Set;
 
 /**
  * 缓存方法注册接口
+ * @author yuhao.wang
  */
 public interface InvocationRegistry {
 
