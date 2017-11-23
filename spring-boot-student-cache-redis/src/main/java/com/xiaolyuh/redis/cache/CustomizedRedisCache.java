@@ -120,7 +120,9 @@ public class CustomizedRedisCache extends RedisCache {
 
         Assert.notNull(cacheKey, "CacheKey must not be null!");
 
+        // 根据key获取缓存值
         RedisCacheElement redisCacheElement = new RedisCacheElement(cacheKey, fromStoreValue(lookup(cacheKey)));
+        // 判断key是否存在
         Boolean exists = (Boolean) redisOperations.execute(new RedisCallback<Boolean>() {
 
             @Override
