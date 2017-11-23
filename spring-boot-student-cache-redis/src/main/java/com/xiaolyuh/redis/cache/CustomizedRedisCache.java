@@ -41,6 +41,7 @@ public class CustomizedRedisCache extends RedisCache {
     public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime) {
         super(name, prefix, redisOperations, expiration);
         this.redisOperations = redisOperations;
+        // 指定自动刷新时间
         this.preloadSecondTime = preloadSecondTime;
         this.prefix = prefix;
     }
@@ -48,6 +49,7 @@ public class CustomizedRedisCache extends RedisCache {
     public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime, boolean allowNullValues) {
         super(name, prefix, redisOperations, expiration, allowNullValues);
         this.redisOperations = redisOperations;
+        // 指定自动刷新时间
         this.preloadSecondTime = preloadSecondTime;
         this.prefix = prefix;
     }
