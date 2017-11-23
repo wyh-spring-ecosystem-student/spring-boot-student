@@ -33,8 +33,8 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
-        RedisTemplate<Object, Object> redisTemplate = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) {
+        RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory);
 
         Jackson2JsonRedisSerializer<Object> jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer<Object>(Object.class);
@@ -67,7 +67,7 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisCacheManager cacheManager(RedisTemplate<Object, Object> redisTemplate) {
+    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         RedisCacheManager redisCacheManager = new CustomizedRedisCacheManager(redisTemplate);
         redisCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
