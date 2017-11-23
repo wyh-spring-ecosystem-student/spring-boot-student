@@ -160,4 +160,9 @@ public class SpringBootStudentCacheRedisApplicationTests {
         logger.info(invocations.size()+"");
 
     }
+
+    @Test
+    public void testString() {
+        System.out.println("dd\"dd".replace("\"", ""));
+    }
 }
