@@ -143,7 +143,7 @@ public class RedisLock {
     }
 
     public boolean isLock() {
-        redisTemplate.getConnectionFactory().getConnection().time();
+
         return redisTemplate.hasKey(key);
     }
 
