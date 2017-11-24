@@ -45,7 +45,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 	private final String SEPARATOR = "#";
 
 	/**
-	 * 记录容器与所有执行方法信息。
+	 * 记录缓存执行方法信息的容器。
 	 * 如果有很多无用的缓存数据的话，有可能会照成内存溢出。
 	 */
 	private Map<String, Set<CachedInvocation>> cacheToInvocationsMap = new ConcurrentHashMap<>();

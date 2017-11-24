@@ -41,6 +41,7 @@ public class CustomizedRedisCache extends RedisCache {
     public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime) {
         super(name, prefix, redisOperations, expiration);
         this.redisOperations = redisOperations;
+        // 指定自动刷新时间
         this.preloadSecondTime = preloadSecondTime;
         this.prefix = prefix;
     }
@@ -48,6 +49,7 @@ public class CustomizedRedisCache extends RedisCache {
     public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime, boolean allowNullValues) {
         super(name, prefix, redisOperations, expiration, allowNullValues);
         this.redisOperations = redisOperations;
+        // 指定自动刷新时间
         this.preloadSecondTime = preloadSecondTime;
         this.prefix = prefix;
     }
@@ -72,37 +74,6 @@ public class CustomizedRedisCache extends RedisCache {
             refreshCache(key, cacheKeyStr);
         }
         return valueWrapper;
-    }
-
-    /**
-     * 刷新缓存数据
-     */
-    private void refreshCache(Object key, String cacheKeyStr) {
-        Long ttl = this.redisOperations.getExpire(cacheKeyStr);
-        if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-            // 尽量少的去开启线程，因为线程池是有限的
-            ThreadTaskHelper.run(new Runnable() {
-                @Override
-                public void run() {
-                    // 加一个分布式锁，只放一个请求去刷新缓存
-                    RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
-                    try {
-                        if (redisLock.lock()) {
-                            // 获取锁之后再判断一下过期时间，看是否需要加载数据
-                            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
-                            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                                // 通过获取代理方法信息重新加载缓存数据
-                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
-                            }
-                        }
-                    } catch (Exception e) {
-                        logger.info(e.getMessage(), e);
-                    } finally {
-                        redisLock.unlock();
-                    }
-                }
-            });
-        }
     }
 
     /**
@@ -138,7 +109,6 @@ public class CustomizedRedisCache extends RedisCache {
         return redisCacheElement;
     }
 
-
     /**
      * 获取RedisCacheKey
      *
@@ -148,5 +118,36 @@ public class CustomizedRedisCache extends RedisCache {
     private RedisCacheKey getRedisCacheKey(Object key) {
         return new RedisCacheKey(key).usePrefix(this.prefix)
                 .withKeySerializer(redisOperations.getKeySerializer());
+    }
+
+    /**
+     * 刷新缓存数据
+     */
+    private void refreshCache(Object key, String cacheKeyStr) {
+        Long ttl = this.redisOperations.getExpire(cacheKeyStr);
+        if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+            // 尽量少的去开启线程，因为线程池是有限的
+            ThreadTaskHelper.run(new Runnable() {
+                @Override
+                public void run() {
+                    // 加一个分布式锁，只放一个请求去刷新缓存
+                    RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
+                    try {
+                        if (redisLock.lock()) {
+                            // 获取锁之后再判断一下过期时间，看是否需要加载数据
+                            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
+                            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                                // 通过获取代理方法信息重新加载缓存数据
+                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.info(e.getMessage(), e);
+                    } finally {
+                        redisLock.unlock();
+                    }
+                }
+            });
+        }
     }
 }
