@@ -97,7 +97,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
         if (cacheParams.length > 1) {
             String expirationStr = cacheParams[1];
             if (!StringUtils.isEmpty(expirationStr)) {
-                // 支持配置过期时间使用EL表达式读取配置时间
+                // 支持配置过期时间使用EL表达式读取配置文件时间
                 if (expirationStr.contains(MARK)) {
                     expirationStr = beanFactory.resolveEmbeddedValue(expirationStr);
                 }
@@ -108,7 +108,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
         if (cacheParams.length > 2) {
             String preloadStr = cacheParams[2];
             if (!StringUtils.isEmpty(preloadStr)) {
-                // 支持配置刷新时间使用EL表达式读取配置时间
+                // 支持配置刷新时间使用EL表达式读取配置文件时间
                 if (preloadStr.contains(MARK)) {
                     preloadStr = beanFactory.resolveEmbeddedValue(preloadStr);
                 }
