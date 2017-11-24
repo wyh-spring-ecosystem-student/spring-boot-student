@@ -13,6 +13,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.PropertySources;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -62,6 +63,9 @@ public class SpringBootStudentCacheRedisApplicationTests {
 
     @Autowired
     DefaultListableBeanFactory beanFactory;
+
+    @Autowired
+    private RedisTemplate redisTemplate;;
 
     @Before // 在测试开始前初始化工作  
     public void setup() {
@@ -182,6 +186,6 @@ public class SpringBootStudentCacheRedisApplicationTests {
 
         String strVal = beanFactory.resolveEmbeddedValue("${select.cache.timeout:1800}");
 
-        System.out.println(propertySources.toString());
+        System.out.println(strVal);
     }
 }

@@ -80,7 +80,6 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
 
     @Override
     public Cache getCache(String name) {
-
         String[] cacheParams = name.split(SEPARATOR);
         String cacheName = cacheParams[0];
 
@@ -89,9 +88,30 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
         }
 
         // 有效时间，初始化获取默认的有效时间
-        Long expirationSecondTime = this.computeExpiration(cacheName);
+        Long expirationSecondTime = getExpirationSecondTime(cacheName, cacheParams);
         // 自动刷新时间，默认是0
-        Long preloadSecondTime = 0L;
+        Long preloadSecondTime = getExpirationSecondTime(cacheParams);
+
+        // 通过反射获取父类存放缓存的容器对象
+        Object object = ReflectionUtils.getFieldValue(getInstance(), SUPER_FIELD_CACHEMAP);
+        if (object != null && object instanceof ConcurrentHashMap) {
+            ConcurrentHashMap<String, Cache> cacheMap = (ConcurrentHashMap<String, Cache>) object;
+            // 生成Cache对象，并将其保存到父类的Cache容器中
+            return getCache(cacheName, expirationSecondTime, preloadSecondTime, cacheMap);
+        } else {
+            return super.getCache(cacheName);
+        }
+
+    }
+
+    /**
+     * 获取过期时间
+     *
+     * @return
+     */
+    private long getExpirationSecondTime(String cacheName, String[] cacheParams) {
+        // 有效时间，初始化获取默认的有效时间
+        Long expirationSecondTime = this.computeExpiration(cacheName);
 
         // 设置key有效时间
         if (cacheParams.length > 1) {
@@ -104,6 +124,18 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
                 expirationSecondTime = Long.parseLong(expirationStr);
             }
         }
+
+        return expirationSecondTime;
+    }
+
+    /**
+     * 获取自动刷新时间
+     *
+     * @return
+     */
+    private long getExpirationSecondTime(String[] cacheParams) {
+        // 自动刷新时间，默认是0
+        Long preloadSecondTime = 0L;
         // 设置自动刷新时间
         if (cacheParams.length > 2) {
             String preloadStr = cacheParams[2];
@@ -115,15 +147,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
                 preloadSecondTime = Long.parseLong(preloadStr);
             }
         }
-
-        Object object = ReflectionUtils.getFieldValue(getInstance(), SUPER_FIELD_CACHEMAP);
-        if (object != null && object instanceof ConcurrentHashMap) {
-            ConcurrentHashMap<String, Cache> cacheMap = (ConcurrentHashMap<String, Cache>) object;
-            return getCache(cacheName, expirationSecondTime, preloadSecondTime, cacheMap);
-        } else {
-            return super.getCache(cacheName);
-        }
-
+        return preloadSecondTime;
     }
 
     /**
