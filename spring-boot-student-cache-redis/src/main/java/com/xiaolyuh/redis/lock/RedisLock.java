@@ -10,6 +10,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisCluster;
+import redis.clients.jedis.JedisCommands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -296,13 +297,8 @@ public class RedisLock {
             public String doInRedis(RedisConnection connection) throws DataAccessException {
                 Object nativeConnection = connection.getNativeConnection();
                 String result = null;
-                // 集群模式
-                if (nativeConnection instanceof JedisCluster) {
-                    result = ((JedisCluster) nativeConnection).set(key, value, NX, EX, seconds);
-                }
-                // 单机模式
-                if (nativeConnection instanceof Jedis) {
-                    result = ((Jedis) nativeConnection).set(key, value, NX, EX, seconds);
+                if (nativeConnection instanceof JedisCommands) {
+                    result = ((JedisCommands) nativeConnection).set(key, value, NX, EX, seconds);
                 }
 
                 if (!StringUtils.isEmpty(lockKeyLog) && !StringUtils.isEmpty(result)) {
