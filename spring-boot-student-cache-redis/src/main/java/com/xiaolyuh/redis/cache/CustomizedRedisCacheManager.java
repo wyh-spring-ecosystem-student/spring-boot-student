@@ -5,6 +5,8 @@ import com.xiaolyuh.redis.utils.ReflectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.cache.Cache;
 import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.core.RedisOperations;
@@ -51,7 +53,15 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
      */
     private static final String SEPARATOR = "#";
 
+    /**
+     * SpEL标示符
+     */
+    private static final String MARK = "$";
+
     RedisCacheManager redisCacheManager = null;
+
+    @Autowired
+    DefaultListableBeanFactory beanFactory;
 
     public CustomizedRedisCacheManager(RedisOperations redisOperations) {
         super(redisOperations);
@@ -85,11 +95,25 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
 
         // 设置key有效时间
         if (cacheParams.length > 1) {
-            expirationSecondTime = Long.parseLong(cacheParams[1]);
+            String expirationStr = cacheParams[1];
+            if (!StringUtils.isEmpty(expirationStr)) {
+                // 支持配置过期时间使用EL表达式读取配置时间
+                if (expirationStr.contains(MARK)) {
+                    expirationStr = beanFactory.resolveEmbeddedValue(expirationStr);
+                }
+                expirationSecondTime = Long.parseLong(expirationStr);
+            }
         }
         // 设置自动刷新时间
         if (cacheParams.length > 2) {
-            preloadSecondTime = Long.parseLong(cacheParams[2]);
+            String preloadStr = cacheParams[2];
+            if (!StringUtils.isEmpty(preloadStr)) {
+                // 支持配置刷新时间使用EL表达式读取配置时间
+                if (preloadStr.contains(MARK)) {
+                    preloadStr = beanFactory.resolveEmbeddedValue(preloadStr);
+                }
+                preloadSecondTime = Long.parseLong(preloadStr);
+            }
         }
 
         Object object = ReflectionUtils.getFieldValue(getInstance(), SUPER_FIELD_CACHEMAP);

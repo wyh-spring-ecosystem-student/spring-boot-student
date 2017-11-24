@@ -9,7 +9,10 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.core.env.PropertySources;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -51,7 +54,14 @@ public class SpringBootStudentCacheRedisApplicationTests {
 //    private MockHttpSession session;// 注入模拟的http session  
 //      
 //    @Autowired  
-//    private MockHttpServletRequest request;// 注入模拟的http request\  
+//    private MockHttpServletRequest request;// 注入模拟的http request\
+
+
+    @Autowired
+    PropertySourcesPlaceholderConfigurer configurer;
+
+    @Autowired
+    DefaultListableBeanFactory beanFactory;
 
     @Before // 在测试开始前初始化工作  
     public void setup() {
@@ -164,5 +174,14 @@ public class SpringBootStudentCacheRedisApplicationTests {
     @Test
     public void testString() {
         System.out.println("dd\"dd".replace("\"", ""));
+    }
+
+    @Test
+    public void testConfigurer() {
+        PropertySources propertySources = configurer.getAppliedPropertySources();
+
+        String strVal = beanFactory.resolveEmbeddedValue("${select.cache.timeout:1800}");
+
+        System.out.println(propertySources.toString());
     }
 }
