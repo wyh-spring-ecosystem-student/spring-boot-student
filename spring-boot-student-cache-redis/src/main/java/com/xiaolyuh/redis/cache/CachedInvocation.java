@@ -7,6 +7,7 @@ import java.util.Arrays;
 /**
  * 标记了缓存注解的方法类信息
  * 用于主动刷新缓存时调用原始方法加载数据
+ *
  * @author yuhao.wang
  */
 public final class CachedInvocation {
@@ -43,6 +44,7 @@ public final class CachedInvocation {
 
     /**
      * 必须重写equals和hashCode方法，否则放到set集合里没法去重
+     *
      * @param o
      * @return
      */
