@@ -88,9 +88,9 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
         }
 
         // 有效时间，初始化获取默认的有效时间
-        Long expirationSecondTime = getExpirationSecondTime(cacheName, cacheParams);
+        Long expirationSecondTime = getExpirationSecondTime(cacheParams);
         // 自动刷新时间，默认是0
-        Long preloadSecondTime = getExpirationSecondTime(cacheParams);
+        Long preloadSecondTime = getPreloadSecondTime(cacheParams);
 
         // 通过反射获取父类存放缓存的容器对象
         Object object = ReflectionUtils.getFieldValue(getInstance(), SUPER_FIELD_CACHEMAP);
@@ -109,9 +109,13 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
      *
      * @return
      */
-    private long getExpirationSecondTime(String cacheName, String[] cacheParams) {
+    public long getExpirationSecondTime(String[] cacheParams) {
+        if (cacheParams == null || cacheParams.length == 0) {
+            return 0;
+        }
+
         // 有效时间，初始化获取默认的有效时间
-        Long expirationSecondTime = this.computeExpiration(cacheName);
+        Long expirationSecondTime = this.computeExpiration(cacheParams[0]);
 
         // 设置key有效时间
         if (cacheParams.length > 1) {
@@ -133,7 +137,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
      *
      * @return
      */
-    private long getExpirationSecondTime(String[] cacheParams) {
+    private long getPreloadSecondTime(String[] cacheParams) {
         // 自动刷新时间，默认是0
         Long preloadSecondTime = 0L;
         // 设置自动刷新时间
