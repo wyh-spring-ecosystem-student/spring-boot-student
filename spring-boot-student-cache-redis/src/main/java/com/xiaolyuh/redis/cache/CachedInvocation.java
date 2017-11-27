@@ -1,8 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 标记了缓存注解的方法类信息
@@ -13,33 +13,64 @@ import java.util.Arrays;
 public final class CachedInvocation {
 
     private Object key;
-    private final Object targetBean;
-    private final Method targetMethod;
-    private Object[] arguments;
+    private Class targetBean;
+    private String targetMethod;
+    private List<Object> arguments;
+    private List<Class> parameterTypes;
 
-    public CachedInvocation(Object key, Object targetBean, Method targetMethod, Object[] arguments) {
+    public CachedInvocation() {
+    }
+
+    public CachedInvocation(Object key, Object targetBean, String targetMethod, Class[] parameterTypes, Object[] arguments) {
         this.key = key;
-        this.targetBean = targetBean;
+        this.targetBean = targetBean.getClass();
         this.targetMethod = targetMethod;
         if (arguments != null && arguments.length != 0) {
-            this.arguments = Arrays.copyOf(arguments, arguments.length);
+            this.arguments = Arrays.asList(arguments);
         }
-    }
-
-    public Object[] getArguments() {
-        return arguments;
-    }
-
-    public Object getTargetBean() {
-        return targetBean;
-    }
-
-    public Method getTargetMethod() {
-        return targetMethod;
+        if (parameterTypes != null && parameterTypes.length != 0) {
+            this.parameterTypes = Arrays.asList(parameterTypes);
+        }
     }
 
     public Object getKey() {
         return key;
+    }
+
+    public void setKey(Object key) {
+        this.key = key;
+    }
+
+    public Class getTargetBean() {
+        return targetBean;
+    }
+
+    public void setTargetBean(Class targetBean) {
+        this.targetBean = targetBean;
+    }
+
+    public String getTargetMethod() {
+        return targetMethod;
+    }
+
+    public void setTargetMethod(String targetMethod) {
+        this.targetMethod = targetMethod;
+    }
+
+    public List<Object> getArguments() {
+        return arguments;
+    }
+
+    public void setArguments(List<Object> arguments) {
+        this.arguments = arguments;
+    }
+
+    public List<Class> getParameterTypes() {
+        return parameterTypes;
+    }
+
+    public void setParameterTypes(List<Class> parameterTypes) {
+        this.parameterTypes = parameterTypes;
     }
 
     /**

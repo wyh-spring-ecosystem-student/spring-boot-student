@@ -7,12 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class PersonServiceImpl implements PersonService {
     @Autowired
     PersonRepository personRepository;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Override
     @CachePut(value = "people", key = "#person.id")
@@ -40,6 +44,7 @@ public class PersonServiceImpl implements PersonService {
     public Person findOne(Person person) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
+        System.out.println(redisTemplate);
         return p;
     }
 

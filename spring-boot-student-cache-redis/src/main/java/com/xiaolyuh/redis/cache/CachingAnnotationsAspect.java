@@ -84,7 +84,13 @@ public class CachingAnnotationsAspect {
             cacheSet.addAll(Arrays.asList(cacheables.value()));
             cacheKey = cacheables.key();
         }
-        cacheRefreshSupport.registerInvocation(joinPoint.getTarget(), method, joinPoint.getArgs(), cacheSet, cacheKey);
+
+        if (joinPoint.getSignature() instanceof MethodSignature) {
+            Class[] parameterTypes = ((MethodSignature)joinPoint.getSignature()).getParameterTypes();
+            cacheRefreshSupport.registerInvocation(joinPoint.getTarget(), method, parameterTypes,
+                    joinPoint.getArgs(), cacheSet, cacheKey);
+        }
+
         return joinPoint.proceed();
 
     }

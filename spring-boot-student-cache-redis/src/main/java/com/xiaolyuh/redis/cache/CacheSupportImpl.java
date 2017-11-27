@@ -1,25 +1,24 @@
 package com.xiaolyuh.redis.cache;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
-import org.apache.commons.lang3.StringUtils;
+import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.expression.AnnotatedElementKey;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 手动刷新缓存实现类
@@ -32,19 +31,18 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
     private final CacheOperationExpressionEvaluator evaluator = new CacheOperationExpressionEvaluator();
 
+    private final String SEPARATOR = "#";
+
+    private final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_cache_key_suffix";
+
     @Autowired
     private KeyGenerator keyGenerator;
 
-    private final String SEPARATOR = "#";
-
-    /**
-     * 记录缓存执行方法信息的容器。
-     * 如果有很多无用的缓存数据的话，有可能会照成内存溢出。
-     */
-    private Map<String, Set<CachedInvocation>> cacheToInvocationsMap = new ConcurrentHashMap<>();
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Autowired
-    private CacheManager cacheManager;
+    private CustomizedRedisCacheManager cacheManager;
 
     private void refreshCache(CachedInvocation invocation, String cacheName) {
 
@@ -55,33 +53,43 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             computed = invoke(invocation);
             invocationSuccess = true;
         } catch (Exception ex) {
+            logger.info(ex.getMessage(), ex);
             invocationSuccess = false;
         }
         if (invocationSuccess) {
-            if (!CollectionUtils.isEmpty(cacheToInvocationsMap.get(cacheName))) {
-                // 通过cacheManager获取操作缓存的cache对象
-                Cache cache = cacheManager.getCache(cacheName);
-                // 通过Cache对象更新缓存
-                cache.put(invocation.getKey(), computed);
-            }
+            // 通过cacheManager获取操作缓存的cache对象
+            Cache cache = cacheManager.getCache(cacheName);
+            // 通过Cache对象更新缓存
+            cache.put(invocation.getKey(), computed);
+
+            logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
         }
     }
 
-    private Object invoke(CachedInvocation invocation)
-            throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    private Object invoke(CachedInvocation invocation) throws Exception {
 
         final MethodInvoker invoker = new MethodInvoker();
-        invoker.setTargetObject(invocation.getTargetBean());
-        invoker.setArguments(invocation.getArguments());
-        invoker.setTargetMethod(invocation.getTargetMethod().getName());
+
+        // 获取执行方法所需要的参数
+        Object[] args = new Object[invocation.getParameterTypes().size()];
+        for (int i = 0; i < invocation.getParameterTypes().size(); i++) {
+            // 将参数转换成对应类型
+            args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
+        }
+        // 到容器里面获取Bean
+        Object target = SpringContextHolder.getBean(invocation.getTargetBean());
+
+        invoker.setTargetObject(target);
+        invoker.setArguments(args);
+        invoker.setTargetMethod(invocation.getTargetMethod());
         invoker.prepare();
 
         return invoker.invoke();
     }
 
     @Override
-    public void registerInvocation(Object targetBean, Method targetMethod, Object[] arguments,
-                                   Set<String> annotatedCacheNames, String cacheKey) {
+    public void registerInvocation(Object targetBean, Method targetMethod, Class[] invocationParamTypes,
+                                   Object[] invocationArgs, Set<String> annotatedCacheNames, String cacheKey) {
 
         // 获取注解上真实的value值
         Collection<String> cacheNames = generateValue(annotatedCacheNames);
@@ -89,16 +97,17 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
         // 获取注解上的key属性值
         Class<?> targetClass = getTargetClass(targetBean);
         Collection<? extends Cache> caches = getCache(cacheNames);
-        Object key = generateKey(caches, cacheKey, targetMethod, arguments, targetBean, targetClass,
+        Object key = generateKey(caches, cacheKey, targetMethod, invocationArgs, targetBean, targetClass,
                 CacheOperationExpressionEvaluator.NO_RESULT);
 
         // 新建一个代理对象（记录了缓存注解的方法类信息）
-        final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod, arguments);
-        for (final String cacheName : cacheNames) {
-            if (!cacheToInvocationsMap.containsKey(cacheName)) {
-                cacheToInvocationsMap.put(cacheName, new CopyOnWriteArraySet<>());
-            }
-            cacheToInvocationsMap.get(cacheName).add(invocation);
+        final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod.getName(), invocationParamTypes, invocationArgs);
+        for (final String cacheName : annotatedCacheNames) {
+            String[] cacheParams = cacheName.split(SEPARATOR);
+            long expirationTime = cacheManager.getExpirationSecondTime(cacheParams);
+            String invocationCacheKey = getInvocationCacheKey(cacheParams[0], key);
+            // 将方法信息放到redis缓存
+            redisTemplate.opsForValue().set(invocationCacheKey, JSON.toJSON(invocation), expirationTime, TimeUnit.SECONDS);
         }
     }
 
@@ -109,16 +118,16 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
     @Override
     public void refreshCacheByKey(String cacheName, String cacheKey) {
-        // 如果根据缓存名称没有找到代理信息类的set集合就不执行刷新操作。
-        // 只有等缓存有效时间过了，再走到切面哪里然后把代理方法信息注册到这里来。
-        if (!CollectionUtils.isEmpty(cacheToInvocationsMap.get(cacheName))) {
-            for (final CachedInvocation invocation : cacheToInvocationsMap.get(cacheName)) {
-                if (!StringUtils.isBlank(cacheKey) && invocation.getKey().toString().equals(cacheKey)) {
-                    logger.info("缓存：{}-{}，重新加载数据", cacheName, cacheKey.getBytes());
-                    refreshCache(invocation, cacheName);
-                }
-            }
+
+        //在redis拿到方法信息，然后刷新缓存
+        String invocationCacheKey = getInvocationCacheKey(cacheName, cacheKey);
+        JSONObject json = (JSONObject) redisTemplate.opsForValue().get(invocationCacheKey);
+        if (json != null && !json.isEmpty()) {
+            CachedInvocation invocation = JSON.parseObject(json.toJSONString(), CachedInvocation.class);
+            // 执行刷新方法
+            refreshCache(invocation, cacheName);
         }
+
     }
 
     /**
@@ -191,6 +200,10 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             }
             return result;
         }
+    }
+
+    private String getInvocationCacheKey(String cacheName, Object key) {
+        return cacheName + ":" + key.toString() + INVOCATION_CACHE_KEY_SUFFIX;
     }
 
 }

@@ -161,17 +161,17 @@ public class SpringBootStudentCacheRedisApplicationTests {
 
     @Test
     public void testTest() {
-        Object targetBean = null;
-        Method targetMethod = null;
-        Object[] arguments = null;
-        CachedInvocation cachedInvocation1 = new CachedInvocation(1, targetBean, targetMethod, arguments);
-        CachedInvocation cachedInvocation2 = new CachedInvocation(1, targetBean, targetMethod, arguments);
-
-        Set<CachedInvocation> invocations = new HashSet<>();
-        invocations.add(cachedInvocation1);
-        invocations.add(cachedInvocation2);
-
-        logger.info(invocations.size()+"");
+//        Object targetBean = null;
+//        String targetMethod = null;
+//        Object[] arguments = null;
+//        CachedInvocation cachedInvocation1 = new CachedInvocation(1, targetBean, targetMethod, arguments);
+//        CachedInvocation cachedInvocation2 = new CachedInvocation(1, targetBean, targetMethod, arguments);
+//
+//        Set<CachedInvocation> invocations = new HashSet<>();
+//        invocations.add(cachedInvocation1);
+//        invocations.add(cachedInvocation2);
+//
+//        logger.info(invocations.size()+"");
 
     }
 
