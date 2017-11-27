@@ -74,7 +74,7 @@ public class CustomizedRedisCache extends RedisCache {
     @Override
     public ValueWrapper get(final Object key) {
         RedisCacheKey cacheKey = getRedisCacheKey(key);
-        String cacheKeyStr = getCacheKey(cacheKey);
+        String cacheKeyStr = getCacheKey(key);
         // 调用重写后的get方法
         ValueWrapper valueWrapper = this.get(cacheKey);
 
