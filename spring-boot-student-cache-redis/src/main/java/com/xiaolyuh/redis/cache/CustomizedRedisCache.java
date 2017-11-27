@@ -74,7 +74,7 @@ public class CustomizedRedisCache extends RedisCache {
     @Override
     public ValueWrapper get(final Object key) {
         RedisCacheKey cacheKey = getRedisCacheKey(key);
-        String cacheKeyStr = new String(cacheKey.getKeyBytes());
+        String cacheKeyStr = getCacheKey(cacheKey);
         // 调用重写后的get方法
         ValueWrapper valueWrapper = this.get(cacheKey);
 
@@ -124,9 +124,19 @@ public class CustomizedRedisCache extends RedisCache {
      * @param key
      * @return
      */
-    private RedisCacheKey getRedisCacheKey(Object key) {
+    public RedisCacheKey getRedisCacheKey(Object key) {
         return new RedisCacheKey(key).usePrefix(this.prefix)
                 .withKeySerializer(redisOperations.getKeySerializer());
+    }
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    public String getCacheKey(Object key) {
+        return new String(getRedisCacheKey(key).getKeyBytes());
     }
 
     /**
@@ -147,7 +157,7 @@ public class CustomizedRedisCache extends RedisCache {
                             Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
                             if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
                                 // 通过获取代理方法信息重新加载缓存数据
-                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), key.toString());
+                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
                             }
                         }
                     } catch (Exception e) {

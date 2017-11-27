@@ -10,7 +10,7 @@ public interface PersonService {
 
     Person findOne(Person person);
 
-    Person findOne1(Person person);
+    Person findOne1();
 
     Person findOne2(Person person);
 }

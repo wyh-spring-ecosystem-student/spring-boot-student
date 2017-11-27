@@ -62,10 +62,10 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             // 通过Cache对象更新缓存
             cache.put(invocation.getKey(), computed);
 
-            String invocationCacheKey = getInvocationCacheKey(cacheName, invocation.getKey());
-            long expireTime = ((CustomizedRedisCache) cache).getExpirationSecondTime();
+            CustomizedRedisCache redisCache = (CustomizedRedisCache) cache;
+            long expireTime = redisCache.getExpirationSecondTime();
             // 刷新redis中缓存法信息key的有效时间
-            redisTemplate.expire(invocationCacheKey, expireTime, TimeUnit.SECONDS);
+            redisTemplate.expire(getInvocationCacheKey(redisCache.getCacheKey(invocation.getKey())), redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
 
             logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
         }
@@ -107,12 +107,12 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
         // 新建一个代理对象（记录了缓存注解的方法类信息）
         final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod.getName(), invocationParamTypes, invocationArgs);
-        for (final String cacheName : annotatedCacheNames) {
-            String[] cacheParams = cacheName.split(SEPARATOR);
-            long expirationTime = cacheManager.getExpirationSecondTime(cacheParams);
-            String invocationCacheKey = getInvocationCacheKey(cacheParams[0], key);
-            // 将方法信息放到redis缓存
-            redisTemplate.opsForValue().set(invocationCacheKey, JSON.toJSON(invocation), expirationTime, TimeUnit.SECONDS);
+        for (Cache cache: caches) {
+            if(cache instanceof CustomizedRedisCache) {
+                CustomizedRedisCache redisCache = ((CustomizedRedisCache) cache);
+                // 将方法信息放到redis缓存
+                redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)), JSON.toJSON(invocation), redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
+            }
         }
     }
 
@@ -123,10 +123,8 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
     @Override
     public void refreshCacheByKey(String cacheName, String cacheKey) {
-
         //在redis拿到方法信息，然后刷新缓存
-        String invocationCacheKey = getInvocationCacheKey(cacheName, cacheKey);
-        JSONObject json = (JSONObject) redisTemplate.opsForValue().get(invocationCacheKey);
+        JSONObject json = (JSONObject) redisTemplate.opsForValue().get(getInvocationCacheKey(cacheKey));
         if (json != null && !json.isEmpty()) {
             CachedInvocation invocation = JSON.parseObject(json.toJSONString(), CachedInvocation.class);
             // 执行刷新方法
@@ -207,8 +205,8 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
         }
     }
 
-    private String getInvocationCacheKey(String cacheName, Object key) {
-        return cacheName + ":" + key.toString() + INVOCATION_CACHE_KEY_SUFFIX;
+    private String getInvocationCacheKey(String cacheKey) {
+        return cacheKey + INVOCATION_CACHE_KEY_SUFFIX;
     }
 
 }
