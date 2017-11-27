@@ -62,6 +62,11 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             // 通过Cache对象更新缓存
             cache.put(invocation.getKey(), computed);
 
+            String invocationCacheKey = getInvocationCacheKey(cacheName, invocation.getKey());
+            long expireTime = ((CustomizedRedisCache) cache).getExpirationSecondTime();
+            // 刷新redis中缓存法信息key的有效时间
+            redisTemplate.expire(invocationCacheKey, expireTime, TimeUnit.SECONDS);
+
             logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
         }
     }
