@@ -129,7 +129,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
             }
         }
 
-        return expirationSecondTime;
+        return expirationSecondTime < 0 ? 0 : expirationSecondTime;
     }
 
     /**
@@ -151,7 +151,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
                 preloadSecondTime = Long.parseLong(preloadStr);
             }
         }
-        return preloadSecondTime;
+        return preloadSecondTime < 0 ? 0 : preloadSecondTime;
     }
 
     /**
