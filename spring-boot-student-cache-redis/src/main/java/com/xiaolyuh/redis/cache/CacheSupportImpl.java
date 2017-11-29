@@ -18,7 +18,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -101,15 +100,6 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
     public void registerInvocation(Object targetBean, Method targetMethod, Class[] invocationParamTypes,
                                    Object[] invocationArgs, Set<String> annotatedCacheNames, String cacheKey) {
 
-
-        Field[] fields = targetBean.getClass().getDeclaredFields();
-
-        for (Field field: fields
-             ) {
-
-        }
-
-
         // 获取注解上真实的value值
         Collection<String> cacheNames = generateValue(annotatedCacheNames);
 
@@ -121,8 +111,8 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
         // 新建一个代理对象（记录了缓存注解的方法类信息）
         final CachedInvocation invocation = new CachedInvocation(key, targetBean, targetMethod.getName(), invocationParamTypes, invocationArgs);
-        for (Cache cache: caches) {
-            if(cache instanceof CustomizedRedisCache) {
+        for (Cache cache : caches) {
+            if (cache instanceof CustomizedRedisCache) {
                 CustomizedRedisCache redisCache = ((CustomizedRedisCache) cache);
                 // 将方法信息放到redis缓存
                 redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)), JSON.toJSON(invocation), redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
