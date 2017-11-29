@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  */
 
 public class ReflectionUtils {
-    private static final Logger logger = LoggerFactory.getLogger(CacheSupportImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReflectionUtils.class);
 
     /**
      * 循环向上转型, 获取对象的 DeclaredMethod
