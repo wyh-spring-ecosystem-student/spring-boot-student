@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
 import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
+import com.xiaolyuh.redis.utils.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -74,8 +76,6 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
     private Object invoke(CachedInvocation invocation) throws Exception {
 
-        final MethodInvoker invoker = new MethodInvoker();
-
         // 获取执行方法所需要的参数
         Object[] args = null;
         if (!CollectionUtils.isEmpty(invocation.getParameterTypes())) {
@@ -85,10 +85,10 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
                 args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
             }
         }
+        // 通过先获取Spring的代理对象，在根据这个对象获取真实的实例对象
+        Object target = ReflectionUtils.getTarget(SpringContextHolder.getBean(invocation.getTargetBean()));
 
-        // 到容器里面获取Bean
-        Object target = SpringContextHolder.getBean(invocation.getTargetBean());
-
+        final MethodInvoker invoker = new MethodInvoker();
         invoker.setTargetObject(target);
         invoker.setArguments(args);
         invoker.setTargetMethod(invocation.getTargetMethod());
@@ -100,6 +100,15 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
     @Override
     public void registerInvocation(Object targetBean, Method targetMethod, Class[] invocationParamTypes,
                                    Object[] invocationArgs, Set<String> annotatedCacheNames, String cacheKey) {
+
+
+        Field[] fields = targetBean.getClass().getDeclaredFields();
+
+        for (Field field: fields
+             ) {
+
+        }
+
 
         // 获取注解上真实的value值
         Collection<String> cacheNames = generateValue(annotatedCacheNames);

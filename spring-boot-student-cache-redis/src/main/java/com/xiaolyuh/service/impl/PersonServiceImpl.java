@@ -1,11 +1,8 @@
 package com.xiaolyuh.service.impl;
 
 import com.xiaolyuh.entity.Person;
-import com.xiaolyuh.redis.cache.CacheSupportImpl;
 import com.xiaolyuh.repository.PersonRepository;
 import com.xiaolyuh.service.PersonService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -15,8 +12,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PersonServiceImpl implements PersonService {
-    private static final Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
-
     @Autowired
     PersonRepository personRepository;
 
@@ -27,15 +22,14 @@ public class PersonServiceImpl implements PersonService {
     @CachePut(value = "people", key = "#person.id")
     public Person save(Person person) {
         Person p = personRepository.save(person);
-        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
-
+        System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
 
     @Override
     @CacheEvict(value = "people")//2
     public void remove(Long id) {
-        logger.info("删除了id、key为" + id + "的数据缓存");
+        System.out.println("删除了id、key为" + id + "的数据缓存");
         //这里不做实际删除操作
     }
 
@@ -49,15 +43,16 @@ public class PersonServiceImpl implements PersonService {
     @Cacheable(value = "people#${select.cache.timeout:1800}#${select.cache.refresh:600}", key = "#person.id", sync = true)//3
     public Person findOne(Person person) {
         Person p = personRepository.findOne(person.getId());
-        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
+        System.out.println(redisTemplate);
         return p;
     }
 
     @Override
-    @Cacheable(value = "people1#120#110")//3
+    @Cacheable(value = "people1#120#120")//3
     public Person findOne1() {
         Person p = personRepository.findOne(2L);
-        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
 
@@ -65,7 +60,7 @@ public class PersonServiceImpl implements PersonService {
     @Cacheable(value = "people2")//3
     public Person findOne2(Person person) {
         Person p = personRepository.findOne(person.getId());
-        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
 }
