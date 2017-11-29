@@ -14,6 +14,7 @@ import org.springframework.context.expression.AnnotatedElementKey;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.MethodInvoker;
 
 import java.lang.reflect.Method;
@@ -76,11 +77,15 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
         final MethodInvoker invoker = new MethodInvoker();
 
         // 获取执行方法所需要的参数
-        Object[] args = new Object[invocation.getParameterTypes().size()];
-        for (int i = 0; i < invocation.getParameterTypes().size(); i++) {
-            // 将参数转换成对应类型
-            args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
+        Object[] args = null;
+        if (!CollectionUtils.isEmpty(invocation.getParameterTypes())) {
+            args = new Object[invocation.getParameterTypes().size()];
+            for (int i = 0; i < invocation.getParameterTypes().size(); i++) {
+                // 将参数转换成对应类型
+                args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
+            }
         }
+
         // 到容器里面获取Bean
         Object target = SpringContextHolder.getBean(invocation.getTargetBean());
 
