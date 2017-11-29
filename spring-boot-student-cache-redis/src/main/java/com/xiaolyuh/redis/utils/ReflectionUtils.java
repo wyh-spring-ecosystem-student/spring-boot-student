@@ -1,5 +1,8 @@
 package com.xiaolyuh.redis.utils;
 
+import com.xiaolyuh.redis.cache.CacheSupportImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AdvisedSupport;
 import org.springframework.aop.framework.AopProxy;
 import org.springframework.aop.support.AopUtils;
@@ -15,6 +18,7 @@ import java.lang.reflect.Method;
  */
 
 public class ReflectionUtils {
+    private static final Logger logger = LoggerFactory.getLogger(CacheSupportImpl.class);
 
     /**
      * 循环向上转型, 获取对象的 DeclaredMethod
@@ -65,12 +69,8 @@ public class ReflectionUtils {
                 //调用object 的 method 所代表的方法，其方法的参数是 parameters
                 return method.invoke(object, parameters);
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
         }
 
         return null;
@@ -122,10 +122,8 @@ public class ReflectionUtils {
         try {
             //将 object 中 field 所代表的值 设置为 value  
             field.set(object, value);
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.info(e.getMessage(), e);
         }
 
     }
@@ -149,9 +147,8 @@ public class ReflectionUtils {
         try {
             //获取 object 中 field 所代表的属性值  
             return field.get(object);
-
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage(), e);
         }
 
         return null;
