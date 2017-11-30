@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
-import com.xiaolyuh.redis.serializer.FastJson2JsonRedisSerializer;
+import com.xiaolyuh.redis.serializer.FastJsonRedisSerializer;
 import com.xiaolyuh.redis.serializer.StringRedisSerializer;
 
 /**
@@ -48,12 +48,15 @@ public class RedisConfig {
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
         
-        FastJson2JsonRedisSerializer<Object> fastJson2JsonRedisSerializer = new FastJson2JsonRedisSerializer<>(Object.class);
-        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
+        // 全局开启AutoType，不建议使用
+//        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
+        // 建议使用这种方式，小范围指定白名单
+        ParserConfig.getGlobalInstance().addAccept("com.xiaolyuh.");
 
-        // 设置值（value）的序列化采用Jackson2JsonRedisSerializer。
-        redisTemplate.setValueSerializer(fastJson2JsonRedisSerializer);
-        redisTemplate.setHashValueSerializer(fastJson2JsonRedisSerializer);
+        // 设置值（value）的序列化采用FastJsonRedisSerializer。
+        redisTemplate.setValueSerializer(fastJsonRedisSerializer);
+        redisTemplate.setHashValueSerializer(fastJsonRedisSerializer);
         // 设置键（key）的序列化采用StringRedisSerializer。
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());
