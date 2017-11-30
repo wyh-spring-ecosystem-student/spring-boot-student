@@ -1,19 +1,21 @@
 package com.xiaolyuh.redis.config;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
-import com.xiaolyuh.redis.serializer.StringRedisSerializer;
+import com.alibaba.fastjson.parser.ParserConfig;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
+import com.xiaolyuh.redis.serializer.FastJson2JsonRedisSerializer;
+import com.xiaolyuh.redis.serializer.StringRedisSerializer;
 
 /**
  * @author yuhao.wang
@@ -45,10 +47,13 @@ public class RedisConfig {
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
+        
+        FastJson2JsonRedisSerializer<Object> fastJson2JsonRedisSerializer = new FastJson2JsonRedisSerializer<>(Object.class);
+        ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
 
         // 设置值（value）的序列化采用Jackson2JsonRedisSerializer。
-        redisTemplate.setValueSerializer(jackson2JsonRedisSerializer);
-        redisTemplate.setHashValueSerializer(jackson2JsonRedisSerializer);
+        redisTemplate.setValueSerializer(fastJson2JsonRedisSerializer);
+        redisTemplate.setHashValueSerializer(fastJson2JsonRedisSerializer);
         // 设置键（key）的序列化采用StringRedisSerializer。
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         redisTemplate.setHashKeySerializer(new StringRedisSerializer());

@@ -39,7 +39,6 @@ public class SpringContextHolder implements ApplicationContextAware {
     /**
      * 从静态变量ApplicationContext中取得Bean, 自动转型为所赋值对象的类型.
      */
-    @SuppressWarnings("unchecked")
     public static <T> T getBean(Class<T> clazz) {
         checkApplicationContext();
         return (T) applicationContext.getBean(clazz);
