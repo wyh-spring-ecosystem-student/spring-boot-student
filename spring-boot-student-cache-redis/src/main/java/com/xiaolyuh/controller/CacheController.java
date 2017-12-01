@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 public class CacheController {
 
@@ -25,8 +28,12 @@ public class CacheController {
 
     @RequestMapping("/able")
     public Person cacheable(Person person) {
-
-        return personService.findOne(person);
+        String a = "a";
+        String[] b = {"1", "2"};
+        List<Long> c = new ArrayList<>();
+        c.add(3L);
+        c.add(4L);
+        return personService.findOne(person, a, b, c);
     }
 
     @RequestMapping("/able1")
