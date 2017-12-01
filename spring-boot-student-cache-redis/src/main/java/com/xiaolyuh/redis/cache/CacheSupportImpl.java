@@ -81,7 +81,14 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             args = new Object[invocation.getParameterTypes().size()];
             for (int i = 0; i < invocation.getParameterTypes().size(); i++) {
                 // 将参数转换成对应类型
-                args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
+                if (String.class.equals(invocation.getParameterTypes().get(i))
+                        || Character.class.equals(invocation.getParameterTypes().get(i))) {
+
+                    // String、Character类型的不用转，如果转会报错
+                    args[i] = invocation.getArguments().get(i).toString();
+                } else {
+                    args[i] = JSON.parseObject(invocation.getArguments().get(i).toString(), invocation.getParameterTypes().get(i));
+                }
             }
         }
         // 通过先获取Spring的代理对象，在根据这个对象获取真实的实例对象

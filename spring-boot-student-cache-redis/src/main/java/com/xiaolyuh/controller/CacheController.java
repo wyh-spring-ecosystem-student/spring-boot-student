@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+
 @RestController
 public class CacheController {
 
@@ -26,7 +28,7 @@ public class CacheController {
     @RequestMapping("/able")
     public Person cacheable(Person person) {
 
-        return personService.findOne(person);
+        return personService.findOne(person, "q", 1L, true, 'a', new BigDecimal(1));
     }
 
     @RequestMapping("/able1")
