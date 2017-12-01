@@ -55,7 +55,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             computed = invoke(invocation);
             invocationSuccess = true;
         } catch (Exception ex) {
-            logger.info(ex.getMessage(), ex);
+            logger.info("刷新缓存异常：" + ex.getMessage(), ex);
             invocationSuccess = false;
         }
         if (invocationSuccess) {
