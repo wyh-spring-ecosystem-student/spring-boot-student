@@ -1,8 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
+import com.xiaolyuh.redis.lock.RedisLock;
 import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.utils.ThreadTaskUtils;
-import com.xiaolyuh.redis.lock.RedisLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -14,9 +14,6 @@ import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.FutureTask;
 
 /**
  * 自定义的redis缓存
