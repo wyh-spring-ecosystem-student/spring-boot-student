@@ -1,9 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
 import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
+import com.xiaolyuh.redis.utils.RedisTemplateUtils;
 import com.xiaolyuh.redis.utils.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.expression.AnnotatedElementKey;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
@@ -41,10 +41,10 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
     private KeyGenerator keyGenerator;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private CustomizedRedisCacheManager cacheManager;
 
     @Autowired
-    private CustomizedRedisCacheManager cacheManager;
+    private RedisConnectionFactory redisConnectionFactory;
 
     private void refreshCache(CachedInvocation invocation, String cacheName) {
 
@@ -67,6 +67,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             CustomizedRedisCache redisCache = (CustomizedRedisCache) cache;
             long expireTime = redisCache.getExpirationSecondTime();
             // 刷新redis中缓存法信息key的有效时间
+            RedisTemplate redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
             redisTemplate.expire(getInvocationCacheKey(redisCache.getCacheKey(invocation.getKey())), redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
 
             logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
@@ -111,7 +112,9 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             if (cache instanceof CustomizedRedisCache) {
                 CustomizedRedisCache redisCache = ((CustomizedRedisCache) cache);
                 // 将方法信息放到redis缓存
-                redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)), invocation, redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
+                RedisTemplate redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
+                redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)),
+                        invocation, redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
             }
         }
     }
@@ -123,6 +126,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
 
     @Override
     public void refreshCacheByKey(String cacheName, String cacheKey) {
+        RedisTemplate redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
         //在redis拿到方法信息，然后刷新缓存
         CachedInvocation invocation = (CachedInvocation) redisTemplate.opsForValue().get(getInvocationCacheKey(cacheKey));
         if (invocation != null) {

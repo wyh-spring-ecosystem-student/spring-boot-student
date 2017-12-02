@@ -1,6 +1,7 @@
 package com.xiaolyuh.redis.cache;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  *
  * @author yuhao.wang
  */
-public final class CachedInvocation {
+public final class CachedInvocation implements Serializable{
 
     private Object key;
     private String targetBean;
