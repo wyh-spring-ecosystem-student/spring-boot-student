@@ -22,14 +22,6 @@ public interface CacheSupport {
      */
     void registerInvocation(Object invokedBean, Method invokedMethod, Class[] invocationParamTypes, Object[] invocationArgs, Set<String> cacheNames, String cacheKey);
 
-
-    /**
-     * 刷新容器中所有值
-     *
-     * @param cacheName
-     */
-    void refreshCache(String cacheName);
-
     /**
      * 按容器以及指定键更新缓存
      *

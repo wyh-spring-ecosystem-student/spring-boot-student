@@ -70,11 +70,6 @@ public class CacheSupportImpl implements CacheSupport {
     }
 
     @Override
-    public void refreshCache(String cacheName) {
-        this.refreshCacheByKey(cacheName, null);
-    }
-
-    @Override
     public void refreshCacheByKey(String cacheName, String cacheKey) {
         RedisTemplate redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
         //在redis拿到方法信息，然后刷新缓存
@@ -103,8 +98,8 @@ public class CacheSupportImpl implements CacheSupport {
             redisTemplate.expire(getInvocationCacheKey(redisCache.getCacheKey(invocation.getKey())), expireTime, TimeUnit.SECONDS);
 
             logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
-        } catch (Exception ex) {
-            logger.info("刷新缓存异常：" + ex.getMessage(), ex);
+        } catch (Exception e) {
+            logger.info("刷新缓存失败：" + e.getMessage(), e);
         }
 
     }
@@ -208,6 +203,5 @@ public class CacheSupportImpl implements CacheSupport {
         }
         return cacheNames;
     }
-
 
 }
