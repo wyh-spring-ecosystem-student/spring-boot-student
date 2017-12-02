@@ -1,6 +1,6 @@
 package com.xiaolyuh.redis.cache;
 
-import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
+import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.cache.helper.ThreadTaskHelper;
 import com.xiaolyuh.redis.lock.RedisLock;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class CustomizedRedisCache extends RedisCache {
     private static final Logger logger = LoggerFactory.getLogger(CustomizedRedisCache.class);
 
     private CacheSupport getCacheSupport() {
-        return SpringContextHolder.getBean(CacheSupport.class);
+        return SpringContextUtils.getBean(CacheSupport.class);
     }
 
     private final RedisOperations redisOperations;

@@ -1,6 +1,6 @@
 package com.xiaolyuh.redis.cache;
 
-import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
+import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.utils.ReflectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -73,7 +73,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
 
     public RedisCacheManager getInstance() {
         if (redisCacheManager == null) {
-            redisCacheManager = SpringContextHolder.getBean(RedisCacheManager.class);
+            redisCacheManager = SpringContextUtils.getBean(RedisCacheManager.class);
         }
         return redisCacheManager;
     }

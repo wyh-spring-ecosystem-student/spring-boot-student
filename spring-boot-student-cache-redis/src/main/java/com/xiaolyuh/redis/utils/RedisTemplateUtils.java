@@ -10,7 +10,7 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
  *
  * @author yuhao.wang
  */
-public class RedisTemplateUtils {
+public final class RedisTemplateUtils {
 
     private static RedisTemplate redisTemplate;
 

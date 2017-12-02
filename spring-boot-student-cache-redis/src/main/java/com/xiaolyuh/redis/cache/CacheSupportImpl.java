@@ -1,7 +1,7 @@
 package com.xiaolyuh.redis.cache;
 
 import com.xiaolyuh.redis.cache.expression.CacheOperationExpressionEvaluator;
-import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
+import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.utils.RedisTemplateUtils;
 import com.xiaolyuh.redis.utils.ReflectionUtils;
 import org.slf4j.Logger;
@@ -82,7 +82,7 @@ public class CacheSupportImpl implements CacheSupport, InvocationRegistry {
             args = invocation.getArguments().toArray();
         }
         // 通过先获取Spring的代理对象，在根据这个对象获取真实的实例对象
-        Object target = ReflectionUtils.getTarget(SpringContextHolder.getBean(Class.forName(invocation.getTargetBean())));
+        Object target = ReflectionUtils.getTarget(SpringContextUtils.getBean(Class.forName(invocation.getTargetBean())));
 
         final MethodInvoker invoker = new MethodInvoker();
         invoker.setTargetObject(target);
