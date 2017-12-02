@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.expression.AnnotatedElementKey;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.EvaluationContext;
@@ -41,7 +42,7 @@ public class CacheSupportImpl implements CacheSupport {
     private KeyGenerator keyGenerator;
 
     @Autowired
-    private CustomizedRedisCacheManager cacheManager;
+    private RedisCacheManager cacheManager;
 
     @Autowired
     private RedisConnectionFactory redisConnectionFactory;
