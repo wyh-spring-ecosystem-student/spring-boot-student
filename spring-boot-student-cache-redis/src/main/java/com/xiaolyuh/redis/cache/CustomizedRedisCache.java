@@ -15,6 +15,9 @@ import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
+import java.util.concurrent.Callable;
+import java.util.concurrent.FutureTask;
+
 /**
  * 自定义的redis缓存
  *
@@ -146,32 +149,46 @@ public class CustomizedRedisCache extends RedisCache {
     private void refreshCache(Object key, String cacheKeyStr) {
         Long ttl = this.redisOperations.getExpire(cacheKeyStr);
         if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-            // 尽量少的去开启线程，因为线程池是有限的
-            ThreadTaskUtils.run(new Runnable() {
-                @Override
-                public void run() {
-                    // 加一个分布式锁，只放一个请求去刷新缓存
-                    RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
-                    try {
-                        if (redisLock.lock()) {
-                            // 获取锁之后再判断一下过期时间，看是否需要加载数据
-                            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
-                            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                                // 通过获取代理方法信息重新加载缓存数据
-                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
-                            }
+            // 加一个分布式锁，只放一个请求去刷新缓存
+            RedisLock redisLock = new RedisLock((RedisTemplate) redisOperations, cacheKeyStr + "_lock");
+            try {
+                if (redisLock.lock()) {
+                    // 获取锁之后再判断一下过期时间，看是否需要加载数据
+                    ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
+                    if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                        FutureTask<Boolean> futureTask = getRefreshCacheFutureTask(cacheKeyStr);
+                        // 尽量少的去开启线程，因为线程池是有限的
+                        ThreadTaskUtils.run(futureTask);
+                        // 获取异步线程的返回值，并解锁
+                        if (futureTask.get()) {
+                            redisLock.unlock();
                         }
-                    } catch (Exception e) {
-                        logger.info(e.getMessage(), e);
-                    } finally {
-                        redisLock.unlock();
                     }
                 }
-            });
+            } catch (Exception e) {
+                logger.info(e.getMessage(), e);
+            } finally {
+                redisLock.unlock();
+            }
+
         }
     }
 
     public long getExpirationSecondTime() {
         return expirationSecondTime;
+    }
+
+    private FutureTask<Boolean> getRefreshCacheFutureTask(String cacheKeyStr) {
+        FutureTask<Boolean> futureTask = new FutureTask<>(new Callable<Boolean>() {
+            @Override
+            public Boolean call() throws Exception {
+                // 通过获取代理方法信息重新加载缓存数据
+                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
+
+                return true;
+            }
+        });
+
+        return futureTask;
     }
 }
