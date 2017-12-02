@@ -155,7 +155,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
     }
 
     /**
-     * 重写父类的getCache方法，真假了三个参数
+     * 重写父类的getCache方法，增加了三个参数
      *
      * @param cacheName            缓存名称
      * @param expirationSecondTime 过期时间
