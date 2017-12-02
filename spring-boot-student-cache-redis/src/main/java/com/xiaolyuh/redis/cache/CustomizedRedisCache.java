@@ -1,8 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
+import com.xiaolyuh.redis.lock.RedisLock;
 import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.utils.ThreadTaskUtils;
-import com.xiaolyuh.redis.lock.RedisLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -182,13 +182,13 @@ public class CustomizedRedisCache extends RedisCache {
         FutureTask<Boolean> futureTask = new FutureTask<>(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                try{
+                try {
                     // 通过获取代理方法信息重新加载缓存数据
                     CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
+                } catch (Exception e) {
+                    logger.info("异步刷新缓存失败：" + e.getMessage(), e);
                 }
-                catch (Exception e) {
-                    logger.info("异步刷新缓存失败："+e.getMessage(), e);
-                }
+                
                 return true;
             }
         });
