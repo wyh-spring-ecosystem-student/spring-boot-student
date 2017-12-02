@@ -1,7 +1,6 @@
 package com.xiaolyuh;
 
 import com.xiaolyuh.entity.Person;
-import com.xiaolyuh.redis.cache.CachedInvocation;
 import net.minidev.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,11 +25,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -164,10 +160,10 @@ public class SpringBootStudentCacheRedisApplicationTests {
 //        Object targetBean = null;
 //        String targetMethod = null;
 //        Object[] arguments = null;
-//        CachedInvocation cachedInvocation1 = new CachedInvocation(1, targetBean, targetMethod, arguments);
-//        CachedInvocation cachedInvocation2 = new CachedInvocation(1, targetBean, targetMethod, arguments);
+//        CachedMethodInvocation cachedInvocation1 = new CachedMethodInvocation(1, targetBean, targetMethod, arguments);
+//        CachedMethodInvocation cachedInvocation2 = new CachedMethodInvocation(1, targetBean, targetMethod, arguments);
 //
-//        Set<CachedInvocation> invocations = new HashSet<>();
+//        Set<CachedMethodInvocation> invocations = new HashSet<>();
 //        invocations.add(cachedInvocation1);
 //        invocations.add(cachedInvocation2);
 //

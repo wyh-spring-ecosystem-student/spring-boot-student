@@ -1,21 +1,21 @@
 package com.xiaolyuh.redis.config;
 
 import com.alibaba.fastjson.parser.ParserConfig;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.interceptor.SimpleKeyGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xiaolyuh.redis.cache.CustomizedRedisCacheManager;
 import com.xiaolyuh.redis.serializer.FastJsonRedisSerializer;
 import com.xiaolyuh.redis.serializer.StringRedisSerializer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 /**
  * @author yuhao.wang
@@ -47,7 +47,7 @@ public class RedisConfig {
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         jackson2JsonRedisSerializer.setObjectMapper(om);
-        
+
         FastJsonRedisSerializer<Object> fastJsonRedisSerializer = new FastJsonRedisSerializer<>(Object.class);
         // 全局开启AutoType，不建议使用
         // ParserConfig.getGlobalInstance().setAutoTypeSupport(true);
@@ -78,8 +78,8 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public CustomizedRedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
-        CustomizedRedisCacheManager redisCacheManager = new CustomizedRedisCacheManager(redisTemplate);
+    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
+        RedisCacheManager redisCacheManager = new CustomizedRedisCacheManager(redisTemplate);
         redisCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
         redisCacheManager.setDefaultExpiration(redisDefaultExpiration);

@@ -2,6 +2,7 @@ package com.xiaolyuh.redis.cache;
 
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @author yuhao.wang
  */
-public final class CachedInvocation implements Serializable{
+public final class CachedMethodInvocation implements Serializable{
 
     private Object key;
     private String targetBean;
@@ -20,13 +21,12 @@ public final class CachedInvocation implements Serializable{
     private List<Object> arguments;
     private List<String> parameterTypes = new ArrayList<>();
 
-    public CachedInvocation() {
-    }
+    public CachedMethodInvocation() {}
 
-    public CachedInvocation(Object key, Object targetBean, String targetMethod, Class[] parameterTypes, Object[] arguments) {
+    public CachedMethodInvocation(Object key, Object targetBean, Method targetMethod, Class[] parameterTypes, Object[] arguments) {
         this.key = key;
         this.targetBean = targetBean.getClass().getName();
-        this.targetMethod = targetMethod;
+        this.targetMethod = targetMethod.getName();
         if (arguments != null && arguments.length != 0) {
             this.arguments = Arrays.asList(arguments);
         }
@@ -92,7 +92,7 @@ public final class CachedInvocation implements Serializable{
             return false;
         }
 
-        CachedInvocation that = (CachedInvocation) o;
+        CachedMethodInvocation that = (CachedMethodInvocation) o;
 
         return key.equals(that.key);
     }

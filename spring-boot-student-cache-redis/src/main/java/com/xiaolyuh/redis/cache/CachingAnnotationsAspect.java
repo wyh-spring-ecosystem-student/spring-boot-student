@@ -31,7 +31,7 @@ public class CachingAnnotationsAspect {
     private static final Logger logger = LoggerFactory.getLogger(CachingAnnotationsAspect.class);
 
     @Autowired
-    private InvocationRegistry cacheRefreshSupport;
+    private CacheSupport cacheSupport;
 
     private <T extends Annotation> List<T> getMethodAnnotations(AnnotatedElement ae, Class<T> annotationType) {
         List<T> anns = new ArrayList<T>(2);
@@ -87,7 +87,7 @@ public class CachingAnnotationsAspect {
 
         if (joinPoint.getSignature() instanceof MethodSignature) {
             Class[] parameterTypes = ((MethodSignature)joinPoint.getSignature()).getParameterTypes();
-            cacheRefreshSupport.registerInvocation(joinPoint.getTarget(), method, parameterTypes,
+            cacheSupport.registerInvocation(joinPoint.getTarget(), method, parameterTypes,
                     joinPoint.getArgs(), cacheSet, cacheKey);
         }
 
