@@ -1,7 +1,7 @@
 package com.xiaolyuh.redis.cache;
 
 import com.xiaolyuh.redis.utils.SpringContextUtils;
-import com.xiaolyuh.redis.cache.helper.ThreadTaskHelper;
+import com.xiaolyuh.redis.utils.ThreadTaskUtils;
 import com.xiaolyuh.redis.lock.RedisLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,7 +146,7 @@ public class CustomizedRedisCache extends RedisCache {
         Long ttl = this.redisOperations.getExpire(cacheKeyStr);
         if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
             // 尽量少的去开启线程，因为线程池是有限的
-            ThreadTaskHelper.run(new Runnable() {
+            ThreadTaskUtils.run(new Runnable() {
                 @Override
                 public void run() {
                     // 加一个分布式锁，只放一个请求去刷新缓存
