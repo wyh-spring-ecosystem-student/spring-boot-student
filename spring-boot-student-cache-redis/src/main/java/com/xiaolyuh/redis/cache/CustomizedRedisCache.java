@@ -125,6 +125,7 @@ public class CustomizedRedisCache extends RedisCache {
      * @return
      */
     public RedisCacheKey getRedisCacheKey(Object key) {
+
         return new RedisCacheKey(key).usePrefix(this.prefix)
                 .withKeySerializer(redisOperations.getKeySerializer());
     }
