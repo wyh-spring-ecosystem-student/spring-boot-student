@@ -182,9 +182,13 @@ public class CustomizedRedisCache extends RedisCache {
         FutureTask<Boolean> futureTask = new FutureTask<>(new Callable<Boolean>() {
             @Override
             public Boolean call() throws Exception {
-                // 通过获取代理方法信息重新加载缓存数据
-                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
-
+                try{
+                    // 通过获取代理方法信息重新加载缓存数据
+                    CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
+                }
+                catch (Exception e) {
+                    logger.info("异步刷新缓存失败："+e.getMessage(), e);
+                }
                 return true;
             }
         });
