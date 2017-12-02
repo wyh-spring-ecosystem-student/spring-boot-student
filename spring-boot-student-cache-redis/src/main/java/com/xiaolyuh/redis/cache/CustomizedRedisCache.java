@@ -122,28 +122,6 @@ public class CustomizedRedisCache extends RedisCache {
     }
 
     /**
-     * 获取RedisCacheKey
-     *
-     * @param key
-     * @return
-     */
-    public RedisCacheKey getRedisCacheKey(Object key) {
-
-        return new RedisCacheKey(key).usePrefix(this.prefix)
-                .withKeySerializer(redisOperations.getKeySerializer());
-    }
-
-    /**
-     * 获取RedisCacheKey
-     *
-     * @param key
-     * @return
-     */
-    public String getCacheKey(Object key) {
-        return new String(getRedisCacheKey(key).getKeyBytes());
-    }
-
-    /**
      * 刷新缓存数据
      */
     private void refreshCache(Object key, String cacheKeyStr) {
@@ -176,5 +154,28 @@ public class CustomizedRedisCache extends RedisCache {
 
     public long getExpirationSecondTime() {
         return expirationSecondTime;
+    }
+
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    public RedisCacheKey getRedisCacheKey(Object key) {
+
+        return new RedisCacheKey(key).usePrefix(this.prefix)
+                .withKeySerializer(redisOperations.getKeySerializer());
+    }
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    public String getCacheKey(Object key) {
+        return new String(getRedisCacheKey(key).getKeyBytes());
     }
 }
