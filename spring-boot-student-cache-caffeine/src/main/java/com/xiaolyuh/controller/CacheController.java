@@ -3,7 +3,6 @@ package com.xiaolyuh.controller;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
