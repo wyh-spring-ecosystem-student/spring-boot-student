@@ -17,9 +17,6 @@ public class CacheController {
     @Autowired
     PersonService personService;
 
-    @Autowired
-    CacheManager cacheManager;
-
     @RequestMapping("/put")
     public long put(@RequestBody Person person) {
         Person p = personService.save(person);
@@ -33,6 +30,7 @@ public class CacheController {
         List<Long> c = new ArrayList<>();
         c.add(3L);
         c.add(4L);
+        c.add(5L);
         return personService.findOne(person, a, b, c);
     }
 
