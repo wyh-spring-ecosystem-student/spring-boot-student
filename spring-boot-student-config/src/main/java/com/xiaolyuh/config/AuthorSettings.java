@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.config;
+package com.xiaolyuh.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;

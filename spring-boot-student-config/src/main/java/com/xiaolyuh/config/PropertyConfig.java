@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.config;
+package com.xiaolyuh.config;
 
 import java.io.IOException;
 

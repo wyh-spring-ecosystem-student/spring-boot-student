@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.xiaolyuh.redis.config.PropertyConfig;
+import com.xiaolyuh.config.PropertyConfig;
 import com.xiaolyuh.entity.Person;
 
 @RestController

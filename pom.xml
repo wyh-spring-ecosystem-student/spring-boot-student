@@ -81,14 +81,17 @@
 		<module>spring-boot-student-cache</module>
 		<!-- Spring Boot 使用 ehcache作为 Spring 缓存 -->
 		<module>spring-boot-student-cache-ehcache</module>
-		<!-- Spring Boot 使用 redis作为 Spring 缓存 -->
+		<!-- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存） -->
 		<module>spring-boot-student-cache-redis</module>
+		<!-- Spring Boot 使用 caffeine作为 Spring 缓存 -->
+		<module>spring-boot-student-cache-caffeine</module>
 		<!-- Spring Boot 使用Spring data mongo 操作mongodb数据库 -->
 		<module>spring-boot-student-data-mongo</module>
 		<!-- Spring Boot 使用Spring data redis 操作redis数据库 -->
 		<module>spring-boot-student-data-redis</module>
 		<!-- 基于redis实现的分布式锁 -->
-		<module>spring-boot-student-data-redis-distributed-lock</module>
+		<module>spring-boot-student-data-redis-distributed-lock</module>		
+		
     </modules>
 
 </project>
