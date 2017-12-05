@@ -1,11 +1,10 @@
 package com.xiaolyuh.redis.serializer;
 
-import java.nio.charset.Charset;
-
 import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
+
+import java.nio.charset.Charset;
 
 /**
  * 必须重写序列化器，否则@Cacheable注解的key会报类型转换错误

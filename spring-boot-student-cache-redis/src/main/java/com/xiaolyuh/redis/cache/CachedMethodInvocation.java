@@ -13,7 +13,7 @@ import java.util.List;
  *
  * @author yuhao.wang
  */
-public final class CachedMethodInvocation implements Serializable{
+public final class CachedMethodInvocation implements Serializable {
 
     private Object key;
     private String targetBean;
@@ -21,7 +21,8 @@ public final class CachedMethodInvocation implements Serializable{
     private List<Object> arguments;
     private List<String> parameterTypes = new ArrayList<>();
 
-    public CachedMethodInvocation() {}
+    public CachedMethodInvocation() {
+    }
 
     public CachedMethodInvocation(Object key, Object targetBean, Method targetMethod, Class[] parameterTypes, Object[] arguments) {
         this.key = key;
@@ -31,7 +32,7 @@ public final class CachedMethodInvocation implements Serializable{
             this.arguments = Arrays.asList(arguments);
         }
         if (parameterTypes != null && parameterTypes.length != 0) {
-            for (Class clazz: parameterTypes) {
+            for (Class clazz : parameterTypes) {
                 this.parameterTypes.add(clazz.getName());
             }
         }

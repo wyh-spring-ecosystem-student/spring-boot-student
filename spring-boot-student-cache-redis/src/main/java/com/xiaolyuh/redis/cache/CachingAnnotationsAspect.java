@@ -86,7 +86,7 @@ public class CachingAnnotationsAspect {
         }
 
         if (joinPoint.getSignature() instanceof MethodSignature) {
-            Class[] parameterTypes = ((MethodSignature)joinPoint.getSignature()).getParameterTypes();
+            Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
             cacheSupport.registerInvocation(joinPoint.getTarget(), method, parameterTypes,
                     joinPoint.getArgs(), cacheSet, cacheKey);
         }
