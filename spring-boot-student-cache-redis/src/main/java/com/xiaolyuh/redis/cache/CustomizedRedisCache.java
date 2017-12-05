@@ -1,8 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
-import com.xiaolyuh.redis.cache.helper.SpringContextHolder;
-import com.xiaolyuh.redis.cache.helper.ThreadTaskHelper;
 import com.xiaolyuh.redis.lock.RedisLock;
+import com.xiaolyuh.redis.utils.SpringContextUtils;
+import com.xiaolyuh.redis.utils.ThreadTaskUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
@@ -25,7 +25,7 @@ public class CustomizedRedisCache extends RedisCache {
     private static final Logger logger = LoggerFactory.getLogger(CustomizedRedisCache.class);
 
     private CacheSupport getCacheSupport() {
-        return SpringContextHolder.getBean(CacheSupport.class);
+        return SpringContextUtils.getBean(CacheSupport.class);
     }
 
     private final RedisOperations redisOperations;
@@ -119,34 +119,13 @@ public class CustomizedRedisCache extends RedisCache {
     }
 
     /**
-     * 获取RedisCacheKey
-     *
-     * @param key
-     * @return
-     */
-    public RedisCacheKey getRedisCacheKey(Object key) {
-        return new RedisCacheKey(key).usePrefix(this.prefix)
-                .withKeySerializer(redisOperations.getKeySerializer());
-    }
-
-    /**
-     * 获取RedisCacheKey
-     *
-     * @param key
-     * @return
-     */
-    public String getCacheKey(Object key) {
-        return new String(getRedisCacheKey(key).getKeyBytes());
-    }
-
-    /**
      * 刷新缓存数据
      */
     private void refreshCache(Object key, String cacheKeyStr) {
         Long ttl = this.redisOperations.getExpire(cacheKeyStr);
         if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
             // 尽量少的去开启线程，因为线程池是有限的
-            ThreadTaskHelper.run(new Runnable() {
+            ThreadTaskUtils.run(new Runnable() {
                 @Override
                 public void run() {
                     // 加一个分布式锁，只放一个请求去刷新缓存
@@ -172,5 +151,28 @@ public class CustomizedRedisCache extends RedisCache {
 
     public long getExpirationSecondTime() {
         return expirationSecondTime;
+    }
+
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    public RedisCacheKey getRedisCacheKey(Object key) {
+
+        return new RedisCacheKey(key).usePrefix(this.prefix)
+                .withKeySerializer(redisOperations.getKeySerializer());
+    }
+
+    /**
+     * 获取RedisCacheKey
+     *
+     * @param key
+     * @return
+     */
+    public String getCacheKey(Object key) {
+        return new String(getRedisCacheKey(key).getKeyBytes());
     }
 }

@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.cache.helper;
+package com.xiaolyuh.redis.utils;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 /**
  *
  */
-public class ThreadTaskHelper {
+public class ThreadTaskUtils {
     private static ThreadPoolTaskExecutor taskExecutor = null;
 
     static {

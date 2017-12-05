@@ -1,18 +1,26 @@
 package com.xiaolyuh.redis.cache;
 
+import java.lang.reflect.Method;
+import java.util.Set;
+
 /**
- * 主动刷新缓存接口
+ * 注册和刷新缓存接口
  *
  * @author yuhao.wang
  */
 public interface CacheSupport {
 
     /**
-     * 刷新容器中所有值
+     * 注册缓存方法信息
      *
-     * @param cacheName
+     * @param invokedBean          代理Bean
+     * @param invokedMethod        代理方法名称
+     * @param invocationParamTypes 代理方法参数类型
+     * @param invocationArgs       代理方法参数
+     * @param cacheNames           缓存名称（@Cacheable注解的value）
+     * @param cacheKey             缓存key（@Cacheable注解的key）
      */
-    void refreshCache(String cacheName);
+    void registerInvocation(Object invokedBean, Method invokedMethod, Class[] invocationParamTypes, Object[] invocationArgs, Set<String> cacheNames, String cacheKey);
 
     /**
      * 按容器以及指定键更新缓存

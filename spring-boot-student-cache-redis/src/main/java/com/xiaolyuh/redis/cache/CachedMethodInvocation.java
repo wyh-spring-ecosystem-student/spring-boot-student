@@ -1,6 +1,9 @@
 package com.xiaolyuh.redis.cache;
 
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -10,26 +13,27 @@ import java.util.List;
  *
  * @author yuhao.wang
  */
-public final class CachedInvocation {
+public final class CachedMethodInvocation implements Serializable{
 
     private Object key;
-    private Class targetBean;
+    private String targetBean;
     private String targetMethod;
     private List<Object> arguments;
-    private List<Class> parameterTypes;
+    private List<String> parameterTypes = new ArrayList<>();
 
-    public CachedInvocation() {
-    }
+    public CachedMethodInvocation() {}
 
-    public CachedInvocation(Object key, Object targetBean, String targetMethod, Class[] parameterTypes, Object[] arguments) {
+    public CachedMethodInvocation(Object key, Object targetBean, Method targetMethod, Class[] parameterTypes, Object[] arguments) {
         this.key = key;
-        this.targetBean = targetBean.getClass();
-        this.targetMethod = targetMethod;
+        this.targetBean = targetBean.getClass().getName();
+        this.targetMethod = targetMethod.getName();
         if (arguments != null && arguments.length != 0) {
             this.arguments = Arrays.asList(arguments);
         }
         if (parameterTypes != null && parameterTypes.length != 0) {
-            this.parameterTypes = Arrays.asList(parameterTypes);
+            for (Class clazz: parameterTypes) {
+                this.parameterTypes.add(clazz.getName());
+            }
         }
     }
 
@@ -41,11 +45,11 @@ public final class CachedInvocation {
         this.key = key;
     }
 
-    public Class getTargetBean() {
+    public String getTargetBean() {
         return targetBean;
     }
 
-    public void setTargetBean(Class targetBean) {
+    public void setTargetBean(String targetBean) {
         this.targetBean = targetBean;
     }
 
@@ -65,11 +69,11 @@ public final class CachedInvocation {
         this.arguments = arguments;
     }
 
-    public List<Class> getParameterTypes() {
+    public List<String> getParameterTypes() {
         return parameterTypes;
     }
 
-    public void setParameterTypes(List<Class> parameterTypes) {
+    public void setParameterTypes(List<String> parameterTypes) {
         this.parameterTypes = parameterTypes;
     }
 
@@ -88,7 +92,7 @@ public final class CachedInvocation {
             return false;
         }
 
-        CachedInvocation that = (CachedInvocation) o;
+        CachedMethodInvocation that = (CachedMethodInvocation) o;
 
         return key.equals(that.key);
     }

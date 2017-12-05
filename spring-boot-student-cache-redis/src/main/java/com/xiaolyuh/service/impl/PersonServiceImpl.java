@@ -10,7 +10,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PersonServiceImpl implements PersonService {
@@ -43,7 +43,7 @@ public class PersonServiceImpl implements PersonService {
      */
     @Override
     @Cacheable(value = "people#${select.cache.timeout:1800}#${select.cache.refresh:600}", key = "#person.id", sync = true)//3
-    public Person findOne(Person person, String a, long b, boolean c, char d, BigDecimal bigDecimal) {
+    public Person findOne(Person person, String a, String[] b, List<Long> c) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
         System.out.println(redisTemplate);

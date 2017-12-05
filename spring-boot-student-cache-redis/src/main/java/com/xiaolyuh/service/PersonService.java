@@ -2,7 +2,7 @@ package com.xiaolyuh.service;
 
 import com.xiaolyuh.entity.Person;
 
-import java.math.BigDecimal;
+import java.util.List;
 
 
 public interface PersonService {
@@ -10,7 +10,7 @@ public interface PersonService {
 
     void remove(Long id);
 
-    Person findOne(Person person, String a, long b, boolean c, char d, BigDecimal bigDecimal);
+    Person findOne(Person person, String a, String[] b, List<Long> c);
 
     Person findOne1();
 
