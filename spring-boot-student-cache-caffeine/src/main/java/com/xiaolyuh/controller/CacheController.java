@@ -7,16 +7,14 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 @RestController
 public class CacheController {
@@ -39,11 +37,12 @@ public class CacheController {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             // Either: Build with a synchronous computation that is wrapped as asynchronous
             .buildAsync(key -> createExpensiveGraph(key));
-            // Or: Build with a asynchronous computation that returns a future
-            // .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
+    // Or: Build with a asynchronous computation that returns a future
+    // .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
 
     private CompletableFuture<Object> createExpensiveGraphAsync(String key, Executor executor) {
-        return null;
+        CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
+        return objectCompletableFuture;
     }
 
     private Object createExpensiveGraph(String key) {
@@ -89,6 +88,8 @@ public class CacheController {
         return graph;
     }
 
+    int i = 0;
+
     @RequestMapping("/testAsyncLoading")
     public Object testAsyncLoading(Person person) {
         String key = "name1";
@@ -99,7 +100,11 @@ public class CacheController {
         List<String> keys = new ArrayList<>();
         keys.add(key);
         CompletableFuture<Map<String, Object>> graphs = asyncLoadingCache.getAll(keys);
+
+        // 异步转同步
+        loadingCache = asyncLoadingCache.synchronous();
         return graph;
     }
+
 
 }
