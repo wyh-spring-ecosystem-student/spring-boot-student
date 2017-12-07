@@ -38,11 +38,11 @@ public class CacheController {
             .maximumSize(10_000)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             // Either: Build with a synchronous computation that is wrapped as asynchronous
-            //.buildAsync(key -> createExpensiveGraph(key));
+            .buildAsync(key -> createExpensiveGraph(key));
             // Or: Build with a asynchronous computation that returns a future
-             .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
+            // .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
 
-    private  CompletableFuture<Object> createExpensiveGraphAsync(String key, Executor executor) {
+    private CompletableFuture<Object> createExpensiveGraphAsync(String key, Executor executor) {
         return null;
     }
 
@@ -59,13 +59,14 @@ public class CacheController {
         String key = "name1";
         Object graph = null;
 
-        // Lookup an entry, or null if not found
+        // 根据key查询一个缓存，如果没有返回NULL
         graph = manualCache.getIfPresent(key);
-        // Lookup and compute an entry if absent, or null if not computable
+        // 根据Key查询一个缓存，如果没有调用createExpensiveGraph方法，并将返回值保存到缓存。
+        // 如果该方法返回Null则manualCache.get返回null，如果该方法抛出异常则manualCache.get抛出异常
         graph = manualCache.get(key, k -> createExpensiveGraph(k));
-        // Insert or update an entry
+        // 将一个值放入缓存，如果以前有值就覆盖以前的值
         manualCache.put(key, graph);
-        // Remove an entry
+        // 删除一个缓存
         manualCache.invalidate(key);
 
         ConcurrentMap<String, Object> map = manualCache.asMap();
@@ -77,14 +78,28 @@ public class CacheController {
     public Object testLoading(Person person) {
         String key = "name1";
 
-        // Lookup and compute an entry if absent, or null if not computable
+        // 采用同步方式去获取一个缓存和上面的手动方式是一个原理。在build Cache的时候会提供一个createExpensiveGraph函数。
+        // 查询并在缺失的情况下使用同步的方式来构建一个缓存
         Object graph = loadingCache.get(key);
-        // Lookup and compute entries that are absent
+
+        // 获取组key的值返回一个Map
         List<String> keys = new ArrayList<>();
         keys.add(key);
         Map<String, Object> graphs = loadingCache.getAll(keys);
         return graph;
     }
 
+    @RequestMapping("/testAsyncLoading")
+    public Object testAsyncLoading(Person person) {
+        String key = "name1";
+
+        // 查询并在缺失的情况下使用异步的方式来构建缓存
+        CompletableFuture<Object> graph = asyncLoadingCache.get(key);
+        // 查询一组缓存并在缺失的情况下使用异步的方式来构建缓存
+        List<String> keys = new ArrayList<>();
+        keys.add(key);
+        CompletableFuture<Map<String, Object>> graphs = asyncLoadingCache.getAll(keys);
+        return graph;
+    }
 
 }
