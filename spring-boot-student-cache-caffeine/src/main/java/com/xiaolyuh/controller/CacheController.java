@@ -1,5 +1,6 @@
 package com.xiaolyuh.controller;
 
+import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -30,6 +33,18 @@ public class CacheController {
             .maximumSize(10_000)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .build(key -> createExpensiveGraph(key));
+
+    AsyncLoadingCache<String, Object> asyncLoadingCache = Caffeine.newBuilder()
+            .maximumSize(10_000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            // Either: Build with a synchronous computation that is wrapped as asynchronous
+            //.buildAsync(key -> createExpensiveGraph(key));
+            // Or: Build with a asynchronous computation that returns a future
+             .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
+
+    private  CompletableFuture<Object> createExpensiveGraphAsync(String key, Executor executor) {
+        return null;
+    }
 
     private Object createExpensiveGraph(String key) {
         System.out.println("调用了该方法获取缓存key的值");
