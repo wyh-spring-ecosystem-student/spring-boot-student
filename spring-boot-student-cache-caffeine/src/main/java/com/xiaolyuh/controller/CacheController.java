@@ -2,15 +2,16 @@ package com.xiaolyuh.controller;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
@@ -20,65 +21,55 @@ public class CacheController {
     @Autowired
     PersonService personService;
 
-    Cache<String, Object> cache = Caffeine.newBuilder()
+    Cache<String, Object> manualCache = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(10_000)
             .build();
 
-    @RequestMapping("/put")
-    public long put(@RequestBody Person person) {
-        Person p = personService.save(person);
-        return p.getId();
-    }
-
-    @RequestMapping("/able")
-    public Person cacheable(Person person) {
-        String a = "a";
-        String[] b = {"1", "2"};
-        List<Long> c = new ArrayList<>();
-        c.add(3L);
-        c.add(4L);
-        c.add(5L);
-        return personService.findOne(person, a, b, c);
-    }
-
-    @RequestMapping("/testGet")
-    public Object cacheable1(Person person) {
-        String key = "name";
-
-        // Lookup an entry, or null if not found
-        Object graph = cache.getIfPresent(key);
-        // Lookup and compute an entry if absent, or null if not computable
-        graph = cache.get(key, k -> createExpensiveGraph(k));
-        // Insert or update an entry
-        cache.put(key, graph);
-        // Remove an entry
-        cache.invalidate(key);
-
-        ConcurrentMap<String, Object> map = cache.asMap();
-        System.out.println(map.toString());
-        return graph;
-    }
+    LoadingCache<String, Object> loadingCache = Caffeine.newBuilder()
+            .maximumSize(10_000)
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build(key -> createExpensiveGraph(key));
 
     private Object createExpensiveGraph(String key) {
         System.out.println("调用了该方法获取缓存key的值");
         if (key.equals("name")) {
             throw new RuntimeException("调用了该方法获取缓存key的值的时候出现异常");
         }
-        return null;
+        return personService.findOne1();
     }
 
-    @RequestMapping("/able2")
-    public Person cacheable2(Person person) {
+    @RequestMapping("/testManual")
+    public Object testManual(Person person) {
+        String key = "name1";
+        Object graph = null;
 
-        return personService.findOne2(person);
+        // Lookup an entry, or null if not found
+        graph = manualCache.getIfPresent(key);
+        // Lookup and compute an entry if absent, or null if not computable
+        graph = manualCache.get(key, k -> createExpensiveGraph(k));
+        // Insert or update an entry
+        manualCache.put(key, graph);
+        // Remove an entry
+        manualCache.invalidate(key);
+
+        ConcurrentMap<String, Object> map = manualCache.asMap();
+        System.out.println(map.toString());
+        return graph;
     }
 
-    @RequestMapping("/evit")
-    public String evit(Long id) {
+    @RequestMapping("/testLoading")
+    public Object testLoading(Person person) {
+        String key = "name1";
 
-        personService.remove(id);
-        return "ok";
+        // Lookup and compute an entry if absent, or null if not computable
+        Object graph = loadingCache.get(key);
+        // Lookup and compute entries that are absent
+        List<String> keys = new ArrayList<>();
+        keys.add(key);
+        Map<String, Object> graphs = loadingCache.getAll(keys);
+        return graph;
     }
+
 
 }
