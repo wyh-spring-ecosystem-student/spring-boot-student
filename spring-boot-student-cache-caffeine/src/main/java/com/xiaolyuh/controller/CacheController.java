@@ -1,20 +1,21 @@
 package com.xiaolyuh.controller;
 
-import com.github.benmanes.caffeine.cache.AsyncLoadingCache;
-import com.github.benmanes.caffeine.cache.Cache;
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.*;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.service.PersonService;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 public class CacheController {
@@ -46,7 +47,7 @@ public class CacheController {
     }
 
     private Object createExpensiveGraph(String key) {
-        System.out.println("调用了该方法获取缓存key的值");
+        System.out.println("缓存不存在或过期，调用了该方法获取缓存key的值");
         if (key.equals("name")) {
             throw new RuntimeException("调用了该方法获取缓存key的值的时候出现异常");
         }
@@ -88,8 +89,6 @@ public class CacheController {
         return graph;
     }
 
-    int i = 0;
-
     @RequestMapping("/testAsyncLoading")
     public Object testAsyncLoading(Person person) {
         String key = "name1";
@@ -106,5 +105,108 @@ public class CacheController {
         return graph;
     }
 
+    @RequestMapping("/testSizeBased")
+    public Object testSizeBased(Person person) {
+        LoadingCache<String, Object> cache = Caffeine.newBuilder()
+                .maximumSize(1)
+                .build(k -> createExpensiveGraph(k));
 
+        cache.get("A");
+        System.out.println(cache.estimatedSize());
+        cache.get("B");
+        // 因为执行回收的方法是异步的，所以需要调用该方法，来保证缓存回收了。
+        cache.cleanUp();
+        System.out.println(cache.estimatedSize());
+
+        return "";
+    }
+
+    @RequestMapping("/testTimeBased")
+    public Object testTimeBased(Person person) {
+        String key = "name1";
+        // 基于固定的到期策略进行退出
+        // expireAfterAccess
+        LoadingCache<String, Object> graphs1 = Caffeine.newBuilder()
+                .expireAfterAccess(5, TimeUnit.MINUTES)
+                .build(k -> createExpensiveGraph(k));
+
+        System.out.println("expireAfterAccess：第一次获取缓存");
+        graphs1.get(key);
+
+        System.out.println("expireAfterAccess：等待4.9S后，第二次次获取缓存");
+        threadSleep(4900L);
+        graphs1.get(key);
+
+        System.out.println("expireAfterAccess：等待0.101S后，第三次次获取缓存");
+        threadSleep(101L);
+        graphs1.get(key);
+
+        // expireAfterWrite
+        LoadingCache<String, Object> graphs2 = Caffeine.newBuilder()
+                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .build(k -> createExpensiveGraph(k));
+
+        System.out.println("expireAfterWrite：第一次获取缓存");
+        graphs2.get(key);
+
+        System.out.println("expireAfterWrite：等待4.9S后，第二次次获取缓存");
+        threadSleep(4900L);
+        graphs2.get(key);
+
+        System.out.println("expireAfterWrite：等待0.101S后，第三次次获取缓存");
+        threadSleep(101L);
+        graphs2.get(key);
+
+        // Evict based on a varying expiration policy
+        // 基于不同的到期策略进行退出
+        LoadingCache<String, Object> graphs3 = Caffeine.newBuilder()
+                .expireAfter(new Expiry<String, Object>() {
+                    @Override
+                    public long expireAfterCreate(String key, Object graph, long currentTime) {
+
+                        System.out.println("调用了 expireAfterCreate方法");
+                        // Use wall clock time, rather than nanotime, if from an external resource
+                        long seconds = DateUtils.addSeconds(new Date(), 5).getTime();
+                        return TimeUnit.SECONDS.toNanos(seconds);
+                    }
+
+                    @Override
+                    public long expireAfterUpdate(String key, Object graph,
+                                                  long currentTime, long currentDuration) {
+
+                        System.out.println("调用了 expireAfterUpdate");
+                        return currentDuration;
+                    }
+
+                    @Override
+                    public long expireAfterRead(String key, Object graph,
+                                                long currentTime, long currentDuration) {
+
+                        System.out.println("调用了 expireAfterRead");
+                        return currentDuration;
+                    }
+                })
+                .build(k -> createExpensiveGraph(k));
+
+        System.out.println("expireAfter：第一次获取缓存");
+        graphs2.get(key);
+
+        System.out.println("expireAfter：等待4.9S后，第二次次获取缓存");
+        threadSleep(4900L);
+        graphs2.get(key);
+
+        System.out.println("expireAfter：等待0.101S后，第三次次获取缓存");
+        threadSleep(101L);
+        Object object = graphs2.get(key);
+
+        return object;
+    }
+
+    private void threadSleep(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 }
