@@ -4,14 +4,11 @@ import com.github.benmanes.caffeine.cache.*;
 import com.google.common.testing.FakeTicker;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.service.PersonService;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -271,5 +268,56 @@ public class CaffeineCacheController {
         return object;
     }
 
+    @RequestMapping("/testWriter")
+    public Object testWriter(Person person) {
+        String key = "name1";
+        // 用户测试，一个时间源，返回一个时间值，表示从某个固定但任意时间点开始经过的纳秒数。
+        FakeTicker ticker = new FakeTicker();
+
+        // 基于固定的到期策略进行退出
+        // expireAfterAccess
+        LoadingCache<String, Object> graphs = Caffeine.newBuilder()
+                .removalListener((String k, Object graph, RemovalCause cause) ->
+                        System.out.printf("执行移除监听器- Key %s was removed (%s)%n", k, cause))
+                .ticker(ticker::read)
+                .expireAfterWrite(5, TimeUnit.SECONDS)
+                .writer(new CacheWriter<String, Object>() {
+                    @Override
+                    public void write(String key, Object graph) {
+                        // write to storage or secondary cache
+                        // 写入存储或者二级缓存
+                        System.out.printf("testWriter:write - Key %s was write (%s)%n", key, graph);
+                        createExpensiveGraph(key);
+                    }
+
+                    @Override
+                    public void delete(String key, Object graph, RemovalCause cause) {
+                        // delete from storage or secondary cache
+                        // 删除存储或者二级缓存
+                        System.out.printf("testWriter:delete - Key %s was delete (%s)%n", key, graph);
+                    }
+                })
+                // 指定在创建缓存或者最近一次更新缓存后经过固定的时间间隔，刷新缓存
+                .refreshAfterWrite(4, TimeUnit.SECONDS)
+                .build(k -> createExpensiveGraph(k));
+
+        graphs.put(key, personService.findOne1());
+        graphs.invalidate(key);
+
+        System.out.println("第一次获取缓存");
+        Object object = graphs.get(key);
+
+        System.out.println("等待4.1S后，第二次次获取缓存");
+        // 直接指定时钟
+        ticker.advance(4100, TimeUnit.MILLISECONDS);
+        graphs.get(key);
+
+        System.out.println("等待5.1S后，第三次次获取缓存");
+        // 直接指定时钟
+        ticker.advance(5100, TimeUnit.MILLISECONDS);
+        graphs.get(key);
+
+        return object;
+    }
 
 }
