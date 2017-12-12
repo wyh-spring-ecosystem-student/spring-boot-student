@@ -238,5 +238,38 @@ public class CaffeineCacheController {
         return object;
     }
 
+    @RequestMapping("/testRefresh")
+    public Object testRefresh(Person person) {
+        String key = "name1";
+        // 用户测试，一个时间源，返回一个时间值，表示从某个固定但任意时间点开始经过的纳秒数。
+        FakeTicker ticker = new FakeTicker();
+
+        // 基于固定的到期策略进行退出
+        // expireAfterAccess
+        LoadingCache<String, Object> graphs = Caffeine.newBuilder()
+                .removalListener((String k, Object graph, RemovalCause cause) ->
+                        System.out.printf("Key %s was removed (%s)%n", k, cause))
+                .ticker(ticker::read)
+                .expireAfterWrite(5, TimeUnit.SECONDS)
+                // 指定在创建缓存或者最近一次更新缓存后经过固定的时间间隔，刷新缓存
+                .refreshAfterWrite(4, TimeUnit.SECONDS)
+                .build(k -> createExpensiveGraph(k));
+
+        System.out.println("第一次获取缓存");
+        Object object = graphs.get(key);
+
+        System.out.println("等待4S后，第二次次获取缓存");
+        // 直接指定时钟
+        ticker.advance(4000, TimeUnit.MILLISECONDS);
+        graphs.get(key);
+
+        System.out.println("等待5S后，第二次次获取缓存");
+        // 直接指定时钟
+        ticker.advance(5000, TimeUnit.MILLISECONDS);
+        graphs.get(key);
+
+        return object;
+    }
+
 
 }
