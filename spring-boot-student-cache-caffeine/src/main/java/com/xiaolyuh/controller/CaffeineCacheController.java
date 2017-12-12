@@ -248,7 +248,7 @@ public class CaffeineCacheController {
         // expireAfterAccess
         LoadingCache<String, Object> graphs = Caffeine.newBuilder()
                 .removalListener((String k, Object graph, RemovalCause cause) ->
-                        System.out.printf("Key %s was removed (%s)%n", k, cause))
+                        System.out.printf("执行移除监听器- Key %s was removed (%s)%n", k, cause))
                 .ticker(ticker::read)
                 .expireAfterWrite(5, TimeUnit.SECONDS)
                 // 指定在创建缓存或者最近一次更新缓存后经过固定的时间间隔，刷新缓存
@@ -258,14 +258,14 @@ public class CaffeineCacheController {
         System.out.println("第一次获取缓存");
         Object object = graphs.get(key);
 
-        System.out.println("等待4S后，第二次次获取缓存");
+        System.out.println("等待4.1S后，第二次次获取缓存");
         // 直接指定时钟
-        ticker.advance(4000, TimeUnit.MILLISECONDS);
+        ticker.advance(4100, TimeUnit.MILLISECONDS);
         graphs.get(key);
 
-        System.out.println("等待5S后，第二次次获取缓存");
+        System.out.println("等待5.1S后，第三次次获取缓存");
         // 直接指定时钟
-        ticker.advance(5000, TimeUnit.MILLISECONDS);
+        ticker.advance(5100, TimeUnit.MILLISECONDS);
         graphs.get(key);
 
         return object;
