@@ -1,5 +1,6 @@
 package com.xiaolyuh.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.github.benmanes.caffeine.cache.*;
 import com.google.common.testing.FakeTicker;
 import com.xiaolyuh.entity.Person;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalLong;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executor;
@@ -355,5 +357,54 @@ public class CaffeineCacheController {
 
         return cache.get(key);
     }
+
+    @RequestMapping("/testPolicy")
+    public Object testPolicy(Person person) {
+        FakeTicker ticker = new FakeTicker();
+
+        LoadingCache<String, Object> cache = Caffeine.newBuilder()
+                .ticker(ticker::read)
+                .expireAfterAccess(5, TimeUnit.SECONDS)
+                .maximumSize(1)
+                .build(k -> createExpensiveGraph(k));
+
+        // 在代码里面动态的指定最大Size
+        cache.policy().eviction().ifPresent(eviction -> {
+            eviction.setMaximum(4 * eviction.getMaximum());
+        });
+
+        cache.get("E");
+        cache.get("B");
+        cache.get("C");
+        cache.cleanUp();
+        System.out.println(cache.estimatedSize() + ":" + JSON.toJSON(cache.asMap()).toString());
+
+        cache.get("A");
+        ticker.advance(100, TimeUnit.MILLISECONDS);
+        cache.get("D");
+        ticker.advance(100, TimeUnit.MILLISECONDS);
+        cache.get("A");
+        ticker.advance(100, TimeUnit.MILLISECONDS);
+        cache.get("B");
+        ticker.advance(100, TimeUnit.MILLISECONDS);
+        cache.policy().eviction().ifPresent(eviction -> {
+            // 获取热点数据Map
+            Map<String, Object> hottestMap = eviction.hottest(10);
+            // 获取冷数据Map
+            Map<String, Object> coldestMap = eviction.coldest(10);
+
+            System.out.println("热点数据:" + JSON.toJSON(hottestMap).toString());
+            System.out.println("冷数据:" + JSON.toJSON(coldestMap).toString());
+        });
+
+        ticker.advance(3000, TimeUnit.MILLISECONDS);
+        // ageOf通过这个方法来查看key的空闲时间
+        cache.policy().expireAfterAccess().ifPresent(expiration -> {
+
+            System.out.println(JSON.toJSON(expiration.ageOf("A", TimeUnit.MILLISECONDS)));
+        });
+        return cache.get("name1");
+    }
+
 
 }
