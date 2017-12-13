@@ -74,7 +74,7 @@
 
 [Spring Boot + Mybatis + 二级缓存实例（Ehcache，Redis）](http://blog.csdn.net/xiaolyuh123/article/details/73771818)
 
-## spring-boot-student-mybatis-druid
+## spring-boot-student-mybatis-druid 自己定制
 - Druid简介
 - Druid数据源配置
 - Druid监控的配置
@@ -84,8 +84,104 @@
 
 [maven替换中央仓库- 阿里云](http://blog.csdn.net/xiaolyuh123/article/details/74091268)
 
+## spring-boot-student-mybatis-druid-2
+- Spring Boot 使用druid连接池连接数据库（官方start）
+
+[Druid简介（Spring Boot + Mybatis + Druid数据源【官方start】）](http://blog.csdn.net/xiaolyuh123/article/details/75315282)
+
 ## spring-boot-student-encode
 - AES，MD5，SHA1加密算法
 
 [加密算法 AES MD5 SHA1](http://blog.csdn.net/xiaolyuh123/article/details/74344893)
+
+
+## spring-boot-student-data-jpa-transaction
+- 开启事务
+- Spring 事务类型
+- Spring 事务原理
+- Spring 事务的实现方式
+- Spring 事务的注意事项
+
+[Spring Boot Spring事务管理](http://blog.csdn.net/xiaolyuh123/article/details/56278121)
+
+[Spring Boot AOP代理](http://blog.csdn.net/xiaolyuh123/article/details/76999835)
+
+## spring-boot-student-cache
+- 缓存的简介
+- Spring对缓存支持
+- 开启声名式缓存支持
+- 声名式缓存注解
+- Spring Boot的支持
+
+[Spring Boot 数据缓存 Cache](http://blog.csdn.net/xiaolyuh123/article/details/77056340)
+
+[Spring Boot缓存实战 默认Cache（ConcurrentMapCacheManager）](http://blog.csdn.net/xiaolyuh123/article/details/77096708)
+
+## spring-boot-student-cache-ehcache
+- Spring Boot 使用 ehcache作为 Spring 缓存
+
+[Spring Boot缓存实战 EhCache](http://blog.csdn.net/xiaolyuh123/article/details/77161084)
+
+## spring-boot-student-cache-redis
+- Spring Boot缓存实战 Redis
+- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存）
+- 自动刷新缓存
+- redis key、value的序列化
+- java反射
+- 线程池
+
+[Spring Boot缓存实战 Redis](http://blog.csdn.net/xiaolyuh123/article/details/77184508)
+
+[Spring Boot Cache + redis 设置有效时间和自动刷新缓存，时间支持在配置文件中配置](http://blog.csdn.net/xiaolyuh123/article/details/78620302)
+
+[Spring Boot Cache redis 序列化方式StringRedisSerializer和FastJsonRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
+
+[Spring Redis Cache @Cacheable 大并发下返回null](http://blog.csdn.net/xiaolyuh123/article/details/78613041)
+
+## spring-boot-student-cache-caffeine
+- Spring Boot 使用 caffeine作为 Spring 缓存
+- caffeine 简介
+
+[Caffeine 缓存](http://blog.csdn.net/xiaolyuh123/article/details/78794012)
+
+[Spring Boot 与 Caffeine的集成](http://blog.csdn.net/xiaolyuh123/article/details/78794119)
+
+## spring-boot-student-cache-redis-caffeine
+- 基于redis + caffeine实现的多级缓存
+
+## spring-boot-student-data-mongo
+- Spring Boot 使用Spring data mongo 操作mongodb数据库
+
+## spring-boot-student-data-redis
+- Spring Boot 使用Spring data redis 操作redis数据库
+
+## spring-boot-student-data-redis-distributed-lock
+- 基于redis实现的分布式锁
+- 分布式锁的实现方案
+
+[基于 redis 实现的分布式锁（一）](http://blog.csdn.net/xiaolyuh123/article/details/78536708)
+
+[基于 redis 实现的分布式锁（二）](http://blog.csdn.net/xiaolyuh123/article/details/78551345)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
