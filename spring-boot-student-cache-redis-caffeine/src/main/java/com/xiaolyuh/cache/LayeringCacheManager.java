@@ -1,13 +1,11 @@
 package com.xiaolyuh.cache;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.util.ObjectUtils;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -36,9 +34,7 @@ public class LayeringCacheManager implements CacheManager {
     private long defaultExpiration = 0;
 
     // Caffeine 属性
-    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS);
-    private CacheLoader<Object, Object> cacheLoader;
-
+    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().expireAfterWrite(50, TimeUnit.SECONDS);
 
     public LayeringCacheManager(RedisOperations redisOperations) {
         this(redisOperations, Collections.<String>emptyList());
@@ -88,11 +84,7 @@ public class LayeringCacheManager implements CacheManager {
      * @return the native Caffeine Cache instance
      */
     protected com.github.benmanes.caffeine.cache.Cache<Object, Object> createNativeCaffeineCache(String name) {
-        if (this.cacheLoader != null) {
-            return this.cacheBuilder.build(this.cacheLoader);
-        } else {
-            return this.cacheBuilder.build();
-        }
+        return this.cacheBuilder.build();
     }
 
     /**
@@ -101,13 +93,6 @@ public class LayeringCacheManager implements CacheManager {
     private void refreshKnownCaches() {
         for (Map.Entry<String, Cache> entry : this.cacheMap.entrySet()) {
             entry.setValue(createCache(entry.getKey()));
-        }
-    }
-
-    public void setCacheLoader(CacheLoader<Object, Object> cacheLoader) {
-        if (!ObjectUtils.nullSafeEquals(this.cacheLoader, cacheLoader)) {
-            this.cacheLoader = cacheLoader;
-            refreshKnownCaches();
         }
     }
 

@@ -24,12 +24,12 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     /**
      * redi缓存
      */
-    private RedisCache redisCache;
+    private final RedisCache redisCache;
 
     /**
      * Caffeine缓存
      */
-    private CaffeineCache caffeineCache;
+    private final CaffeineCache caffeineCache;
 
     public LayeringCache(String name, RedisCache redisCache, CaffeineCache caffeineCache, boolean allowNullValues) {
 
@@ -83,6 +83,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (value == null) {
             // 查询二级缓存
             value = redisCache.get(key, type);
+            caffeineCache.put(key, value);
             logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
         }
         return value;
@@ -90,13 +91,24 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
-        // 查询一级缓存
-        T value = (T) caffeineCache.get(key);
-        logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
-        if (value == null) {
-            // 查询二级缓存
-            value = redisCache.get(key, valueLoader);
-        }
+
+        System.out.println(caffeineCache.getNativeCache().asMap());
+        // 查询一级缓存,如果一级缓存没有则调用getForsecondaryCache(k, valueLoader)查询二级缓存
+        T value = (T) caffeineCache.getNativeCache().get(key, k -> getForsecondaryCache(k, valueLoader));
+        return value;
+    }
+
+    /**
+     * 查询二级缓存
+     * @param key
+     * @param valueLoader
+     * @param <T>
+     * @return
+     */
+    private <T> Object getForsecondaryCache(Object key, Callable<T> valueLoader) {
+        T value = redisCache.get(key, valueLoader);
+        logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
+
         return value;
     }
 
