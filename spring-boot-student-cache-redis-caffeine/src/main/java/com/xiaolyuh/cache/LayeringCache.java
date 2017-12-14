@@ -1,5 +1,7 @@
 package com.xiaolyuh.cache;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.cache.RedisCache;
@@ -11,6 +13,8 @@ import java.util.concurrent.Callable;
  * @author yuhao.wang
  */
 public class LayeringCache extends AbstractValueAdaptingCache {
+
+    Logger logger = LoggerFactory.getLogger(LayeringCache.class);
 
     /**
      * 缓存的名称
@@ -60,26 +64,37 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public ValueWrapper get(Object key) {
+        // 查询一级缓存
         ValueWrapper wrapper = caffeineCache.get(key);
+        logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
         if (wrapper == null) {
+            // 查询二级缓存
             wrapper = redisCache.get(key);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key, wrapper);
         }
         return wrapper;
     }
 
     @Override
     public <T> T get(Object key, Class<T> type) {
+        // 查询一级缓存
         T t = caffeineCache.get(key, type);
+        logger.debug("查询一级缓存 key:{},返回值是:{}", key, t);
         if (t == null) {
+            // 查询二级缓存
             t = redisCache.get(key, type);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key, t);
         }
         return t;
     }
 
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
+        // 查询一级缓存
         T t = caffeineCache.get(key, valueLoader);
+        logger.debug("查询一级缓存 key:{},返回值是:{}", key, t);
         if (t == null) {
+            // 查询二级缓存
             t = redisCache.get(key, valueLoader);
         }
         return t;

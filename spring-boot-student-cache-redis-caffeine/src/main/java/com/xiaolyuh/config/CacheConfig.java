@@ -6,6 +6,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
 
 /**
@@ -15,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 public class CacheConfig {
 
     @Bean
+    @Primary
     public CacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         LayeringCacheManager layeringCacheManager = new LayeringCacheManager(redisTemplate);
         // 设置使用缓存名称（value属性）作为redis缓存前缀
@@ -33,29 +35,29 @@ public class CacheConfig {
     }
 
 
-    /**
-     * 必须要指定这个Bean，refreshAfterWrite=5s这个配置属性才生效
-     *
-     * @return
-     */
-    @Bean
-    public CacheLoader<Object, Object> cacheLoader() {
-
-        CacheLoader<Object, Object> cacheLoader = new CacheLoader<Object, Object>() {
-
-            @Override
-            public Object load(Object key) throws Exception {
-                return null;
-            }
-
-            // 重写这个方法将oldValue值返回回去，进而刷新缓存
-            @Override
-            public Object reload(Object key, Object oldValue) throws Exception {
-                return oldValue;
-            }
-        };
-
-        return cacheLoader;
-    }
+//    /**
+//     * 必须要指定这个Bean，refreshAfterWrite=5s这个配置属性才生效
+//     *
+//     * @return
+//     */
+//    @Bean
+//    public CacheLoader<Object, Object> cacheLoader() {
+//
+//        CacheLoader<Object, Object> cacheLoader = new CacheLoader<Object, Object>() {
+//
+//            @Override
+//            public Object load(Object key) throws Exception {
+//                return null;
+//            }
+//
+//            // 重写这个方法将oldValue值返回回去，进而刷新缓存
+//            @Override
+//            public Object reload(Object key, Object oldValue) throws Exception {
+//                return oldValue;
+//            }
+//        };
+//
+//        return cacheLoader;
+//    }
 
 }

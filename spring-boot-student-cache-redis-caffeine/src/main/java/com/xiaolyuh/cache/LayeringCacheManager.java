@@ -4,9 +4,7 @@ import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
-import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.util.ObjectUtils;
@@ -14,9 +12,9 @@ import org.springframework.util.ObjectUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuhao.wang
@@ -38,12 +36,12 @@ public class LayeringCacheManager implements CacheManager {
     private long defaultExpiration = 0;
 
     // Caffeine 属性
-    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder();
+    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().expireAfterWrite(5, TimeUnit.SECONDS);
     private CacheLoader<Object, Object> cacheLoader;
 
 
     public LayeringCacheManager(RedisOperations redisOperations) {
-        this(redisOperations, Collections.<String> emptyList());
+        this(redisOperations, Collections.<String>emptyList());
     }
 
     public LayeringCacheManager(RedisOperations redisOperations, Collection<String> cacheNames) {
@@ -85,14 +83,14 @@ public class LayeringCacheManager implements CacheManager {
 
     /**
      * Create a native Caffeine Cache instance for the specified cache name.
+     *
      * @param name the name of the cache
      * @return the native Caffeine Cache instance
      */
     protected com.github.benmanes.caffeine.cache.Cache<Object, Object> createNativeCaffeineCache(String name) {
         if (this.cacheLoader != null) {
             return this.cacheBuilder.build(this.cacheLoader);
-        }
-        else {
+        } else {
             return this.cacheBuilder.build();
         }
     }
@@ -117,6 +115,7 @@ public class LayeringCacheManager implements CacheManager {
      * 在初始化CacheManager的时候初始化一组缓存。
      * 使用这个方法会在CacheManager初始化的时候就会将一组缓存初始化好，并且在运行时不会再去创建更多的缓存。
      * 使用空的Collection或者重新在配置里面指定dynamic后，就可重新在运行时动态的来创建缓存。
+     *
      * @param cacheNames
      */
     public void setCacheNames(Collection<String> cacheNames) {
@@ -124,15 +123,13 @@ public class LayeringCacheManager implements CacheManager {
             for (String name : cacheNames) {
                 this.cacheMap.put(name, createCache(name));
             }
-            this.dynamic = false;
-        }
-        else {
-            this.dynamic = true;
+            this.dynamic = cacheNames.isEmpty();
         }
     }
 
     /**
      * 设置是否允许Cache的值为null
+     *
      * @param allowNullValues
      */
     public void setAllowNullValues(boolean allowNullValues) {
@@ -144,6 +141,7 @@ public class LayeringCacheManager implements CacheManager {
 
     /**
      * 获取是否允许Cache的值为null
+     *
      * @return
      */
     public boolean isAllowNullValues() {
@@ -152,6 +150,7 @@ public class LayeringCacheManager implements CacheManager {
 
     /**
      * 在生成key的时候是否是否使用缓存名称来作为缓存前缀。默认是false，但是建议设置成true。
+     *
      * @param usePrefix
      */
     public void setUsePrefix(boolean usePrefix) {
@@ -164,6 +163,7 @@ public class LayeringCacheManager implements CacheManager {
 
     /**
      * 设置redis默认的过期时间（单位：秒）
+     *
      * @param defaultExpireTime
      */
     public void setDefaultExpiration(long defaultExpireTime) {
