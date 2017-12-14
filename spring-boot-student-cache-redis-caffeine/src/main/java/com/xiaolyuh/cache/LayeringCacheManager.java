@@ -18,6 +18,10 @@ import java.util.concurrent.TimeUnit;
  * @author yuhao.wang
  */
 public class LayeringCacheManager implements CacheManager {
+    // 常量
+    static final int DEFAULT_EXPIRE_AFTER_WRITE = 60;
+    static final int DEFAULT_INITIAL_CAPACITY = 5;
+    static final int DEFAULT_MAXIMUM_SIZE = 1_000;
 
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
 
@@ -25,16 +29,20 @@ public class LayeringCacheManager implements CacheManager {
 
     private boolean allowNullValues = false;
 
+    // Caffeine 属性
+    // 一级缓存默认有效时间60秒
+    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
+            .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.SECONDS)
+            .initialCapacity(DEFAULT_INITIAL_CAPACITY)
+            .maximumSize(DEFAULT_MAXIMUM_SIZE);
+
     // redis 属性
     private final RedisOperations redisOperations;
     private boolean usePrefix = false;
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
     private boolean loadRemoteCachesOnStartup = false;
-    // 0 - never expire
+    // reids key默认永远不过期时间
     private long defaultExpiration = 0;
-
-    // Caffeine 属性
-    private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder().expireAfterWrite(50, TimeUnit.SECONDS);
 
     public LayeringCacheManager(RedisOperations redisOperations) {
         this(redisOperations, Collections.<String>emptyList());
