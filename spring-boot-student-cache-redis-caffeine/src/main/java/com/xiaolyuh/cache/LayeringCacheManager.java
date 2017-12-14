@@ -78,8 +78,6 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     protected Cache createCache(String name) {
-//        String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
-//        long expiration, boolean allowNullValues, com.github.benmanes.caffeine.cache.Cache<Object, Object> cache
         long expiration = defaultExpiration;
         return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations, expiration,
                 isAllowNullValues(), createNativeCaffeineCache(name));
