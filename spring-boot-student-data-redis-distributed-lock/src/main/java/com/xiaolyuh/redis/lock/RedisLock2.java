@@ -141,7 +141,7 @@ public class RedisLock2 {
 
         while ((System.nanoTime() - nowTime) < timeout) {
             // 分布式服务器有时差，这里给1秒的误差值
-            expires = System.currentTimeMillis() + expireTime + 1;
+            expires = System.currentTimeMillis() + expireTime * 1000 + 1 * 1000;
             String expiresStr = String.valueOf(expires); //锁到期时间
 
             if (redisTemplate.opsForValue().setIfAbsent(lockKey, expiresStr)) {
