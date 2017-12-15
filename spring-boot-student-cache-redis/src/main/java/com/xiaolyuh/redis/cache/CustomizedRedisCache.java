@@ -149,10 +149,27 @@ public class CustomizedRedisCache extends RedisCache {
         }
     }
 
+    /**
+     * 设置自动刷新时间
+     */
+    public void setPreloadSecondTime(long preloadSecondTime) {
+        this.preloadSecondTime = preloadSecondTime;
+    }
+
+    /**
+     * 设置有效时间
+     */
+    public void setExpirationSecondTime(long expirationSecondTime) {
+        this.expirationSecondTime = expirationSecondTime;
+    }
+
+    /**
+     * 获取有效时间
+     * @return
+     */
     public long getExpirationSecondTime() {
         return expirationSecondTime;
     }
-
 
     /**
      * 获取RedisCacheKey
