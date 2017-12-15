@@ -1,9 +1,8 @@
 package com.xiaolyuh.redis.cache;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +49,7 @@ public class CachingAnnotationsAspect {
         return (anns.isEmpty() ? null : anns);
     }
 
-    private Method getSpecificmethod(ProceedingJoinPoint pjp) {
+    private Method getSpecificmethod(JoinPoint pjp) {
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
         Method method = methodSignature.getMethod();
         // The method may be on an interface, but we need attributes from the
@@ -71,8 +70,8 @@ public class CachingAnnotationsAspect {
     public void pointcut() {
     }
 
-    @Around("pointcut()")
-    public Object registerInvocation(ProceedingJoinPoint joinPoint) throws Throwable {
+    @After("pointcut()")
+    public void registerInvocation(JoinPoint joinPoint) throws Throwable {
 
         Method method = this.getSpecificmethod(joinPoint);
 
@@ -91,7 +90,29 @@ public class CachingAnnotationsAspect {
                     joinPoint.getArgs(), cacheSet, cacheKey);
         }
 
-        return joinPoint.proceed();
-
     }
+
+//    @Around("pointcut()")
+//    public Object registerInvocation(ProceedingJoinPoint joinPoint) throws Throwable {
+//
+//        Method method = this.getSpecificmethod(joinPoint);
+//
+//        List<Cacheable> annotations = this.getMethodAnnotations(method, Cacheable.class);
+//
+//        Set<String> cacheSet = new HashSet<String>();
+//        String cacheKey = null;
+//        for (Cacheable cacheables : annotations) {
+//            cacheSet.addAll(Arrays.asList(cacheables.value()));
+//            cacheKey = cacheables.key();
+//        }
+//
+//        if (joinPoint.getSignature() instanceof MethodSignature) {
+//            Class[] parameterTypes = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
+//            cacheSupport.registerInvocation(joinPoint.getTarget(), method, parameterTypes,
+//                    joinPoint.getArgs(), cacheSet, cacheKey);
+//        }
+//
+//        return joinPoint.proceed();
+//
+//    }
 }

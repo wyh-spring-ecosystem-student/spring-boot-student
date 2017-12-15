@@ -169,7 +169,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
             if (cache instanceof CustomizedRedisCache) {
                 // 设置有效时间和自动刷新时间
                 CustomizedRedisCache redisCache = (CustomizedRedisCache) cache;
-                redisCache.setExpirationSecondTime(expirationSecondTime);
+                redisCache.setExpirationSecondTime(redisCache, expirationSecondTime);
                 redisCache.setPreloadSecondTime(preloadSecondTime);
                 return redisCache;
             }

@@ -3,6 +3,7 @@ package com.xiaolyuh.cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.caffeine.CaffeineCache;
+import org.springframework.cache.interceptor.CacheAspectSupport;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.core.RedisOperations;
@@ -92,8 +93,10 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
 
-        System.out.println(caffeineCache.getNativeCache().asMap());
-        // 查询一级缓存,如果一级缓存没有则调用getForsecondaryCache(k, valueLoader)查询二级缓存
+        CacheAspectSupport cacheAspectSupport  = (CacheAspectSupport) valueLoader;
+        System.out.println(cacheAspectSupport.getClass());
+//        System.out.println(cacheAspectSupport.);
+        // 查询一级缓存,如果一级缓存没有则调用getForSecondaryCache(k, valueLoader)查询二级缓存
         T value = (T) caffeineCache.getNativeCache().get(key, k -> getForSecondaryCache(k, valueLoader));
         return value;
     }
@@ -102,7 +105,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
      * 查询二级缓存
      * @param key
      * @param valueLoader
-     * @param <T>
      * @return
      */
     private <T> Object getForSecondaryCache(Object key, Callable<T> valueLoader) {

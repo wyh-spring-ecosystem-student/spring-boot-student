@@ -1,6 +1,7 @@
 package com.xiaolyuh.redis.cache;
 
 import com.xiaolyuh.redis.lock.RedisLock;
+import com.xiaolyuh.redis.utils.ReflectionUtils;
 import com.xiaolyuh.redis.utils.SpringContextUtils;
 import com.xiaolyuh.redis.utils.ThreadTaskUtils;
 import org.slf4j.Logger;
@@ -31,6 +32,8 @@ public class CustomizedRedisCache extends RedisCache {
     private final RedisOperations redisOperations;
 
     private final byte[] prefix;
+
+    private final String SUPER_FIELD_CACHEMETADATA = "cacheMetadata";
 
     /**
      * 缓存主动在失效前强制刷新缓存的时间
@@ -159,12 +162,14 @@ public class CustomizedRedisCache extends RedisCache {
     /**
      * 设置有效时间
      */
-    public void setExpirationSecondTime(long expirationSecondTime) {
+    public void setExpirationSecondTime(RedisCache redisCache, long expirationSecondTime) {
+        ReflectionUtils.setFieldValue(ReflectionUtils.getFieldValue(redisCache, SUPER_FIELD_CACHEMETADATA), "defaultExpiration", expirationSecondTime);
         this.expirationSecondTime = expirationSecondTime;
     }
 
     /**
      * 获取有效时间
+     *
      * @return
      */
     public long getExpirationSecondTime() {
