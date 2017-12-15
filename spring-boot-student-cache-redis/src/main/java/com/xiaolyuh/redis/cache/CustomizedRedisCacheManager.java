@@ -166,13 +166,6 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
     public Cache getCache(String cacheName, long expirationSecondTime, long preloadSecondTime, ConcurrentHashMap<String, Cache> cacheMap) {
         Cache cache = cacheMap.get(cacheName);
         if (cache != null) {
-            if (cache instanceof CustomizedRedisCache) {
-                // 设置有效时间和自动刷新时间
-                CustomizedRedisCache redisCache = (CustomizedRedisCache) cache;
-                redisCache.setExpirationSecondTime(redisCache, expirationSecondTime);
-                redisCache.setPreloadSecondTime(preloadSecondTime);
-                return redisCache;
-            }
             return cache;
         } else {
             // Fully synchronize now for missing cache creation...
