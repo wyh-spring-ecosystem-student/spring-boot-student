@@ -159,8 +159,31 @@ public class LayeringCacheManager implements CacheManager {
      *
      * @param defaultExpireTime
      */
-    public void setDefaultExpiration(long defaultExpireTime) {
+    public void setSecondaryCacheDefaultExpiration(long defaultExpireTime) {
         this.defaultExpiration = defaultExpireTime;
     }
 
+    /**
+     * 设置一级缓存的初始大小，默认是5
+     * @param defaultInitialCapacity
+     */
+    public void setFirstCacheDefaultInitialCapacity(int defaultInitialCapacity) {
+        cacheBuilder.initialCapacity(defaultInitialCapacity);
+    }
+
+    /**
+     * 设置一级缓存的最大size，默认是1_000
+     * @param defaultMaximumSize
+     */
+    public void setFirstCacheDefaultMaximumSize(int defaultMaximumSize) {
+        cacheBuilder.maximumSize(defaultMaximumSize);
+    }
+
+    /**
+     *  设置一级缓存的过期时间，单位毫秒，默认1分钟
+     * @param defaultExpireAfterWrite
+     */
+    public void setFirstCacheDefaultExpireAfterWrite(int defaultExpireAfterWrite) {
+        cacheBuilder.expireAfterWrite(defaultExpireAfterWrite, TimeUnit.MILLISECONDS);
+    }
 }

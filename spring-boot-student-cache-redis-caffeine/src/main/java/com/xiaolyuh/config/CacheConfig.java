@@ -22,7 +22,7 @@ public class CacheConfig {
         // 设置使用缓存名称（value属性）作为redis缓存前缀
         layeringCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
-        layeringCacheManager.setDefaultExpiration(600);
+        layeringCacheManager.setSecondaryCacheDefaultExpiration(600);
 
         return layeringCacheManager;
     }
