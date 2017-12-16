@@ -5,8 +5,6 @@ package com.xiaolyuh.redis.cache;
  */
 public class CacheTime {
 
-    public CacheTime() {}
-
     public CacheTime(long preloadSecondTime, long expirationSecondTime) {
         this.preloadSecondTime = preloadSecondTime;
         this.expirationSecondTime = expirationSecondTime;
@@ -27,15 +25,7 @@ public class CacheTime {
         return preloadSecondTime;
     }
 
-    public void setPreloadSecondTime(long preloadSecondTime) {
-        this.preloadSecondTime = preloadSecondTime;
-    }
-
     public long getExpirationSecondTime() {
         return expirationSecondTime;
-    }
-
-    public void setExpirationSecondTime(long expirationSecondTime) {
-        this.expirationSecondTime = expirationSecondTime;
     }
 }
