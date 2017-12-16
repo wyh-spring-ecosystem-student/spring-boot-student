@@ -35,7 +35,7 @@ public class RedisConfig {
     @Value("${select.cache.timeout:1800}")
     private long selectCacheTimeout;
     // 查询缓存自动刷新时间
-    @Value("${select.cache.refresh:600}")
+    @Value("${select.cache.refresh:1799}")
     private long selectCacheRefresh;
 
     /**
