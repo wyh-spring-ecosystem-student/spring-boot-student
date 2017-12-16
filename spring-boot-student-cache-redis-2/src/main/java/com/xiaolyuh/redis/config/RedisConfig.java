@@ -91,9 +91,11 @@ public class RedisConfig {
     @Bean
     public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         CustomizedRedisCacheManager redisCacheManager = new CustomizedRedisCacheManager(redisTemplate);
+        // 开启使用缓存名称最为key前缀
         redisCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
         redisCacheManager.setDefaultExpiration(redisDefaultExpiration);
+
         // 设置缓存的过期时间和自动刷新时间
         Map<String, CacheTime> cacheTimes = new HashMap<>();
         cacheTimes.put("people", new CacheTime(selectCacheTimeout, selectCacheRefresh));
