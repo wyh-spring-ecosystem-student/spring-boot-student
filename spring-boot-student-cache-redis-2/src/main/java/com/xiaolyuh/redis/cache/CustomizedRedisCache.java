@@ -176,6 +176,4 @@ public class CustomizedRedisCache extends RedisCache {
     public String getCacheKey(Object key) {
         return new String(getRedisCacheKey(key).getKeyBytes());
     }
-
-
 }
