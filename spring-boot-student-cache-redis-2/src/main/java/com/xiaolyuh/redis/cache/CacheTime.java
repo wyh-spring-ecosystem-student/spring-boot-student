@@ -5,9 +5,9 @@ package com.xiaolyuh.redis.cache;
  */
 public class CacheTime {
 
-    public CacheTime(long preloadSecondTime, long expirationSecondTime) {
-        this.preloadSecondTime = preloadSecondTime;
+    public CacheTime(long expirationSecondTime, long preloadSecondTime) {
         this.expirationSecondTime = expirationSecondTime;
+        this.preloadSecondTime = preloadSecondTime;
     }
 
     /**
