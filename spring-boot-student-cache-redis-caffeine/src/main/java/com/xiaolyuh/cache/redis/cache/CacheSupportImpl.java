@@ -38,7 +38,7 @@ public class CacheSupportImpl implements CacheSupport {
 
     private final String SEPARATOR = "#";
 
-    private final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_cache_key_suffix";
+    private final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_suffix";
 
     @Autowired
     private KeyGenerator keyGenerator;
