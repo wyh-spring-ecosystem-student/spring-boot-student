@@ -190,7 +190,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private <T> Object getForSecondaryCache(Object key, Callable<T> valueLoader) {
         T value = redisCache.get(key, valueLoader);
         logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
-
         return value;
     }
 }
