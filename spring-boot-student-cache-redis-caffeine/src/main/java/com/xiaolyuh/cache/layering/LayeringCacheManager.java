@@ -57,11 +57,29 @@ public class LayeringCacheManager implements CacheManager {
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
     // redis 属性
+    /**
+     * 操作Redis的客户端
+     */
     private final RedisOperations redisOperations;
+
+    /**
+     * 是否使用缓存名称作为key前缀
+     */
     private boolean usePrefix = false;
+
+    /**
+     * 前缀处理器
+     */
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
-    // 0 - never expire
+
+    /**
+     * redis key的过期时间，默认：0永不过期
+     */
     private long defaultExpiration = 0;
+
+    /**
+     * 每个二级缓存对应的过期时间和自动刷新时间
+     */
     private Map<String, CacheTime> cacheTimes = null;
 
     public LayeringCacheManager(RedisOperations redisOperations) {
