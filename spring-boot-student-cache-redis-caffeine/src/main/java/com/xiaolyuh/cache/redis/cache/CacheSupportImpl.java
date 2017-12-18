@@ -64,7 +64,8 @@ public class CacheSupportImpl implements CacheSupport {
         for (Cache cache : caches) {
             if (cache instanceof LayeringCache) {
                 CustomizedRedisCache redisCache = getRedisCache(cache);
-                if (redisCache != null) {
+                // 判断是否需要强制刷新（走数据库）
+                if (redisCache != null && redisCache.getForceRefresh()) {
                     // 将方法信息放到redis缓存
                     RedisTemplate<String, Object> redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
                     redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)),

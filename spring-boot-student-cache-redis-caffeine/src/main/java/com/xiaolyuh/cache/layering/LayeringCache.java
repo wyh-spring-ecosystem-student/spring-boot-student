@@ -4,7 +4,6 @@ import com.xiaolyuh.cache.redis.cache.CustomizedRedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.caffeine.CaffeineCache;
-import org.springframework.cache.interceptor.CacheAspectSupport;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisOperations;
 
@@ -25,7 +24,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     /**
      * 是否使用二级缓存
      */
-    private boolean isUsedFirstCache = true;
+    private boolean usedFirstCache = true;
 
     /**
      * redi缓存
@@ -38,48 +37,24 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private final CaffeineCache caffeineCache;
 
     /**
-     * @param name          缓存名称
-     * @param redisCache    Redis缓存
-     * @param caffeineCache Caffeine缓存
-     */
-    public LayeringCache(String name, CustomizedRedisCache redisCache, CaffeineCache caffeineCache, boolean allowNullValues, boolean isUsedFirstCache) {
-
-        super(allowNullValues);
-        this.name = name;
-        this.redisCache = redisCache;
-        this.caffeineCache = caffeineCache;
-    }
-
-    /**
-     * @param name              缓存名称
-     * @param prefix            缓存前缀
-     * @param redisOperations   操作Redis的RedisTemplate
-     * @param expiration        redis缓存过期时间
-     * @param preloadSecondTime redis缓存自动刷新时间
-     * @param caffeineCache     Caffeine缓存
-     */
-    public LayeringCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
-                         long expiration, long preloadSecondTime, com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
-        this(name, prefix, redisOperations, expiration, preloadSecondTime, false, true, caffeineCache);
-    }
-
-    /**
      * @param name              缓存名称
      * @param prefix            缓存前缀
      * @param redisOperations   操作Redis的RedisTemplate
      * @param expiration        redis缓存过期时间
      * @param preloadSecondTime redis缓存自动刷新时间
      * @param allowNullValues   是否允许存NULL，默认是false
+     * @param usedFirstCache   是否使用一级缓存，默认是true
+     * @param forceRefresh   是否强制刷新（走数据库），默认是false
      * @param caffeineCache     Caffeine缓存
      */
     public LayeringCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
-                         long expiration, long preloadSecondTime, boolean allowNullValues, boolean isUsedFirstCache,
-                         com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
+                         long expiration, long preloadSecondTime, boolean allowNullValues, boolean usedFirstCache,
+                         boolean forceRefresh, com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
 
         super(allowNullValues);
         this.name = name;
-        this.isUsedFirstCache = isUsedFirstCache;
-        this.redisCache = new CustomizedRedisCache(name, prefix, redisOperations, expiration, preloadSecondTime, allowNullValues);
+        this.usedFirstCache = usedFirstCache;
+        this.redisCache = new CustomizedRedisCache(name, prefix, redisOperations, expiration, preloadSecondTime, forceRefresh, allowNullValues);
         this.caffeineCache = new CaffeineCache(name, caffeineCache, allowNullValues);
     }
 
@@ -100,7 +75,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     @Override
     public ValueWrapper get(Object key) {
         ValueWrapper wrapper = null;
-        if (isUsedFirstCache) {
+        if (usedFirstCache) {
             // 查询一级缓存
             wrapper = caffeineCache.get(key);
             logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
@@ -117,7 +92,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     @Override
     public <T> T get(Object key, Class<T> type) {
         T value = null;
-        if (isUsedFirstCache) {
+        if (usedFirstCache) {
             // 查询一级缓存
             value = caffeineCache.get(key, type);
             logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
@@ -135,7 +110,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
         T value = null;
-        if (isUsedFirstCache) {
+        if (usedFirstCache) {
             // 查询一级缓存,如果一级缓存没有值则调用getForSecondaryCache(k, valueLoader)查询二级缓存
             value = (T) caffeineCache.getNativeCache().get(key, k -> getForSecondaryCache(k, valueLoader));
         } else {

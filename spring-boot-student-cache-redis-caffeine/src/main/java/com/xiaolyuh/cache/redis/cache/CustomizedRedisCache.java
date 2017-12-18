@@ -16,6 +16,8 @@ import com.xiaolyuh.cache.redis.lock.RedisLock;
 import com.xiaolyuh.cache.redis.utils.SpringContextUtils;
 import com.xiaolyuh.cache.redis.utils.ThreadTaskUtils;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * 自定义的redis缓存
  *
@@ -45,23 +47,20 @@ public class CustomizedRedisCache extends RedisCache {
      */
     private long expirationSecondTime;
 
-    public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime) {
-        super(name, prefix, redisOperations, expiration);
-        this.redisOperations = redisOperations;
-        // 指定有效时间
-        this.expirationSecondTime = expiration;
-        // 指定自动刷新时间
-        this.preloadSecondTime = preloadSecondTime;
-        this.prefix = prefix;
-    }
+    /**
+     * 是否强制刷新（走数据库），默认是false
+     */
+    private boolean forceRefresh = false;
 
-    public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime, boolean allowNullValues) {
+    public CustomizedRedisCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations, long expiration, long preloadSecondTime, boolean forceRefresh, boolean allowNullValues) {
         super(name, prefix, redisOperations, expiration, allowNullValues);
         this.redisOperations = redisOperations;
         // 指定有效时间
         this.expirationSecondTime = expiration;
         // 指定自动刷新时间
         this.preloadSecondTime = preloadSecondTime;
+        // 是强制刷新
+        this.forceRefresh = forceRefresh;
         this.prefix = prefix;
 
     }
@@ -129,28 +128,34 @@ public class CustomizedRedisCache extends RedisCache {
     private void refreshCache(Object key, String cacheKeyStr) {
 		Long ttl = this.redisOperations.getExpire(cacheKeyStr);
         if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-            // 尽量少的去开启线程，因为线程池是有限的
-            ThreadTaskUtils.run(new Runnable() {
-                @Override
-                public void run() {
-                    // 加一个分布式锁，只放一个请求去刷新缓存
-                    RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
-                    try {
-                        if (redisLock.lock()) {
-                            // 获取锁之后再判断一下过期时间，看是否需要加载数据
-                            Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
-                            if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
-                                // 通过获取代理方法信息重新加载缓存数据
-                                CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
+            // 判断是否需要强制刷新在开启刷新线程
+            if (!getForceRefresh()) {
+                // 不需要强制刷新则直接修改缓存时间
+                redisOperations.expire(cacheKeyStr, this.expirationSecondTime, TimeUnit.SECONDS);
+            } else {
+                // 尽量少的去开启线程，因为线程池是有限的
+                ThreadTaskUtils.run(new Runnable() {
+                    @Override
+                    public void run() {
+                        // 加一个分布式锁，只放一个请求去刷新缓存
+                        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
+                        try {
+                            if (redisLock.lock()) {
+                                // 获取锁之后再判断一下过期时间，看是否需要加载数据
+                                Long ttl = CustomizedRedisCache.this.redisOperations.getExpire(cacheKeyStr);
+                                if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
+                                    // 通过获取代理方法信息重新加载缓存数据
+                                    CustomizedRedisCache.this.getCacheSupport().refreshCacheByKey(CustomizedRedisCache.super.getName(), cacheKeyStr);
+                                }
                             }
+                        } catch (Exception e) {
+                            logger.info(e.getMessage(), e);
+                        } finally {
+                            redisLock.unlock();
                         }
-                    } catch (Exception e) {
-                        logger.info(e.getMessage(), e);
-                    } finally {
-                        redisLock.unlock();
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -179,5 +184,13 @@ public class CustomizedRedisCache extends RedisCache {
      */
     public String getCacheKey(Object key) {
         return new String(getRedisCacheKey(key).getKeyBytes());
+    }
+
+    /**
+     * 是否强制刷新（走数据库），默认是false
+     * @return
+     */
+    public boolean getForceRefresh() {
+        return forceRefresh;
     }
 }
