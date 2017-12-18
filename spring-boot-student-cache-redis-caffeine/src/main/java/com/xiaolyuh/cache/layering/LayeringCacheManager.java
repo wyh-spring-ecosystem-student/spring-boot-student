@@ -30,9 +30,14 @@ public class LayeringCacheManager implements CacheManager {
 
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
 
+    // 是否允许动态创建缓存
     private boolean dynamic = true;
 
+    // 缓存值是否允许为NULL
     private boolean allowNullValues = false;
+
+    // 是否使用二级缓存
+    private boolean isUsedFirstCache = true;
 
     // Caffeine 属性
     // 一级缓存默认有效时间60秒
@@ -88,7 +93,7 @@ public class LayeringCacheManager implements CacheManager {
 	protected Cache createCache(String name) {
         return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations,
                 getSecondaryCacheExpirationSecondTime(name), getSecondaryCachePreloadSecondTime(name),
-                isAllowNullValues(), createNativeCaffeineCache(name));
+                isAllowNullValues(), isUsedFirstCache, createNativeCaffeineCache(name));
     }
 
     /**
@@ -237,4 +242,11 @@ public class LayeringCacheManager implements CacheManager {
         return preloadSecondTime < 0 ? 0 : preloadSecondTime;
     }
 
+    /**
+     * 设置是否使用二级缓存，默认是true
+     * @param usedFirstCache
+     */
+    public void setUsedFirstCache(boolean usedFirstCache) {
+        isUsedFirstCache = usedFirstCache;
+    }
 }

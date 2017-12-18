@@ -1,7 +1,6 @@
 package com.xiaolyuh.cache.layering;
 
-import java.util.concurrent.Callable;
-
+import com.xiaolyuh.cache.redis.cache.CustomizedRedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -9,7 +8,7 @@ import org.springframework.cache.interceptor.CacheAspectSupport;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.data.redis.core.RedisOperations;
 
-import com.xiaolyuh.cache.redis.cache.CustomizedRedisCache;
+import java.util.concurrent.Callable;
 
 /**
  * @author yuhao.wang
@@ -24,6 +23,11 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private final String name;
 
     /**
+     * 是否使用二级缓存
+     */
+    private boolean isUsedFirstCache = true;
+
+    /**
      * redi缓存
      */
     private final CustomizedRedisCache redisCache;
@@ -34,12 +38,11 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private final CaffeineCache caffeineCache;
 
     /**
-     *
-     * @param name 缓存名称
-     * @param redisCache Redis缓存
+     * @param name          缓存名称
+     * @param redisCache    Redis缓存
      * @param caffeineCache Caffeine缓存
      */
-    public LayeringCache(String name, CustomizedRedisCache redisCache, CaffeineCache caffeineCache, boolean allowNullValues) {
+    public LayeringCache(String name, CustomizedRedisCache redisCache, CaffeineCache caffeineCache, boolean allowNullValues, boolean isUsedFirstCache) {
 
         super(allowNullValues);
         this.name = name;
@@ -48,33 +51,34 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     }
 
     /**
-     *
-     * @param name 缓存名称
-     * @param prefix 缓存前缀
-     * @param redisOperations 操作Redis的RedisTemplate
-     * @param expiration redis缓存过期时间
+     * @param name              缓存名称
+     * @param prefix            缓存前缀
+     * @param redisOperations   操作Redis的RedisTemplate
+     * @param expiration        redis缓存过期时间
      * @param preloadSecondTime redis缓存自动刷新时间
-     * @param caffeineCache Caffeine缓存
+     * @param caffeineCache     Caffeine缓存
      */
     public LayeringCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
                          long expiration, long preloadSecondTime, com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
-        this(name, prefix, redisOperations, expiration, preloadSecondTime, false, caffeineCache);
+        this(name, prefix, redisOperations, expiration, preloadSecondTime, false, true, caffeineCache);
     }
 
     /**
-     *
-     * @param name 缓存名称
-     * @param prefix 缓存前缀
-     * @param redisOperations 操作Redis的RedisTemplate
-     * @param expiration redis缓存过期时间
+     * @param name              缓存名称
+     * @param prefix            缓存前缀
+     * @param redisOperations   操作Redis的RedisTemplate
+     * @param expiration        redis缓存过期时间
      * @param preloadSecondTime redis缓存自动刷新时间
-     * @param allowNullValues 是否允许存NULL，默认是false
-     * @param caffeineCache Caffeine缓存
+     * @param allowNullValues   是否允许存NULL，默认是false
+     * @param caffeineCache     Caffeine缓存
      */
     public LayeringCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
-                         long expiration, long preloadSecondTime, boolean allowNullValues, com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
+                         long expiration, long preloadSecondTime, boolean allowNullValues, boolean isUsedFirstCache,
+                         com.github.benmanes.caffeine.cache.Cache<Object, Object> caffeineCache) {
+
         super(allowNullValues);
         this.name = name;
+        this.isUsedFirstCache = isUsedFirstCache;
         this.redisCache = new CustomizedRedisCache(name, prefix, redisOperations, expiration, preloadSecondTime, allowNullValues);
         this.caffeineCache = new CaffeineCache(name, caffeineCache, allowNullValues);
     }
@@ -91,9 +95,13 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public ValueWrapper get(Object key) {
-        // 查询一级缓存
-        ValueWrapper wrapper = caffeineCache.get(key);
-        logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
+        ValueWrapper wrapper = null;
+        if (isUsedFirstCache) {
+            // 查询一级缓存
+            wrapper = caffeineCache.get(key);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
+        }
+
         if (wrapper == null) {
             // 查询二级缓存
             wrapper = redisCache.get(key);
@@ -104,9 +112,13 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public <T> T get(Object key, Class<T> type) {
-        // 查询一级缓存
-        T value = caffeineCache.get(key, type);
-        logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
+        T value = null;
+        if (isUsedFirstCache) {
+            // 查询一级缓存
+            value = caffeineCache.get(key, type);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
+        }
+
         if (value == null) {
             // 查询二级缓存
             value = redisCache.get(key, type);
@@ -118,13 +130,17 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
+//        CacheAspectSupport cacheAspectSupport = (CacheAspectSupport) valueLoader;
+//        System.out.println(cacheAspectSupport.getClass());
 
-        CacheAspectSupport cacheAspectSupport = (CacheAspectSupport) valueLoader;
-        System.out.println(cacheAspectSupport.getClass());
-//        System.out.println(cacheAspectSupport.);
-        // 查询一级缓存,如果一级缓存没有值则调用getForSecondaryCache(k, valueLoader)查询二级缓存
-        @SuppressWarnings("unchecked")
-		T value = (T) caffeineCache.getNativeCache().get(key, k -> getForSecondaryCache(k, valueLoader));
+        T value = null;
+        if (isUsedFirstCache) {
+            // 查询一级缓存,如果一级缓存没有值则调用getForSecondaryCache(k, valueLoader)查询二级缓存
+            value = (T) caffeineCache.getNativeCache().get(key, k -> getForSecondaryCache(k, valueLoader));
+        } else {
+            // 直接查询二级缓存
+            value = (T) getForSecondaryCache(key, valueLoader);
+        }
         return value;
     }
 

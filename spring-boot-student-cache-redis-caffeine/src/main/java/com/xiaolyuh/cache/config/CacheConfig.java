@@ -35,11 +35,14 @@ public class CacheConfig {
     @Primary
     public CacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         LayeringCacheManager layeringCacheManager = new LayeringCacheManager(redisTemplate);
+        // Caffeine缓存设置
+        layeringCacheManager.setFirstCacheDefaultExpireAfterWrite(5);
+
+        // redis缓存设置
         // 设置使用缓存名称（value属性）作为redis缓存前缀
         layeringCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
         layeringCacheManager.setSecondaryCacheDefaultExpiration(redisDefaultExpiration);
-
         // 设置缓存的过期时间和自动刷新时间
         Map<String, CacheTime> cacheTimes = new HashMap<>();
         cacheTimes.put("people", new CacheTime(selectCacheTimeout, selectCacheRefresh));
