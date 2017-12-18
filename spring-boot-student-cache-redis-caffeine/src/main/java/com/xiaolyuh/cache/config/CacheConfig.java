@@ -6,8 +6,8 @@ import com.xiaolyuh.cache.redis.cache.CacheTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +23,7 @@ import java.util.Map;
  * @author yuhao.wang
  */
 @Configuration
+@EnableConfigurationProperties(CacheProperties.class)
 public class CacheConfig {
 
     // redis缓存的有效时间单位是秒
@@ -44,10 +45,10 @@ public class CacheConfig {
     public CacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
         LayeringCacheManager layeringCacheManager = new LayeringCacheManager(redisTemplate);
         // Caffeine缓存设置
+        setFirstCacheConfig(layeringCacheManager);
 
         // redis缓存设置
         setSecondaryCacheConfig(layeringCacheManager);
-
         return layeringCacheManager;
     }
 
