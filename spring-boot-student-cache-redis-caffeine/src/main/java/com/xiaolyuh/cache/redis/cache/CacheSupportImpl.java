@@ -1,5 +1,6 @@
 package com.xiaolyuh.cache.redis.cache;
 
+import com.xiaolyuh.cache.layering.LayeringCache;
 import com.xiaolyuh.cache.redis.cache.expression.CacheOperationExpressionEvaluator;
 import com.xiaolyuh.cache.redis.utils.RedisTemplateUtils;
 import com.xiaolyuh.cache.redis.utils.ReflectionUtils;
@@ -12,6 +13,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.context.expression.AnnotatedElementKey;
+import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.EvaluationContext;
@@ -60,12 +62,14 @@ public class CacheSupportImpl implements CacheSupport {
         // 新建一个代理对象（记录了缓存注解的方法类信息）
         final CachedMethodInvocation invocation = new CachedMethodInvocation(key, targetBean, targetMethod, invocationParamTypes, invocationArgs);
         for (Cache cache : caches) {
-            if (cache instanceof CustomizedRedisCache) {
-                CustomizedRedisCache redisCache = ((CustomizedRedisCache) cache);
-                // 将方法信息放到redis缓存
-                RedisTemplate<String, Object> redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
-                redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)),
-                        invocation, redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
+            if (cache instanceof LayeringCache) {
+                CustomizedRedisCache redisCache = getRedisCache(cache);
+                if (redisCache != null) {
+                    // 将方法信息放到redis缓存
+                    RedisTemplate<String, Object> redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
+                    redisTemplate.opsForValue().set(getInvocationCacheKey(redisCache.getCacheKey(key)),
+                            invocation, redisCache.getExpirationSecondTime(), TimeUnit.SECONDS);
+                }
             }
         }
     }
@@ -93,12 +97,14 @@ public class CacheSupportImpl implements CacheSupport {
             cache.put(invocation.getKey(), computed);
 
             RedisTemplate<String, Object> redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
-            CustomizedRedisCache redisCache = (CustomizedRedisCache) cache;
-            long expireTime = redisCache.getExpirationSecondTime();
-            // 刷新redis中缓存法信息key的有效时间
-            redisTemplate.expire(getInvocationCacheKey(redisCache.getCacheKey(invocation.getKey())), expireTime, TimeUnit.SECONDS);
+            CustomizedRedisCache redisCache = getRedisCache(cache);
+            if (redisCache != null) {
+                long expireTime = redisCache.getExpirationSecondTime();
+                // 刷新redis中缓存法信息key的有效时间
+                redisTemplate.expire(getInvocationCacheKey(redisCache.getCacheKey(invocation.getKey())), expireTime, TimeUnit.SECONDS);
 
-            logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
+                logger.info("缓存：{}-{}，重新加载数据", cacheName, invocation.getKey().toString().getBytes());
+            }
         } catch (Exception e) {
             logger.info("刷新缓存失败：" + e.getMessage(), e);
         }
@@ -203,6 +209,11 @@ public class CacheSupportImpl implements CacheSupport {
             cacheNames.add(realCacheName);
         }
         return cacheNames;
+    }
+
+    private CustomizedRedisCache getRedisCache(Cache cache) {
+        LayeringCache layeringCache = ((LayeringCache) cache);
+        return layeringCache.getSecondaryCache();
     }
 
 }

@@ -81,7 +81,7 @@ public class CustomizedRedisCache extends RedisCache {
         // 调用重写后的get方法
         ValueWrapper valueWrapper = this.get(cacheKey);
 
-        if (null != valueWrapper) {
+        if (null != valueWrapper && CustomizedRedisCache.this.preloadSecondTime > 0) {
             // 刷新缓存数据
             refreshCache(key, cacheKeyStr);
         }

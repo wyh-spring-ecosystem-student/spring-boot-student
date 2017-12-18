@@ -93,6 +93,10 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         return this;
     }
 
+    public CustomizedRedisCache getSecondaryCache() {
+        return this.redisCache;
+    }
+
     @Override
     public ValueWrapper get(Object key) {
         ValueWrapper wrapper = null;
