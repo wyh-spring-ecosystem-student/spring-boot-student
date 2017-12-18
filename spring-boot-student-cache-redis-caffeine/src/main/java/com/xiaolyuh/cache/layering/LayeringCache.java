@@ -130,9 +130,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public <T> T get(Object key, Callable<T> valueLoader) {
-//        CacheAspectSupport cacheAspectSupport = (CacheAspectSupport) valueLoader;
-//        System.out.println(cacheAspectSupport.getClass());
-
         T value = null;
         if (isUsedFirstCache) {
             // 查询一级缓存,如果一级缓存没有值则调用getForSecondaryCache(k, valueLoader)查询二级缓存

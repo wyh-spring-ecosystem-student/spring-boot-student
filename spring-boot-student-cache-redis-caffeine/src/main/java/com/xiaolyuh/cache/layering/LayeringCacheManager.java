@@ -1,12 +1,8 @@
 package com.xiaolyuh.cache.layering;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.CaffeineSpec;
+import com.xiaolyuh.cache.redis.cache.CacheTime;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -14,40 +10,54 @@ import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.xiaolyuh.cache.redis.cache.CacheTime;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuhao.wang
  */
 @SuppressWarnings("rawtypes")
 public class LayeringCacheManager implements CacheManager {
-    // 常量
     static final int DEFAULT_EXPIRE_AFTER_WRITE = 60;
     static final int DEFAULT_INITIAL_CAPACITY = 5;
     static final int DEFAULT_MAXIMUM_SIZE = 1_000;
 
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
 
-    // 是否允许动态创建缓存
+    /**
+     * 是否允许动态创建缓存，默认是false
+     */
     private boolean dynamic = true;
 
-    // 缓存值是否允许为NULL
+    /**
+     * 缓存值是否允许为NULL
+     */
     private boolean allowNullValues = false;
 
-    // 是否使用二级缓存
+    /**
+     * 是否使用二级缓存
+     */
     private boolean isUsedFirstCache = true;
 
     // Caffeine 属性
-    // 一级缓存默认有效时间60秒
+    /**
+     * initialCapacity: 5
+     * maximumSize: 1000
+     * expireAfterWrite：60s
+     */
     private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
             .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.SECONDS)
             .initialCapacity(DEFAULT_INITIAL_CAPACITY)
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
     // redis 属性
-	private final RedisOperations redisOperations;
+    private final RedisOperations redisOperations;
     private boolean usePrefix = false;
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
     // 0 - never expire
@@ -90,7 +100,7 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     @SuppressWarnings("unchecked")
-	protected Cache createCache(String name) {
+    protected Cache createCache(String name) {
         return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations,
                 getSecondaryCacheExpirationSecondTime(name), getSecondaryCachePreloadSecondTime(name),
                 isAllowNullValues(), isUsedFirstCache, createNativeCaffeineCache(name));
@@ -166,31 +176,6 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     /**
-     * 设置一级缓存的初始大小，默认是5
-     * @param defaultInitialCapacity
-     */
-    public void setFirstCacheDefaultInitialCapacity(int defaultInitialCapacity) {
-        cacheBuilder.initialCapacity(defaultInitialCapacity);
-    }
-
-    /**
-     * 设置一级缓存的最大size，默认是1_000
-     * @param defaultMaximumSize
-     */
-    public void setFirstCacheDefaultMaximumSize(int defaultMaximumSize) {
-        cacheBuilder.maximumSize(defaultMaximumSize);
-    }
-
-    /**
-     *  设置一级缓存的过期时间，单位毫秒，默认1分钟
-     * @param defaultExpireAfterWrite
-     */
-    public void setFirstCacheDefaultExpireAfterWrite(int defaultExpireAfterWrite) {
-        cacheBuilder.expireAfterWrite(defaultExpireAfterWrite, TimeUnit.MILLISECONDS);
-    }
-
-
-    /**
      * 设置redis默认的过期时间（单位：秒）
      *
      * @param defaultExpireTime
@@ -244,9 +229,21 @@ public class LayeringCacheManager implements CacheManager {
 
     /**
      * 设置是否使用二级缓存，默认是true
+     *
      * @param usedFirstCache
      */
     public void setUsedFirstCache(boolean usedFirstCache) {
         isUsedFirstCache = usedFirstCache;
+    }
+
+    public void setCaffeineSpec(CaffeineSpec caffeineSpec) {
+        doSetCaffeine(Caffeine.from(caffeineSpec));
+    }
+
+    private void doSetCaffeine(Caffeine<Object, Object> cacheBuilder) {
+        if (!ObjectUtils.nullSafeEquals(this.cacheBuilder, cacheBuilder)) {
+            this.cacheBuilder = cacheBuilder;
+            refreshKnownCaches();
+        }
     }
 }
