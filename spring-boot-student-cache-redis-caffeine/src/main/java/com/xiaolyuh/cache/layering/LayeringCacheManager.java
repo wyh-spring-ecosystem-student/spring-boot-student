@@ -1,11 +1,4 @@
-package com.xiaolyuh.cache;
-
-import com.github.benmanes.caffeine.cache.Caffeine;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
-import org.springframework.data.redis.cache.RedisCachePrefix;
-import org.springframework.data.redis.core.RedisOperations;
+package com.xiaolyuh.cache.layering;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -14,9 +7,21 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
+import org.springframework.data.redis.cache.RedisCachePrefix;
+import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.util.CollectionUtils;
+
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.xiaolyuh.cache.redis.cache.CacheTime;
+
 /**
  * @author yuhao.wang
  */
+@SuppressWarnings("rawtypes")
 public class LayeringCacheManager implements CacheManager {
     // 常量
     static final int DEFAULT_EXPIRE_AFTER_WRITE = 60;
@@ -37,12 +42,12 @@ public class LayeringCacheManager implements CacheManager {
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
     // redis 属性
-    private final RedisOperations redisOperations;
+	private final RedisOperations redisOperations;
     private boolean usePrefix = false;
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
-    private boolean loadRemoteCachesOnStartup = false;
-    // reids key默认永远不过期时间
+    // 0 - never expire
     private long defaultExpiration = 0;
+    private Map<String, CacheTime> cacheTimes = null;
 
     public LayeringCacheManager(RedisOperations redisOperations) {
         this(redisOperations, Collections.<String>emptyList());
@@ -79,9 +84,10 @@ public class LayeringCacheManager implements CacheManager {
         return Collections.unmodifiableSet(this.cacheMap.keySet());
     }
 
-    protected Cache createCache(String name) {
-        long expiration = defaultExpiration;
-        return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations, expiration,
+    @SuppressWarnings("unchecked")
+	protected Cache createCache(String name) {
+        return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations,
+                getSecondaryCacheExpirationSecondTime(name), getSecondaryCachePreloadSecondTime(name),
                 isAllowNullValues(), createNativeCaffeineCache(name));
     }
 
@@ -155,15 +161,6 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     /**
-     * 设置redis默认的过期时间（单位：秒）
-     *
-     * @param defaultExpireTime
-     */
-    public void setSecondaryCacheDefaultExpiration(long defaultExpireTime) {
-        this.defaultExpiration = defaultExpireTime;
-    }
-
-    /**
      * 设置一级缓存的初始大小，默认是5
      * @param defaultInitialCapacity
      */
@@ -186,4 +183,58 @@ public class LayeringCacheManager implements CacheManager {
     public void setFirstCacheDefaultExpireAfterWrite(int defaultExpireAfterWrite) {
         cacheBuilder.expireAfterWrite(defaultExpireAfterWrite, TimeUnit.MILLISECONDS);
     }
+
+
+    /**
+     * 设置redis默认的过期时间（单位：秒）
+     *
+     * @param defaultExpireTime
+     */
+    public void setSecondaryCacheDefaultExpiration(long defaultExpireTime) {
+        this.defaultExpiration = defaultExpireTime;
+    }
+
+
+    /**
+     * 根据缓存名称设置缓存的有效时间和刷新时间，单位秒
+     *
+     * @param cacheTimes
+     */
+    public void setSecondaryCacheTimess(Map<String, CacheTime> cacheTimes) {
+        this.cacheTimes = (cacheTimes != null ? new ConcurrentHashMap<String, CacheTime>(cacheTimes) : null);
+    }
+
+    /**
+     * 获取过期时间
+     *
+     * @return
+     */
+    public long getSecondaryCacheExpirationSecondTime(String name) {
+        if (StringUtils.isEmpty(name)) {
+            return 0;
+        }
+
+        CacheTime cacheTime = null;
+        if (!CollectionUtils.isEmpty(cacheTimes)) {
+            cacheTime = cacheTimes.get(name);
+        }
+        Long expiration = cacheTime != null ? cacheTime.getExpirationSecondTime() : defaultExpiration;
+        return expiration < 0 ? 0 : expiration;
+    }
+
+    /**
+     * 获取自动刷新时间
+     *
+     * @return
+     */
+    private long getSecondaryCachePreloadSecondTime(String name) {
+        // 自动刷新时间，默认是0
+        CacheTime cacheTime = null;
+        if (!CollectionUtils.isEmpty(cacheTimes)) {
+            cacheTime = cacheTimes.get(name);
+        }
+        Long preloadSecondTime = cacheTime != null ? cacheTime.getPreloadSecondTime() : 0;
+        return preloadSecondTime < 0 ? 0 : preloadSecondTime;
+    }
+
 }

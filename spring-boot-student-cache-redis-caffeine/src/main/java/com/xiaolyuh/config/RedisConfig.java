@@ -1,29 +1,23 @@
-package com.xiaolyuh.redis.config;
+package com.xiaolyuh.config;
 
-import com.alibaba.fastjson.parser.ParserConfig;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xiaolyuh.redis.serializer.FastJsonRedisSerializer;
-import com.xiaolyuh.redis.serializer.StringRedisSerializer;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
+import com.alibaba.fastjson.parser.ParserConfig;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaolyuh.cache.redis.serializer.FastJsonRedisSerializer;
+import com.xiaolyuh.cache.redis.serializer.StringRedisSerializer;
+
 /**
  * @author yuhao.wang
  */
 @Configuration
 public class RedisConfig {
-
-    // redis缓存的有效时间单位是秒
-    @Value("${redis.default.expiration:3600}")
-    private long redisDefaultExpiration;
 
     /**
      * 重写Redis序列化方式，使用Json方式:
@@ -61,17 +55,6 @@ public class RedisConfig {
 
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
-    }
-
-    /**
-     * 显示声明缓存key生成器
-     *
-     * @return
-     */
-    @Bean
-    public KeyGenerator keyGenerator() {
-
-        return new SimpleKeyGenerator();
     }
 
 }

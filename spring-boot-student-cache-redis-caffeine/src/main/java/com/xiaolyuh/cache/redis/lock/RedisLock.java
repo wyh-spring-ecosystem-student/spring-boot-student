@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.lock;
+package com.xiaolyuh.cache.redis.lock;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class RedisLock {
 
     private static Logger logger = LoggerFactory.getLogger(RedisLock.class);
 
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 将key 的值设为value ，当且仅当key 不存在，等效于 SETNX。
@@ -128,7 +128,7 @@ public class RedisLock {
      * @param redisTemplate
      * @param lockKey       锁的key（Redis的Key）
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey) {
+    public RedisLock(RedisTemplate<String, Object> redisTemplate, String lockKey) {
         this.redisTemplate = redisTemplate;
         this.lockKey = lockKey + "_lock";
     }
@@ -140,7 +140,7 @@ public class RedisLock {
      * @param lockKey       锁的key（Redis的Key）
      * @param expireTime    锁的过期时间(单位：秒)
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, int expireTime) {
+    public RedisLock(RedisTemplate<String, Object> redisTemplate, String lockKey, int expireTime) {
         this(redisTemplate, lockKey);
         this.expireTime = expireTime;
     }
@@ -152,7 +152,7 @@ public class RedisLock {
      * @param lockKey       锁的key（Redis的Key）
      * @param timeOut       请求锁的超时时间(单位：毫秒)
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, long timeOut) {
+    public RedisLock(RedisTemplate<String, Object> redisTemplate, String lockKey, long timeOut) {
         this(redisTemplate, lockKey);
         this.timeOut = timeOut;
     }
@@ -165,7 +165,7 @@ public class RedisLock {
      * @param expireTime    锁的过期时间(单位：秒)
      * @param timeOut       请求锁的超时时间(单位：毫秒)
      */
-    public RedisLock(RedisTemplate redisTemplate, String lockKey, int expireTime, long timeOut) {
+    public RedisLock(RedisTemplate<String, Object> redisTemplate, String lockKey, int expireTime, long timeOut) {
         this(redisTemplate, lockKey, expireTime);
         this.timeOut = timeOut;
     }

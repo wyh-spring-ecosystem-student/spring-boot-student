@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.serializer;
+package com.xiaolyuh.cache.redis.serializer;
 
 import com.alibaba.fastjson.JSON;
 import org.springframework.data.redis.serializer.RedisSerializer;

@@ -1,9 +1,10 @@
-package com.xiaolyuh.redis.utils;
+package com.xiaolyuh.cache.redis.utils;
 
-import com.xiaolyuh.redis.serializer.StringRedisSerializer;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+
+import com.xiaolyuh.cache.redis.serializer.StringRedisSerializer;
 
 /**
  * 获取默认的RedisTemplate
@@ -12,13 +13,13 @@ import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer
  */
 public final class RedisTemplateUtils {
 
-    private static RedisTemplate redisTemplate;
+    private static RedisTemplate<String, Object> redisTemplate;
 
-    public static RedisTemplate getRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
+    public static RedisTemplate<String, Object> getRedisTemplate(RedisConnectionFactory redisConnectionFactory) {
         if (redisTemplate == null) {
             synchronized (RedisTemplateUtils.class) {
                 if (redisTemplate == null) {
-                    redisTemplate = new RedisTemplate();
+                    redisTemplate = new RedisTemplate<String, Object>();
                     redisTemplate.setConnectionFactory(redisConnectionFactory);
 
                     JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();

@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.utils;
+package com.xiaolyuh.cache.redis.utils;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 

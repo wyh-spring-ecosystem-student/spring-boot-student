@@ -37,9 +37,9 @@ public class CaffeineCacheController {
             .maximumSize(10_000)
             .expireAfterWrite(10, TimeUnit.MINUTES)
             // Either: Build with a synchronous computation that is wrapped as asynchronous
-            .buildAsync(key -> createExpensiveGraph(key));
-    // Or: Build with a asynchronous computation that returns a future
-    // .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
+            // .buildAsync(key -> createExpensiveGraph(key));
+            // Or: Build with a asynchronous computation that returns a future
+            .buildAsync((key, executor) -> createExpensiveGraphAsync(key, executor));
 
     private CompletableFuture<Object> createExpensiveGraphAsync(String key, Executor executor) {
         CompletableFuture<Object> objectCompletableFuture = new CompletableFuture<>();
@@ -86,6 +86,7 @@ public class CaffeineCacheController {
         List<String> keys = new ArrayList<>();
         keys.add(key);
         Map<String, Object> graphs = loadingCache.getAll(keys);
+        graphs.isEmpty();
         return graph;
     }
 
@@ -99,7 +100,8 @@ public class CaffeineCacheController {
         List<String> keys = new ArrayList<>();
         keys.add(key);
         CompletableFuture<Map<String, Object>> graphs = asyncLoadingCache.getAll(keys);
-
+        graphs.hashCode();
+        
         // 异步转同步
         loadingCache = asyncLoadingCache.synchronous();
         return graph;

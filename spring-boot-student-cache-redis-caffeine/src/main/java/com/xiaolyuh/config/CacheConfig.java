@@ -1,19 +1,39 @@
 package com.xiaolyuh.config;
 
-import com.github.benmanes.caffeine.cache.CacheLoader;
-import com.xiaolyuh.cache.LayeringCacheManager;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
-import org.springframework.cache.caffeine.CaffeineCacheManager;
+import org.springframework.cache.interceptor.KeyGenerator;
+import org.springframework.cache.interceptor.SimpleKeyGenerator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.RedisTemplate;
+
+import com.xiaolyuh.cache.layering.LayeringCacheManager;
 
 /**
  * @author yuhao.wang
  */
 @Configuration
 public class CacheConfig {
+
+
+    // redis缓存的有效时间单位是秒
+    @Value("${redis.default.expiration:3600}")
+    private long redisDefaultExpiration;
+
+
+    /**
+     * 显示声明缓存key生成器
+     *
+     * @return
+     */
+    @Bean
+    public KeyGenerator keyGenerator() {
+
+        return new SimpleKeyGenerator();
+    }
+
 
     @Bean
     @Primary
@@ -25,13 +45,6 @@ public class CacheConfig {
         layeringCacheManager.setSecondaryCacheDefaultExpiration(600);
 
         return layeringCacheManager;
-    }
-
-    @Bean
-    public CaffeineCacheManager caffeineCacheManager(RedisTemplate<String, Object> redisTemplate) {
-        CaffeineCacheManager redisCacheManager = new CaffeineCacheManager();
-
-        return redisCacheManager;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.xiaolyuh.redis.utils;
+package com.xiaolyuh.cache.redis.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
