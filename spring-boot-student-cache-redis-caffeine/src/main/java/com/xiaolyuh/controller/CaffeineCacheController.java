@@ -51,7 +51,7 @@ public class CaffeineCacheController {
         if (key.equals("name")) {
             throw new RuntimeException("调用了该方法获取缓存key的值的时候出现异常");
         }
-        return personService.findOne1();
+        return personService.findOne();
     }
 
     @RequestMapping("/testManual")
@@ -304,7 +304,7 @@ public class CaffeineCacheController {
                 .refreshAfterWrite(4, TimeUnit.SECONDS)
                 .build(k -> createExpensiveGraph(k));
 
-        cache.put(key, personService.findOne1());
+        cache.put(key, personService.findOne());
         cache.invalidate(key);
 
         System.out.println("第一次获取缓存");
