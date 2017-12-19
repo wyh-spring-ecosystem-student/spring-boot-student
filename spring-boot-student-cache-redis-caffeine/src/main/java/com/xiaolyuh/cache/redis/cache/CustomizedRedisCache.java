@@ -27,6 +27,8 @@ public class CustomizedRedisCache extends RedisCache {
 
     private static final Logger logger = LoggerFactory.getLogger(CustomizedRedisCache.class);
 
+    public static final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_suffix";
+
     private CacheSupport getCacheSupport() {
         return SpringContextUtils.getBean(CacheSupport.class);
     }
@@ -63,6 +65,12 @@ public class CustomizedRedisCache extends RedisCache {
         this.forceRefresh = forceRefresh;
         this.prefix = prefix;
 
+    }
+
+    @Override
+    public void evict(Object key) {
+        super.evict(key);
+        redisOperations.delete(getCacheKey(key) + INVOCATION_CACHE_KEY_SUFFIX);
     }
 
     /**

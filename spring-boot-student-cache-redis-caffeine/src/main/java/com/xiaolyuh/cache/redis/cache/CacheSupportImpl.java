@@ -38,8 +38,6 @@ public class CacheSupportImpl implements CacheSupport {
 
     private final String SEPARATOR = "#";
 
-    private final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_suffix";
-
     @Autowired
     private KeyGenerator keyGenerator;
 
@@ -192,7 +190,7 @@ public class CacheSupportImpl implements CacheSupport {
     }
 
     private String getInvocationCacheKey(String cacheKey) {
-        return cacheKey + INVOCATION_CACHE_KEY_SUFFIX;
+        return cacheKey + CustomizedRedisCache.INVOCATION_CACHE_KEY_SUFFIX;
     }
 
     /**

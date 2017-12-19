@@ -24,7 +24,7 @@ public class PersonServiceImpl implements PersonService {
     PersonRepository personRepository;
 
     @Override
-    @CachePut(value = "people", key = "#person.id")
+    @CachePut(value = "people1", key = "#person.id")
     public Person save(Person person) {
         Person p = personRepository.save(person);
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
@@ -32,7 +32,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @CacheEvict(value = "people")//2
+    @CacheEvict(value = "people1", key = "#id")//2
     public void remove(Long id) {
         logger.info("删除了id、key为" + id + "的数据缓存");
         //这里不做实际删除操作
