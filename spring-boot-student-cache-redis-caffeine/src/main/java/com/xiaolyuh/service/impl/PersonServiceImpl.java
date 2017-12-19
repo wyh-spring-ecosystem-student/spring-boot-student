@@ -67,4 +67,12 @@ public class PersonServiceImpl implements PersonService {
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
+
+    @Override
+    @Cacheable(value = "people3")//3
+    public Person findOne3(Person person) {
+        Person p = personRepository.findOne(person.getId());
+        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        return p;
+    }
 }

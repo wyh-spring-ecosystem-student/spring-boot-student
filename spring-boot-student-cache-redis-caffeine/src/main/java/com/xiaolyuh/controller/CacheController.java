@@ -48,6 +48,12 @@ public class CacheController {
         return personService.findOne2(person);
     }
 
+    @RequestMapping("/able3")
+    public Person cacheable3(Person person) {
+
+        return personService.findOne3(person);
+    }
+
     @RequestMapping("/evit")
     public String evit(Long id) {
 

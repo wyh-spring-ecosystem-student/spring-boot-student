@@ -15,4 +15,6 @@ public interface PersonService {
     Person findOne1();
 
     Person findOne2(Person person);
+
+    Person findOne3(Person person);
 }
