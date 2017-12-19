@@ -28,7 +28,7 @@ public class CacheController {
 
     @RequestMapping("/able")
     public Person cacheable(Person person) {
-        return personService.findOne1();
+        return personService.findOne();
     }
 
     @RequestMapping("/able1")
@@ -39,7 +39,7 @@ public class CacheController {
         c.add(3L);
         c.add(4L);
         c.add(5L);
-        return personService.findOne(person, a, b, c);
+        return personService.findOne1(person, a, b, c);
     }
 
     @RequestMapping("/able2")

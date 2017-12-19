@@ -10,9 +10,9 @@ public interface PersonService {
 
     void remove(Long id);
 
-    Person findOne(Person person, String a, String[] b, List<Long> c);
+    Person findOne();
 
-    Person findOne1();
+    Person findOne1(Person person, String a, String[] b, List<Long> c);
 
     Person findOne2(Person person);
 
