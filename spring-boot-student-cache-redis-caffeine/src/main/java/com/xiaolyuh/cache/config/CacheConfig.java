@@ -69,6 +69,7 @@ public class CacheConfig {
         secondaryCacheSettings.put("people", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh));
         secondaryCacheSettings.put("people1", new SecondaryCacheSetting(120, 115, true));
         secondaryCacheSettings.put("people2", new SecondaryCacheSetting(false, 120, 115));
+        secondaryCacheSettings.put("people3", new SecondaryCacheSetting(120, 115, false, true));
         layeringCacheManager.setSecondaryCacheSettings(secondaryCacheSettings);
     }
 
