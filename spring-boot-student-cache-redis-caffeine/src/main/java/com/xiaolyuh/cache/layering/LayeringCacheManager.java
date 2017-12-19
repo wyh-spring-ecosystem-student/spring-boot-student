@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.TimeUnit;
 
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
-import com.xiaolyuh.cache.redis.cache.SecondaryCacheConfig;
+import com.xiaolyuh.cache.redis.cache.SecondaryCacheSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -56,7 +56,7 @@ public class LayeringCacheManager implements CacheManager {
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
     // 0 - never expire
     private long defaultExpiration = 0;
-    private Map<String, SecondaryCacheConfig> secondaryCacheConfigs = null;
+    private Map<String, SecondaryCacheSetting> secondaryCacheSettings = null;
 
     public LayeringCacheManager(RedisOperations redisOperations) {
         this(redisOperations, Collections.<String>emptyList());
@@ -182,10 +182,10 @@ public class LayeringCacheManager implements CacheManager {
     /**
      * 根据缓存名称设置缓存的有效时间和刷新时间，单位秒
      *
-     * @param secondaryCacheConfigs
+     * @param secondaryCacheSettings
      */
-    public void setSecondaryCacheTimess(Map<String, SecondaryCacheConfig> secondaryCacheConfigs) {
-        this.secondaryCacheConfigs = (secondaryCacheConfigs != null ? new ConcurrentHashMap<String, SecondaryCacheConfig>(secondaryCacheConfigs) : null);
+    public void setSecondaryCacheSettings(Map<String, SecondaryCacheSetting> secondaryCacheSettings) {
+        this.secondaryCacheSettings = (secondaryCacheSettings != null ? new ConcurrentHashMap<>(secondaryCacheSettings) : null);
     }
 
     /**
@@ -198,11 +198,11 @@ public class LayeringCacheManager implements CacheManager {
             return 0;
         }
 
-        SecondaryCacheConfig secondaryCacheConfig = null;
-        if (!CollectionUtils.isEmpty(secondaryCacheConfigs)) {
-            secondaryCacheConfig = secondaryCacheConfigs.get(name);
+        SecondaryCacheSetting secondaryCacheSetting = null;
+        if (!CollectionUtils.isEmpty(secondaryCacheSettings)) {
+            secondaryCacheSetting = secondaryCacheSettings.get(name);
         }
-        Long expiration = secondaryCacheConfig != null ? secondaryCacheConfig.getExpirationSecondTime() : defaultExpiration;
+        Long expiration = secondaryCacheSetting != null ? secondaryCacheSetting.getExpirationSecondTime() : defaultExpiration;
         return expiration < 0 ? 0 : expiration;
     }
 
@@ -213,11 +213,11 @@ public class LayeringCacheManager implements CacheManager {
      */
     private long getSecondaryCachePreloadSecondTime(String name) {
         // 自动刷新时间，默认是0
-        SecondaryCacheConfig secondaryCacheConfig = null;
-        if (!CollectionUtils.isEmpty(secondaryCacheConfigs)) {
-            secondaryCacheConfig = secondaryCacheConfigs.get(name);
+        SecondaryCacheSetting secondaryCacheSetting = null;
+        if (!CollectionUtils.isEmpty(secondaryCacheSettings)) {
+            secondaryCacheSetting = secondaryCacheSettings.get(name);
         }
-        Long preloadSecondTime = secondaryCacheConfig != null ? secondaryCacheConfig.getPreloadSecondTime() : 0;
+        Long preloadSecondTime = secondaryCacheSetting != null ? secondaryCacheSetting.getPreloadSecondTime() : 0;
         return preloadSecondTime < 0 ? 0 : preloadSecondTime;
     }
 
@@ -225,24 +225,24 @@ public class LayeringCacheManager implements CacheManager {
      * 获取是否使用二级缓存，默认是true
      */
     public boolean getUsedFirstCache(String name) {
-        SecondaryCacheConfig secondaryCacheConfig = null;
-        if (!CollectionUtils.isEmpty(secondaryCacheConfigs)) {
-            secondaryCacheConfig = secondaryCacheConfigs.get(name);
+        SecondaryCacheSetting secondaryCacheSetting = null;
+        if (!CollectionUtils.isEmpty(secondaryCacheSettings)) {
+            secondaryCacheSetting = secondaryCacheSettings.get(name);
         }
 
-        return secondaryCacheConfig != null ? secondaryCacheConfig.getUsedFirstCache() : true;
+        return secondaryCacheSetting != null ? secondaryCacheSetting.getUsedFirstCache() : true;
     }
 
     /**
      * 获取是否强制刷新（走数据库），默认是false
      */
     public boolean getForceRefresh(String name) {
-        SecondaryCacheConfig secondaryCacheConfig = null;
-        if (!CollectionUtils.isEmpty(secondaryCacheConfigs)) {
-            secondaryCacheConfig = secondaryCacheConfigs.get(name);
+        SecondaryCacheSetting secondaryCacheSetting = null;
+        if (!CollectionUtils.isEmpty(secondaryCacheSettings)) {
+            secondaryCacheSetting = secondaryCacheSettings.get(name);
         }
 
-        return secondaryCacheConfig != null ? secondaryCacheConfig.getForceRefresh() : false;
+        return secondaryCacheSetting != null ? secondaryCacheSetting.getForceRefresh() : false;
     }
 
     public void setCaffeineSpec(CaffeineSpec caffeineSpec) {

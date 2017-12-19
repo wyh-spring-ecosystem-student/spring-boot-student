@@ -2,7 +2,7 @@ package com.xiaolyuh.cache.config;
 
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
 import com.xiaolyuh.cache.layering.LayeringCacheManager;
-import com.xiaolyuh.cache.redis.cache.SecondaryCacheConfig;
+import com.xiaolyuh.cache.redis.cache.SecondaryCacheSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -65,11 +65,11 @@ public class CacheConfig {
         //这里可以设置一个默认的过期时间 单位是秒
         layeringCacheManager.setSecondaryCacheDefaultExpiration(redisDefaultExpiration);
         // 设置缓存的过期时间和自动刷新时间
-        Map<String, SecondaryCacheConfig> cacheTimes = new HashMap<>();
-        cacheTimes.put("people", new SecondaryCacheConfig(selectCacheTimeout, selectCacheRefresh));
-        cacheTimes.put("people1", new SecondaryCacheConfig(120, 115, false, true));
-        cacheTimes.put("people2", new SecondaryCacheConfig(120, 115, true, false));
-        layeringCacheManager.setSecondaryCacheTimess(cacheTimes);
+        Map<String, SecondaryCacheSetting> secondaryCacheSettings = new HashMap<>();
+        secondaryCacheSettings.put("people", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh));
+        secondaryCacheSettings.put("people1", new SecondaryCacheSetting(120, 115, true));
+        secondaryCacheSettings.put("people2", new SecondaryCacheSetting(false, 120, 115));
+        layeringCacheManager.setSecondaryCacheSettings(secondaryCacheSettings);
     }
 
     /**
