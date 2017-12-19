@@ -34,7 +34,7 @@ public class CacheConfig {
     @Value("${select.cache.timeout:1800}")
     private long selectCacheTimeout;
     // 查询缓存自动刷新时间
-    @Value("${select.cache.refresh:1799}")
+    @Value("${select.cache.refresh:1790}")
     private long selectCacheRefresh;
 
     @Autowired
