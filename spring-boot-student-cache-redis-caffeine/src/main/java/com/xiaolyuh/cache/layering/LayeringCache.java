@@ -43,8 +43,8 @@ public class LayeringCache extends AbstractValueAdaptingCache {
      * @param expiration        redis缓存过期时间
      * @param preloadSecondTime redis缓存自动刷新时间
      * @param allowNullValues   是否允许存NULL，默认是false
-     * @param usedFirstCache   是否使用一级缓存，默认是true
-     * @param forceRefresh   是否强制刷新（走数据库），默认是false
+     * @param usedFirstCache    是否使用一级缓存，默认是true
+     * @param forceRefresh      是否强制刷新（走数据库），默认是false
      * @param caffeineCache     Caffeine缓存
      */
     public LayeringCache(String name, byte[] prefix, RedisOperations<? extends Object, ? extends Object> redisOperations,
@@ -78,9 +78,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (usedFirstCache) {
             // 查询一级缓存
             wrapper = caffeineCache.get(key);
-            System.out.println(caffeineCache.getNativeCache().asMap());
-            System.out.println(key.toString());
-
             logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
         }
 
