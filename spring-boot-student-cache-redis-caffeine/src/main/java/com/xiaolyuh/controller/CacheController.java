@@ -28,18 +28,18 @@ public class CacheController {
 
     @RequestMapping("/able")
     public Person cacheable(Person person) {
+        return personService.findOne1();
+    }
+
+    @RequestMapping("/able1")
+    public Person cacheable1(Person person) {
         String a = "a";
         String[] b = {"1", "2"};
         List<Long> c = new ArrayList<>();
         c.add(3L);
         c.add(4L);
+        c.add(5L);
         return personService.findOne(person, a, b, c);
-    }
-
-    @RequestMapping("/able1")
-    public Person cacheable1(Person person) {
-
-        return personService.findOne1();
     }
 
     @RequestMapping("/able2")
