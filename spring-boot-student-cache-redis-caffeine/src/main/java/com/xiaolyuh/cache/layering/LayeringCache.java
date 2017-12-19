@@ -95,14 +95,14 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (usedFirstCache) {
             // 查询一级缓存
             value = caffeineCache.get(key, type);
-            logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key);
         }
 
         if (value == null) {
             // 查询二级缓存
             value = redisCache.get(key, type);
             caffeineCache.put(key, value);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key);
         }
         return value;
     }
@@ -147,10 +147,10 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     @Override
     protected Object lookup(Object key) {
         Object value = caffeineCache.get(key);
-        logger.debug("查询一级缓存 key:{},返回值是:{}", key, value);
+        logger.debug("查询一级缓存 key:{},返回值是:{}", key);
         if (value == null) {
             value = redisCache.get(key);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key);
         }
         return value;
     }
