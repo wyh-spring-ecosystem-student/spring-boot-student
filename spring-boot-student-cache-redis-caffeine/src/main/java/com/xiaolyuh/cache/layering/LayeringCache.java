@@ -78,6 +78,9 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (usedFirstCache) {
             // 查询一级缓存
             wrapper = caffeineCache.get(key);
+            System.out.println(caffeineCache.getNativeCache().asMap());
+            System.out.println(key.toString());
+
             logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
         }
 
