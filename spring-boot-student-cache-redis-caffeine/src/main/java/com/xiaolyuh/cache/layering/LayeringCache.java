@@ -22,7 +22,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private final String name;
 
     /**
-     * 是否使用二级缓存
+     * 是否使用一级缓存
      */
     private boolean usedFirstCache = true;
 
@@ -122,13 +122,17 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public void put(Object key, Object value) {
-        caffeineCache.put(key, value);
+        if (usedFirstCache) {
+            caffeineCache.put(key, value);
+        }
         redisCache.put(key, value);
     }
 
     @Override
     public ValueWrapper putIfAbsent(Object key, Object value) {
-        caffeineCache.putIfAbsent(key, value);
+        if (usedFirstCache) {
+            caffeineCache.putIfAbsent(key, value);
+        }
         return redisCache.putIfAbsent(key, value);
     }
 
@@ -136,19 +140,26 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     public void evict(Object key) {
         // 删除的时候要先删除二级缓存再删除一级缓存，否则有并发问题
         redisCache.evict(key);
-        caffeineCache.evict(key);
+        if (usedFirstCache) {
+            caffeineCache.evict(key);
+        }
     }
 
     @Override
     public void clear() {
         redisCache.clear();
-        caffeineCache.clear();
+        if (usedFirstCache) {
+            caffeineCache.clear();
+        }
     }
 
     @Override
     protected Object lookup(Object key) {
-        Object value = caffeineCache.get(key);
-        logger.debug("查询一级缓存 key:{},返回值是:{}", key);
+        Object value = null;
+        if (usedFirstCache) {
+            value = caffeineCache.get(key);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key);
+        }
         if (value == null) {
             value = redisCache.get(key);
             logger.debug("查询二级缓存 key:{},返回值是:{}", key);
