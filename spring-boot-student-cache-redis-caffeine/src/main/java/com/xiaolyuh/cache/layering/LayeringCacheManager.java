@@ -32,8 +32,19 @@ public class LayeringCacheManager implements CacheManager {
 
     private final ConcurrentMap<String, Cache> cacheMap = new ConcurrentHashMap<String, Cache>(16);
 
+
     /**
-     * 是否允许动态创建缓存，默认是false
+     * 一级缓存配置
+     */
+    private Map<String, FirstCacheSetting> firstCacheSettings = null;
+
+    /**
+     * 二级缓存配置
+     */
+    private Map<String, SecondaryCacheSetting> secondaryCacheSettings = null;
+
+    /**
+     * 是否允许动态创建缓存，默认是true
      */
     private boolean dynamic = true;
 
@@ -53,11 +64,6 @@ public class LayeringCacheManager implements CacheManager {
             .initialCapacity(DEFAULT_INITIAL_CAPACITY)
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
-    /**
-     * 一级缓存配置
-     */
-    private Map<String, FirstCacheSetting> firstCacheSettings = null;
-
     // redis 属性
     /**
      * 操作redis的RedisTemplate
@@ -74,11 +80,6 @@ public class LayeringCacheManager implements CacheManager {
      * redis缓存默认时间，默认是0 永不过期
      */
     private long defaultExpiration = 0;
-
-    /**
-     * 二级缓存配置
-     */
-    private Map<String, SecondaryCacheSetting> secondaryCacheSettings = null;
 
     public LayeringCacheManager(RedisOperations redisOperations) {
         this(redisOperations, Collections.<String>emptyList());
