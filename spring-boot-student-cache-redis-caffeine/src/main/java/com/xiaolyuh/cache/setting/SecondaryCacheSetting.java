@@ -1,4 +1,4 @@
-package com.xiaolyuh.cache.redis.cache;
+package com.xiaolyuh.cache.setting;
 
 /**
  * @author yuhao.wang

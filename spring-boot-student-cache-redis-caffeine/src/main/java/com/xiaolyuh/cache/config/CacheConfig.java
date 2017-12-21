@@ -2,7 +2,8 @@ package com.xiaolyuh.cache.config;
 
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
 import com.xiaolyuh.cache.layering.LayeringCacheManager;
-import com.xiaolyuh.cache.redis.cache.SecondaryCacheSetting;
+import com.xiaolyuh.cache.setting.FirstCacheSetting;
+import com.xiaolyuh.cache.setting.SecondaryCacheSetting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
@@ -53,10 +54,17 @@ public class CacheConfig {
     }
 
     private void setFirstCacheConfig(LayeringCacheManager layeringCacheManager) {
+        // 设置默认的一级缓存配置
         String specification = this.cacheProperties.getCaffeine().getSpec();
         if (StringUtils.hasText(specification)) {
             layeringCacheManager.setCaffeineSpec(CaffeineSpec.parse(specification));
         }
+
+        // 设置每个一级缓存的过期时间和自动刷新时间
+        Map<String, FirstCacheSetting> firstCacheSettings = new HashMap<>();
+        firstCacheSettings.put("people", new FirstCacheSetting("initialCapacity=5,maximumSize=500,expireAfterAccess=10s"));
+        firstCacheSettings.put("people1", new FirstCacheSetting("initialCapacity=5,maximumSize=50,expireAfterWrite=10s"));
+        layeringCacheManager.setFirstCacheSettings(firstCacheSettings);
     }
 
     private void setSecondaryCacheConfig(LayeringCacheManager layeringCacheManager) {
@@ -64,7 +72,8 @@ public class CacheConfig {
         layeringCacheManager.setUsePrefix(true);
         //这里可以设置一个默认的过期时间 单位是秒
         layeringCacheManager.setSecondaryCacheDefaultExpiration(redisDefaultExpiration);
-        // 设置缓存的过期时间和自动刷新时间
+
+        // 设置每个二级缓存的过期时间和自动刷新时间
         Map<String, SecondaryCacheSetting> secondaryCacheSettings = new HashMap<>();
         secondaryCacheSettings.put("people", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh));
         secondaryCacheSettings.put("people1", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh, true));

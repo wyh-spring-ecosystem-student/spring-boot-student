@@ -1,14 +1,9 @@
 package com.xiaolyuh.cache.layering;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
-import com.xiaolyuh.cache.redis.cache.SecondaryCacheSetting;
+import com.xiaolyuh.cache.setting.FirstCacheSetting;
+import com.xiaolyuh.cache.setting.SecondaryCacheSetting;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -16,9 +11,14 @@ import org.springframework.data.redis.cache.DefaultRedisCachePrefix;
 import org.springframework.data.redis.cache.RedisCachePrefix;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.util.CollectionUtils;
-
-import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.util.ObjectUtils;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author yuhao.wang
@@ -38,24 +38,46 @@ public class LayeringCacheManager implements CacheManager {
     private boolean dynamic = true;
 
     /**
-     *
-     缓存值是否允许为NULL
+     * 缓存值是否允许为NULL
      */
     private boolean allowNullValues = false;
 
     // Caffeine 属性
-    // 一级缓存默认有效时间60秒
+    /**
+     * expireAfterWrite：60
+     * initialCapacity：5
+     * maximumSize： 1_000
+     */
     private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
             .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.SECONDS)
             .initialCapacity(DEFAULT_INITIAL_CAPACITY)
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
+    /**
+     * 一级缓存配置
+     */
+    private Map<String, FirstCacheSetting> firstCacheSettings = null;
+
     // redis 属性
-	private final RedisOperations redisOperations;
+    /**
+     * 操作redis的RedisTemplate
+     */
+    private final RedisOperations redisOperations;
+
+    /**
+     * 二级缓存使用使用前缀，默认是false，建议设置成true
+     */
     private boolean usePrefix = false;
     private RedisCachePrefix cachePrefix = new DefaultRedisCachePrefix();
-    // 0 - never expire
+
+    /**
+     * redis缓存默认时间，默认是0 永不过期
+     */
     private long defaultExpiration = 0;
+
+    /**
+     * 二级缓存配置
+     */
     private Map<String, SecondaryCacheSetting> secondaryCacheSettings = null;
 
     public LayeringCacheManager(RedisOperations redisOperations) {
@@ -94,7 +116,7 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     @SuppressWarnings("unchecked")
-	protected Cache createCache(String name) {
+    protected Cache createCache(String name) {
         return new LayeringCache(name, (usePrefix ? cachePrefix.prefix(name) : null), redisOperations,
                 getSecondaryCacheExpirationSecondTime(name), getSecondaryCachePreloadSecondTime(name),
                 isAllowNullValues(), getUsedFirstCache(name), getForceRefresh(name), createNativeCaffeineCache(name));
@@ -107,7 +129,7 @@ public class LayeringCacheManager implements CacheManager {
      * @return the native Caffeine Cache instance
      */
     protected com.github.benmanes.caffeine.cache.Cache<Object, Object> createNativeCaffeineCache(String name) {
-        return this.cacheBuilder.build();
+        return getCaffeine(name).build();
     }
 
     /**
@@ -180,13 +202,23 @@ public class LayeringCacheManager implements CacheManager {
 
 
     /**
-     * 根据缓存名称设置缓存的有效时间和刷新时间，单位秒
+     * 根据缓存名称设置一级缓存的有效时间和刷新时间，单位秒
+     *
+     * @param firstCacheSettings
+     */
+    public void setFirstCacheSettings(Map<String, FirstCacheSetting> firstCacheSettings) {
+        this.firstCacheSettings = (!CollectionUtils.isEmpty(firstCacheSettings) ? new ConcurrentHashMap<>(firstCacheSettings) : null);
+    }
+
+    /**
+     * 根据缓存名称设置二级缓存的有效时间和刷新时间，单位秒
      *
      * @param secondaryCacheSettings
      */
     public void setSecondaryCacheSettings(Map<String, SecondaryCacheSetting> secondaryCacheSettings) {
-        this.secondaryCacheSettings = (secondaryCacheSettings != null ? new ConcurrentHashMap<>(secondaryCacheSettings) : null);
+        this.secondaryCacheSettings = (!CollectionUtils.isEmpty(secondaryCacheSettings) ? new ConcurrentHashMap<>(secondaryCacheSettings) : null);
     }
+
 
     /**
      * 获取过期时间
@@ -246,13 +278,22 @@ public class LayeringCacheManager implements CacheManager {
     }
 
     public void setCaffeineSpec(CaffeineSpec caffeineSpec) {
-        doSetCaffeine(Caffeine.from(caffeineSpec));
-    }
-
-    private void doSetCaffeine(Caffeine<Object, Object> cacheBuilder) {
+        Caffeine<Object, Object> cacheBuilder = Caffeine.from(caffeineSpec);
         if (!ObjectUtils.nullSafeEquals(this.cacheBuilder, cacheBuilder)) {
             this.cacheBuilder = cacheBuilder;
             refreshKnownCaches();
         }
+    }
+
+    private Caffeine<Object, Object> getCaffeine(String name) {
+        if (!CollectionUtils.isEmpty(firstCacheSettings)) {
+            FirstCacheSetting firstCacheSetting = firstCacheSettings.get(name);
+            if (firstCacheSetting != null && StringUtils.isNotBlank(firstCacheSetting.getCacheSpecification())) {
+                // 根据缓存名称获取一级缓存配置
+                return Caffeine.from(CaffeineSpec.parse(firstCacheSetting.getCacheSpecification()));
+            }
+        }
+
+        return this.cacheBuilder;
     }
 }
