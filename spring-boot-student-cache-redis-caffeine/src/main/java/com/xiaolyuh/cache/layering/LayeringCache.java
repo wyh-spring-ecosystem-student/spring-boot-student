@@ -134,14 +134,15 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public void evict(Object key) {
-        caffeineCache.evict(key);
+        // 删除的时候要先删除二级缓存再删除一级缓存，否则有并发问题
         redisCache.evict(key);
+        caffeineCache.evict(key);
     }
 
     @Override
     public void clear() {
-        caffeineCache.clear();
         redisCache.clear();
+        caffeineCache.clear();
     }
 
     @Override
