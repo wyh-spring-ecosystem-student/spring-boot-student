@@ -94,6 +94,7 @@ public class CustomizedRedisCacheManager extends RedisCacheManager {
      * @param cacheName 缓存名称
      * @return
      */
+    @Override
     public CustomizedRedisCache getMissingCache(String cacheName) {
 
         // 有效时间，初始化获取默认的有效时间
