@@ -56,7 +56,9 @@ public class PersonServiceImpl implements PersonService {
     @Cacheable(value = "people1", key = "#person.id", sync = true)//3
     public Person findOne1(Person person, String a, String[] b, List<Long> c) {
         Person p = personRepository.findOne(person.getId());
-        logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        if (p != null) {
+            logger.info("为id、key为:" + p.getId() + "数据做了缓存");
+        }
         return p;
     }
 
