@@ -1,5 +1,6 @@
 package com.xiaolyuh.cache.layering;
 
+import com.alibaba.fastjson.JSON;
 import com.xiaolyuh.cache.redis.cache.CustomizedRedisCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,13 +80,13 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (usedFirstCache) {
             // 查询一级缓存
             wrapper = caffeineCache.get(key);
-            logger.debug("查询一级缓存 key:{},返回值是:{}", key, wrapper);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, JSON.toJSONString(wrapper));
         }
 
         if (wrapper == null) {
             // 查询二级缓存
             wrapper = redisCache.get(key);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key, wrapper);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(wrapper));
         }
         return wrapper;
     }
@@ -96,14 +97,14 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         if (usedFirstCache) {
             // 查询一级缓存
             value = caffeineCache.get(key, type);
-            logger.debug("查询一级缓存 key:{},返回值是:{}", key);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
 
         if (value == null) {
             // 查询二级缓存
             value = redisCache.get(key, type);
             caffeineCache.put(key, value);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
         return value;
     }
@@ -163,11 +164,11 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         Object value = null;
         if (usedFirstCache) {
             value = caffeineCache.get(key);
-            logger.debug("查询一级缓存 key:{},返回值是:{}", key);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
         if (value == null) {
             value = redisCache.get(key);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key);
+            logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
         return value;
     }
@@ -181,7 +182,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
      */
     private <T> Object getForSecondaryCache(Object key, Callable<T> valueLoader) {
         T value = redisCache.get(key, valueLoader);
-        logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
+        logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         return toStoreValue(value);
     }
 }
