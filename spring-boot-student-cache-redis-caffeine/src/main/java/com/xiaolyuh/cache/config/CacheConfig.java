@@ -35,7 +35,7 @@ public class CacheConfig {
     @Value("${select.cache.timeout:1800}")
     private long selectCacheTimeout;
     // 查询缓存自动刷新时间
-    @Value("${select.cache.refresh:1790}")
+    @Value("${select.cache.refresh:1780}")
     private long selectCacheRefresh;
 
     @Autowired
@@ -66,7 +66,7 @@ public class CacheConfig {
         // 设置每个一级缓存的过期时间和自动刷新时间
         Map<String, FirstCacheSetting> firstCacheSettings = new HashMap<>();
         firstCacheSettings.put("people", new FirstCacheSetting("initialCapacity=5,maximumSize=500,expireAfterWrite=10s"));
-        firstCacheSettings.put("people1", new FirstCacheSetting("initialCapacity=5,maximumSize=50,expireAfterAccess=10s"));
+        firstCacheSettings.put("people1", new FirstCacheSetting("initialCapacity=5,maximumSize=50,expireAfterWrite=10s"));
         layeringCacheManager.setFirstCacheSettings(firstCacheSettings);
     }
 

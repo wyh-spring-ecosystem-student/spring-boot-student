@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
+import org.springframework.cache.support.NullValue;
 import org.springframework.data.redis.core.RedisOperations;
 
 import java.util.concurrent.Callable;
@@ -117,6 +118,10 @@ public class LayeringCache extends AbstractValueAdaptingCache {
             // 直接查询二级缓存
             value = (T) getForSecondaryCache(key, valueLoader);
         }
+
+        if (value instanceof NullValue) {
+            return null;
+        }
         return value;
     }
 
@@ -177,6 +182,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     private <T> Object getForSecondaryCache(Object key, Callable<T> valueLoader) {
         T value = redisCache.get(key, valueLoader);
         logger.debug("查询二级缓存 key:{},返回值是:{}", key, value);
-        return value;
+        return toStoreValue(value);
     }
 }
