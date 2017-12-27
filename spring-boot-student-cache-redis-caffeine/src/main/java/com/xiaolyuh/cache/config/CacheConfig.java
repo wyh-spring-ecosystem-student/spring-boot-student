@@ -51,7 +51,7 @@ public class CacheConfig {
         // redis缓存设置
         setSecondaryCacheConfig(layeringCacheManager);
 
-        // 允许存null，放置缓存击穿
+        // 允许存null，防止缓存击穿
         layeringCacheManager.setAllowNullValues(true);
         return layeringCacheManager;
     }
