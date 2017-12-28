@@ -110,23 +110,15 @@ public class CustomizedRedisCache extends RedisCache {
 
         Assert.notNull(cacheKey, "CacheKey must not be null!");
 
+        // Redis cache 不会存null，所以可以直接根据NULL来判断缓存时候存在
         // 根据key获取缓存值
-        RedisCacheElement redisCacheElement = new RedisCacheElement(cacheKey, fromStoreValue(lookup(cacheKey)));
-        // 判断key是否存在
-        @SuppressWarnings("unchecked")
-		Boolean exists = (Boolean) redisOperations.execute(new RedisCallback<Boolean>() {
-
-            @Override
-            public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
-                return connection.exists(cacheKey.getKeyBytes());
-            }
-        });
-
-        if (!exists.booleanValue()) {
+        Object result = lookup(cacheKey);
+        if (result == null) {
+            // 缓存不存在直接返回NULL
             return null;
         }
 
-        return redisCacheElement;
+        return new RedisCacheElement(cacheKey, fromStoreValue(result));
     }
 
     /**
