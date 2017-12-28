@@ -107,7 +107,6 @@ public class CustomizedRedisCache extends RedisCache {
      */
     @Override
     public RedisCacheElement get(final RedisCacheKey cacheKey) {
-
         Assert.notNull(cacheKey, "CacheKey must not be null!");
 
         // Redis cache 不会存null，所以可以直接根据NULL来判断缓存时候存在
