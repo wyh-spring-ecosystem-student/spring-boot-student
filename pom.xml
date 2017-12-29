@@ -94,7 +94,9 @@
 		<!-- Spring Boot 使用Spring data redis 操作redis数据库 -->
 		<module>spring-boot-student-data-redis</module>
 		<!-- 基于redis实现的分布式锁 -->
-		<module>spring-boot-student-data-redis-distributed-lock</module>
+		<module>spring-boot-student-data-redis-distributed-lock</module>		
+		<!-- drools规则引擎入门 -->
+		<module>spring-boot-student-drools</module>
     </modules>
 
 </project>

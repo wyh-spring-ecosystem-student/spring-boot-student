@@ -1,0 +1,52 @@
+//这里的package属性是一个逻辑区分，不需要个文件路径相对应
+package point.rules
+
+import com.xiaolyuh.domain.model.Order
+
+rule "zero"
+    no-loop true
+    lock-on-active true
+    salience 1
+    when
+        $s : Order(amout <= 100)
+    then
+        $s.setScore(0);
+        System.out.println("不加积分");
+        update($s);
+end
+
+rule "add100"
+    no-loop true
+    lock-on-active true
+    salience 1
+    when
+        $s : Order(amout > 100 && amout <= 500)
+    then
+        $s.setScore(100);
+        System.out.println("加100积分");
+        update($s);
+end
+
+rule "add500"
+    no-loop true
+    lock-on-active true
+    salience 1
+    when
+        $s : Order(amout > 500 && amout <= 1000)
+    then
+        $s.setScore(500);
+        System.out.println("加500积分");
+        update($s);
+end
+
+rule "add1000"
+    no-loop true
+    lock-on-active true
+    salience 1
+    when
+        $s : Order(amout > 1000)
+    then
+        $s.setScore(1000);
+        System.out.println("加500积分");
+        update($s);
+end
