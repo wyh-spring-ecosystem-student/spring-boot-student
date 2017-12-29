@@ -38,6 +38,7 @@ public class DroolsUtil {
             synchronized (DroolsUtil.class) {
                 if (kieContainer == null) {
                     kieContainer = kieServices.getKieClasspathContainer();
+                    // 检查规则文件是否有错
                     Results results = kieContainer.verify();
                     if (results.hasMessages(Message.Level.ERROR)) {
                         StringBuffer sb = new StringBuffer();
