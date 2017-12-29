@@ -37,6 +37,7 @@ public class DroolsUtil {
             //线程安全
             synchronized (DroolsUtil.class) {
                 if (kieContainer == null) {
+                    // 创建Container
                     kieContainer = kieServices.getKieClasspathContainer();
                     // 检查规则文件是否有错
                     Results results = kieContainer.verify();
