@@ -142,9 +142,10 @@
 
     <select id="findByRuleKey" resultMap="BaseResultMap">
         SELECT
-        <include refid="Base_Column_List"/>
-        FROM rule
+          <include refid="Base_Column_List"/>
+        FROM
+          rule
         WHERE
-        rule_key = #{ruleKey,jdbcType=VARCHAR}
+          rule_key = #{ruleKey,jdbcType=VARCHAR}
     </select>
 </mapper>
