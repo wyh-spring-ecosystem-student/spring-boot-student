@@ -2,7 +2,7 @@
 <kmodule xmlns="http://jboss.org/kie/6.0.0/kmodule">
 
     <!-- 这里的packages属性就是规则文件的文件路径 -->
-    <kbase name="pointrules" packages="rules.point">
+    <kbase name="point_rule" packages="rules.point">
         <ksession name="point_ksession"/>
     </kbase>
 
