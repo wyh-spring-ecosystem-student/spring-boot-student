@@ -3,7 +3,7 @@ CREATE TABLE `rule` (
   `id` bigint(20) NOT NULL AUTO_INCREMENT,
   `rule_key` varchar(255) NOT NULL DEFAULT '' COMMENT '规则编码',
   `version` varchar(255) NOT NULL DEFAULT '' COMMENT '规则编码',
-  `content` varchar(2048) NOT NULL DEFAULT '' COMMENT '规则n内容',
+  `content` varchar(2048) NOT NULL DEFAULT '' COMMENT '规则内容',
   `create_time` datetime NOT NULL,
   `update_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
