@@ -8,13 +8,23 @@ import org.kie.api.builder.KieBuilder;
 import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.KieRepository;
 import org.kie.api.builder.Message;
+import org.kie.api.io.ResourceType;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import org.kie.internal.KnowledgeBase;
+import org.kie.internal.KnowledgeBaseFactory;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderError;
+import org.kie.internal.builder.KnowledgeBuilderErrors;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
+import org.kie.internal.runtime.StatefulKnowledgeSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +35,6 @@ import java.util.List;
 public class RuleServiceImpl implements RuleService {
 
     public static final Logger logger = LoggerFactory.getLogger(RuleServiceImpl.class);
-
-    public static KieContainer kieContainer;
 
     @Autowired
     private RuleMapper ruleMapper;
@@ -53,31 +61,42 @@ public class RuleServiceImpl implements RuleService {
     }
 
     @Override
-    public KieSession getKieSessionByName() {
-        if (kieContainer == null) {
-            synchronized (RuleServiceImpl.class) {
-                if (kieContainer == null) {
-                    reloadRule();
-                }
-            }
-        }
-        long startTime = System.currentTimeMillis();
-        KieSession kieSession;
+    public KieSession getKieSessionByName(String ruleKey) {
+        StatefulKnowledgeSession kSession = null;
         try {
-            kieSession = kieContainer.newKieSession();
-        } catch (Exception e) {
-            logger.error("创建kiesession异常");
-            throw new RuntimeException(e);
+            long startTime = System.currentTimeMillis();
+            // TODO 可以缓存到本地，不用每次都去查数据库
+            Rule rule = ruleMapper.findByRuleKey(ruleKey);
+
+            KnowledgeBuilder kb = KnowledgeBuilderFactory.newKnowledgeBuilder();
+            // 装入规则，可以装入多个
+            kb.add(ResourceFactory.newByteArrayResource(rule.getContent().getBytes("utf-8")), ResourceType.DRL);
+
+            // 检查错误
+            KnowledgeBuilderErrors errors = kb.getErrors();
+            for (KnowledgeBuilderError error : errors) {
+                System.out.println(error);
+            }
+
+            // TODO 没有找到替代方法
+            KnowledgeBase kBase = KnowledgeBaseFactory.newKnowledgeBase();
+            kBase.addKnowledgePackages(kb.getKnowledgePackages());
+
+            // 创建kSession
+            kSession = kBase.newStatefulKnowledgeSession();
+            long endTime = System.currentTimeMillis();
+            logger.info("获取kSession耗时：{}", endTime - startTime);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
-        long endTime = System.currentTimeMillis();
-        System.out.println("获取kieSession耗时 : " + (endTime - startTime) + " ms");
-        return kieSession;
+        return kSession;
     }
 
+    // 不使用kieContainer这种方式，因为创建kSession的时候只能用kieContainer.newKieSession()，
+    // 不能指定要创建那个kSession，在执行规则的时候会把所有的规则都执行一次
     @Override
     public void reloadRule() {
         KieContainer kieContainer = loadContainerFromString(findAll());
-        RuleServiceImpl.kieContainer = kieContainer;
     }
 
     private KieContainer loadContainerFromString(List<Rule> rules) {

@@ -2,6 +2,7 @@ package com.xiaolyuh.domain.mapper;
 
 import com.xiaolyuh.domain.model.Rule;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -56,4 +57,6 @@ public interface RuleMapper {
     int updateByPrimaryKey(Rule record);
 
     List<Rule> findAll();
+
+    Rule findByRuleKey(@Param("ruleKey") String ruleKey);
 }

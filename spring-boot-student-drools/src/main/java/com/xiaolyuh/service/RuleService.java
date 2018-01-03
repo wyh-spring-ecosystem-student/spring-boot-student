@@ -17,5 +17,10 @@ public interface RuleService {
 
     void reloadRule();
 
-    KieSession getKieSessionByName();
+    /**
+     * 根据ruleKey获取规则
+     * @param ruleKey
+     * @return
+     */
+    KieSession getKieSessionByName(String ruleKey);
 }

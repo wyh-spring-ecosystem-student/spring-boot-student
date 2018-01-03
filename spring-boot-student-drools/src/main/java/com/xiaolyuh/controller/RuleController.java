@@ -32,7 +32,8 @@ public class RuleController {
         Address address = new Address();
         address.setPostcode(generateRandom(num));
 
-        KieSession kieSession = ruleService.getKieSessionByName();
+        String ruleKey = "score";
+        KieSession kieSession = ruleService.getKieSessionByName(ruleKey);
         int ruleFiredCount = 0;
         try {
             kieSession.insert(address);
