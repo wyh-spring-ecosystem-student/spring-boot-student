@@ -157,7 +157,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         // 删除的时候要先删除二级缓存再删除一级缓存，否则有并发问题
         redisCache.evict(key);
         if (usedFirstCache) {
-            // 删除一级缓存需要用到redis的订阅/发布模式，否则集群中其他服服务器节点的一级缓存数据无法删除
+            // 删除一级缓存需要用到redis的Pub/Sub（订阅/发布）模式，否则集群中其他服服务器节点的一级缓存数据无法删除
             Map<String, Object> message = new HashMap<>();
             message.put("cacheName", name);
             message.put("key", key);
