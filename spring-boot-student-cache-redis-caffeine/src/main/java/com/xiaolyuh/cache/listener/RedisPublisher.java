@@ -3,7 +3,6 @@ package com.xiaolyuh.cache.listener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 
 /**
@@ -23,7 +22,7 @@ public class RedisPublisher {
 
     /**
      * @param redisOperations Redis客户端
-     * @param channelTopic  频道名称
+     * @param channelTopic    频道名称
      */
     public RedisPublisher(RedisOperations<? extends Object, ? extends Object> redisOperations, ChannelTopic channelTopic) {
         this.channelTopic = channelTopic;
