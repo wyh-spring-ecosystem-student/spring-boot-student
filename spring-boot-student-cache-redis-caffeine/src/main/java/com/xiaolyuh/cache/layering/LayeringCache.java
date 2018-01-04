@@ -1,7 +1,7 @@
 package com.xiaolyuh.cache.layering;
 
 import com.alibaba.fastjson.JSON;
-import com.xiaolyuh.cache.config.RedisConfig;
+import com.xiaolyuh.cache.enums.ChannelTopicEnum;
 import com.xiaolyuh.cache.listener.RedisPublisher;
 import com.xiaolyuh.cache.redis.cache.CustomizedRedisCache;
 import org.slf4j.Logger;
@@ -10,7 +10,6 @@ import org.springframework.cache.caffeine.CaffeineCache;
 import org.springframework.cache.support.AbstractValueAdaptingCache;
 import org.springframework.cache.support.NullValue;
 import org.springframework.data.redis.core.RedisOperations;
-import org.springframework.data.redis.listener.ChannelTopic;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -163,7 +162,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
             message.put("cacheName", name);
             message.put("key", key);
             // 创建redis发布者
-            RedisPublisher redisPublisher = new RedisPublisher(redisOperations, new ChannelTopic(RedisConfig.CHANNEL_TOPIC));
+            RedisPublisher redisPublisher = new RedisPublisher(redisOperations, ChannelTopicEnum.REDIS_CACHE_DELETE_TOPIC.getChannelTopic());
             // 发布消息
             redisPublisher.publisher(message);
         }
@@ -173,7 +172,13 @@ public class LayeringCache extends AbstractValueAdaptingCache {
     public void clear() {
         redisCache.clear();
         if (usedFirstCache) {
-            caffeineCache.clear();
+            // 清除一级缓存需要用到redis的订阅/发布模式，否则集群中其他服服务器节点的一级缓存数据无法删除
+            Map<String, Object> message = new HashMap<>();
+            message.put("cacheName", name);
+            // 创建redis发布者
+            RedisPublisher redisPublisher = new RedisPublisher(redisOperations, ChannelTopicEnum.REDIS_CACHE_CLEAR_TOPIC.getChannelTopic());
+            // 发布消息
+            redisPublisher.publisher(message);
         }
     }
 

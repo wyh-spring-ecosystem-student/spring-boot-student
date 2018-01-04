@@ -1,6 +1,7 @@
 package com.xiaolyuh.cache.listener;
 
 import com.alibaba.fastjson.JSON;
+import com.xiaolyuh.cache.enums.ChannelTopicEnum;
 import com.xiaolyuh.cache.layering.LayeringCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,8 @@ public class RedisMessageListener extends MessageListenerAdapter {
     @Override
     public void onMessage(Message message, byte[] pattern) {
         super.onMessage(message, pattern);
-        logger.info("redis消息订阅者接收到频道【{}】发布的消息。消息内容：{}", new String(message.getChannel()), message.toString().getBytes());
+        ChannelTopicEnum channelTopic = ChannelTopicEnum.getChannelTopicEnum(new String(message.getChannel()));
+        logger.info("redis消息订阅者接收到频道【{}】发布的消息。消息内容：{}", channelTopic.getChannelTopicStr(), message.toString().getBytes());
         // 解析订阅发布的信息，获取缓存的名称和缓存的key
         String ms = new String(message.getBody());
         Map<String, Object> map = JSON.parseObject(ms, HashMap.class);
@@ -41,9 +43,24 @@ public class RedisMessageListener extends MessageListenerAdapter {
 
         // 判断缓存是否是多级缓存
         if (cache != null && cache instanceof LayeringCache) {
-            // 获取一级缓存，并删除一级缓存数据
-            ((LayeringCache) cache).getFirstCache().evict(key);
-            logger.info("删除一级缓存数据,key:{}", key.toString().getBytes());
+            switch (channelTopic) {
+                case REDIS_CACHE_DELETE_TOPIC:
+                    // 获取一级缓存，并删除一级缓存数据
+                    ((LayeringCache) cache).getFirstCache().evict(key);
+                    logger.info("删除一级缓存{}数据,key:{}", cacheName, key.toString().getBytes());
+                    break;
+
+                case REDIS_CACHE_CLEAR_TOPIC:
+                    // 获取一级缓存，并删除一级缓存数据
+                    ((LayeringCache) cache).getFirstCache().clear();
+                    logger.info("清除一级缓存{}数据", cacheName);
+                    break;
+
+                default:
+                    logger.info("接收到没有定义的订阅消息频道数据");
+                    break;
+            }
+
         }
     }
 
