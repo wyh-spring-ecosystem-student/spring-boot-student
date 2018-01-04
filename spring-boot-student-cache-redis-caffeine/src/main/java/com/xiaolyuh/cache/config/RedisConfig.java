@@ -4,12 +4,17 @@ import com.alibaba.fastjson.parser.ParserConfig;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xiaolyuh.cache.listener.RedisMessageListener;
+import com.xiaolyuh.cache.listener.RedisPublisher;
 import com.xiaolyuh.cache.redis.serializer.FastJsonRedisSerializer;
 import com.xiaolyuh.cache.redis.serializer.StringRedisSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.ChannelTopic;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
+import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 
 /**
@@ -17,6 +22,8 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+    public static final String CHANNEL_TOPIC = "redis:cache:topic";
 
     /**
      * 重写Redis序列化方式，使用Json方式:
@@ -54,6 +61,15 @@ public class RedisConfig {
 
         redisTemplate.afterPropertiesSet();
         return redisTemplate;
+    }
+
+    @Bean
+    RedisMessageListenerContainer redisContainer(RedisConnectionFactory redisConnectionFactory, MessageListenerAdapter messageListener) {
+        final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+
+        container.setConnectionFactory(redisConnectionFactory);
+        container.addMessageListener(messageListener, new ChannelTopic(CHANNEL_TOPIC));
+        return container;
     }
 
 }
