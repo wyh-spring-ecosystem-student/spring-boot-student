@@ -86,8 +86,20 @@ public class LayeringCache extends AbstractValueAdaptingCache {
 
     @Override
     public ValueWrapper get(Object key) {
+        ValueWrapper wrapper = null;
+        if (usedFirstCache) {
+            // 查询一级缓存
+            wrapper = caffeineCache.get(key);
+            logger.debug("查询一级缓存 key:{},返回值是:{}", key, JSON.toJSONString(wrapper));
+        }
 
-        return toValueWrapper(lookup(key));
+        if (wrapper == null) {
+            // 查询二级缓存
+            wrapper = redisCache.get(key);
+            caffeineCache.put(key, wrapper == null ? null : wrapper.get());
+            logger.debug("查询二级缓存,并将数据放到一级缓存。 key:{},返回值是:{}", key, JSON.toJSONString(wrapper));
+        }
+        return wrapper;
     }
 
     @Override
@@ -103,7 +115,7 @@ public class LayeringCache extends AbstractValueAdaptingCache {
             // 查询二级缓存
             value = redisCache.get(key, type);
             caffeineCache.put(key, value);
-            logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
+            logger.debug("查询二级缓存,并将数据放到一级缓存。 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
         return value;
     }
@@ -181,8 +193,6 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         }
         if (value == null) {
             value = redisCache.get(key);
-            // 将数据放到一级缓存
-            caffeineCache.put(key, value);
             logger.debug("查询二级缓存 key:{},返回值是:{}", key, JSON.toJSONString(value));
         }
         return value;
