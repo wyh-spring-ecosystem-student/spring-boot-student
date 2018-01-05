@@ -309,6 +309,17 @@ public class RedisLock {
             }
         });
     }
+    
+    /**
+     * 获取锁状态
+     * @Title: isLock
+     * @return  
+     * @author yuhao.wang
+     */
+    public boolean isLock() {
+		
+		return locked;
+	}
 
     /**
      * @param millis 毫秒

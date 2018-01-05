@@ -274,6 +274,17 @@ public class RedisLock3 {
 
         return true;
     }
+    
+    /**
+     * 获取锁状态
+     * @Title: isLock
+     * @return  
+     * @author yuhao.wang
+     */
+    public boolean isLock() {
+		
+		return locked;
+	}
 
     /**
      * 重写redisTemplate的set方法
