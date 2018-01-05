@@ -34,7 +34,8 @@ public class RedisMessageListener extends MessageListenerAdapter {
         logger.info("redis消息订阅者接收到频道【{}】发布的消息。消息内容：{}", channelTopic.getChannelTopicStr(), message.toString().getBytes());
         // 解析订阅发布的信息，获取缓存的名称和缓存的key
         String ms = new String(message.getBody());
-        Map<String, Object> map = JSON.parseObject(ms, HashMap.class);
+        @SuppressWarnings("unchecked")
+		Map<String, Object> map = JSON.parseObject(ms, HashMap.class);
         String cacheName = (String) map.get("cacheName");
         Object key = map.get("key");
 

@@ -119,7 +119,8 @@ public class LayeringCache extends AbstractValueAdaptingCache {
         return value;
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public <T> T get(Object key, Callable<T> valueLoader) {
         T value = null;
         if (usedFirstCache) {

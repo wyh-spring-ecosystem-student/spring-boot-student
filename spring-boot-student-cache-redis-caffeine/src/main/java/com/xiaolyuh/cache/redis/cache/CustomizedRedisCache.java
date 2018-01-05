@@ -1,13 +1,12 @@
 package com.xiaolyuh.cache.redis.cache;
 
+import java.util.concurrent.TimeUnit;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCacheElement;
 import org.springframework.data.redis.cache.RedisCacheKey;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
@@ -15,8 +14,6 @@ import org.springframework.util.Assert;
 import com.xiaolyuh.cache.redis.lock.RedisLock;
 import com.xiaolyuh.cache.redis.utils.SpringContextUtils;
 import com.xiaolyuh.cache.redis.utils.ThreadTaskUtils;
-
-import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义的redis缓存
@@ -67,7 +64,8 @@ public class CustomizedRedisCache extends RedisCache {
 
     }
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void evict(Object key) {
         super.evict(key);
         redisOperations.delete(getCacheKey(key) + INVOCATION_CACHE_KEY_SUFFIX);
@@ -140,9 +138,10 @@ public class CustomizedRedisCache extends RedisCache {
      * 软刷新，直接修改缓存时间
      * @param cacheKeyStr 缓存key
      */
+    @SuppressWarnings("unchecked")
     private void  softRefresh(String cacheKeyStr) {
         // 加一个分布式锁，只放一个请求去刷新缓存
-        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
+		RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
         try {
             if (redisLock.tryLock()) {
                 redisOperations.expire(cacheKeyStr, this.expirationSecondTime, TimeUnit.SECONDS);
@@ -158,13 +157,14 @@ public class CustomizedRedisCache extends RedisCache {
      * 硬刷新（走数据库）
      * @param cacheKeyStr
      */
+    @SuppressWarnings("unchecked")
     private void  forceRefresh(String cacheKeyStr) {
         // 尽量少的去开启线程，因为线程池是有限的
         ThreadTaskUtils.run(new Runnable() {
             @Override
             public void run() {
                 // 加一个分布式锁，只放一个请求去刷新缓存
-                RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
+				RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
                 try {
                     if (redisLock.lock()) {
                         // 获取锁之后再判断一下过期时间，看是否需要加载数据
