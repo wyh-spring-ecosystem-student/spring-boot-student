@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("rawtypes")
 public class LayeringCacheManager implements CacheManager {
     // 常量
-    static final int DEFAULT_EXPIRE_AFTER_WRITE = 60;
+    static final int DEFAULT_EXPIRE_AFTER_WRITE = 2;
     static final int DEFAULT_INITIAL_CAPACITY = 5;
     static final int DEFAULT_MAXIMUM_SIZE = 1_000;
 
@@ -55,12 +55,12 @@ public class LayeringCacheManager implements CacheManager {
 
     // Caffeine 属性
     /**
-     * expireAfterWrite：60
+     * expireAfterWrite：2 小时
      * initialCapacity：5
      * maximumSize： 1_000
      */
     private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
-            .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.SECONDS)
+            .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.HOURS)
             .initialCapacity(DEFAULT_INITIAL_CAPACITY)
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
