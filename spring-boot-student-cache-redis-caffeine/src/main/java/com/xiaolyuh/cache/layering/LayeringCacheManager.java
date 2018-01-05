@@ -60,7 +60,7 @@ public class LayeringCacheManager implements CacheManager {
      * maximumSize： 1_000
      */
     private Caffeine<Object, Object> cacheBuilder = Caffeine.newBuilder()
-            .expireAfterWrite(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.HOURS)
+            .expireAfterAccess(DEFAULT_EXPIRE_AFTER_WRITE, TimeUnit.HOURS)
             .initialCapacity(DEFAULT_INITIAL_CAPACITY)
             .maximumSize(DEFAULT_MAXIMUM_SIZE);
 
