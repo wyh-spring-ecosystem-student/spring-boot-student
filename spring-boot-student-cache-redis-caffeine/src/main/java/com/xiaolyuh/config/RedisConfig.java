@@ -1,4 +1,4 @@
-package com.xiaolyuh.cache.config;
+package com.xiaolyuh.config;
 
 import com.alibaba.fastjson.parser.ParserConfig;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

@@ -1,4 +1,4 @@
-package com.xiaolyuh.cache.config;
+package com.xiaolyuh.config;
 
 import com.github.benmanes.caffeine.cache.CaffeineSpec;
 import com.xiaolyuh.cache.layering.LayeringCacheManager;
