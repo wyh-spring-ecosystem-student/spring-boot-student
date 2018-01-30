@@ -103,7 +103,7 @@ public class StockService {
                     }
                 }
             } catch (Exception e) {
-                logger.warn(e.getMessage(), e);
+                logger.error(e.getMessage(), e);
             } finally {
                 redisLock.unlock();
             }
