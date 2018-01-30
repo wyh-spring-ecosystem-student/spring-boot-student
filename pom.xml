@@ -96,7 +96,9 @@
 		<!-- 基于redis实现的分布式锁 -->
 		<module>spring-boot-student-data-redis-distributed-lock</module>		
 		<!-- drools规则引擎入门 -->
-		<module>spring-boot-student-drools</module>
+		<module>spring-boot-student-drools</module>	
+		<!-- 基于redis实现的扣减库存 -->
+		<module>spring-boot-student-stock-redis</module>
     </modules>
 
 </project>
