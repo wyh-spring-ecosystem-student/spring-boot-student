@@ -21,8 +21,8 @@ public class StockController {
         long commodityId = 1;
         // 库存ID
         String redisKey = "redis_key:stock:" + commodityId;
-
-        return stockService.stock(redisKey, 60 * 60, () -> initStock(commodityId));
+        long stock = stockService.stock(redisKey, 60 * 60, () -> initStock(commodityId));
+        return stock > 0;
     }
 
     /**
@@ -30,7 +30,7 @@ public class StockController {
      * @return
      */
     private int initStock(long commodityId) {
-        // TODO
+        // TODO 这里做一些初始化库存的操作
         return 1000;
     }
 
