@@ -164,10 +164,10 @@
 [基于 redis 实现的分布式锁（二）](http://blog.csdn.net/xiaolyuh123/article/details/78551345)
 
 ## spring-boot-student-drools
-- drools规则引擎入门
+- [drools规则引擎入门](https://www.jianshu.com/p/e713860b128e)
 
 ## spring-boot-student-stock-redis
-- 基于redis实现的扣减库存
+- [基于redis实现的扣减库存](https://www.jianshu.com/p/76bc0e963172)
 
 
 ![扫码有红包哦](http://upload-images.jianshu.io/upload_images/6464086-66015db4df45091e?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
