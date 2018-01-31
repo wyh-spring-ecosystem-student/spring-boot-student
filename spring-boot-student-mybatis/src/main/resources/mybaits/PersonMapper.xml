@@ -127,4 +127,8 @@
     <include refid="Base_Column_List" />
     from person
   </select>
+
+  <update id="updateAge">
+    UPDATE person SET age = age -1 WHERE id = #{id,jdbcType=BIGINT} AND age > 0
+  </update>
 </mapper>

@@ -3,6 +3,7 @@ package com.xiaolyuh.domain.mapper;
 import com.github.pagehelper.Page;
 import com.xiaolyuh.domain.model.Person;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -32,4 +33,11 @@ public interface PersonMapper {
      * @return
      */
     Page<Person> findByPage();
+
+    /**
+     * 扣库存测试
+     * @param id
+     * @return
+     */
+    int updateAge(@Param("id") long id);
 }

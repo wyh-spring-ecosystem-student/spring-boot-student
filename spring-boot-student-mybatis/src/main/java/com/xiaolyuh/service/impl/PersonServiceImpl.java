@@ -15,7 +15,6 @@ import java.util.List;
  * Created by yuhao.wang on 2017/6/19.
  */
 @Service
-@Transactional(readOnly = true)
 public class PersonServiceImpl implements PersonService {
 
     @Autowired
@@ -33,10 +32,20 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void insert(Person person) {
         personMapper.insert(person);
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int updateAge(long id) {
+        int result = personMapper.updateAge(id);
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
 
+        }
+        return result;
+    }
 }

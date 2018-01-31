@@ -21,4 +21,11 @@ public interface PersonService {
     Page<Person> findByPage(int pageNo, int pageSize);
 
     void insert(Person person);
+
+    /**
+     * 扣库存测试
+     * @param id
+     * @return
+     */
+    int updateAge(long id);
 }

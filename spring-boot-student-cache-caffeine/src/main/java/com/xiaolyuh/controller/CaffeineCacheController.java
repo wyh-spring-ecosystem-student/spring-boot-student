@@ -122,6 +122,29 @@ public class CaffeineCacheController {
         return "";
     }
 
+    @RequestMapping("/testWeightBased")
+    public Object testWeightBased(Person person) {
+        LoadingCache<String, Object> cache = Caffeine.newBuilder()
+                .maximumWeight(5)
+                .weigher((String key, Object value) -> getWeigher(key, value))
+                .build(k -> createExpensiveGraph(k));
+
+        // 基于权重来清除缓存，权重只是用于确定缓存大小，不会用于决定该缓存是否被驱逐
+        cache.get("AA");
+        cache.get("AB");
+        System.out.println(cache.estimatedSize());
+        cache.get("AC");
+        // 因为执行回收的方法是异步的，所以需要调用该方法，手动触发一次回收操作。
+        cache.cleanUp();
+        System.out.println(cache.estimatedSize());
+
+        return "";
+    }
+
+    private int getWeigher(String key, Object value) {
+        return key.length();
+    }
+
     @RequestMapping("/testTimeBased")
     public Object testTimeBased(Person person) {
         String key = "name1";
