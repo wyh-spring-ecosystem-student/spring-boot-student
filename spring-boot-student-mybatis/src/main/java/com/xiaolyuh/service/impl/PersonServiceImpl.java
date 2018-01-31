@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by yuhao.wang on 2017/6/19.
@@ -19,6 +20,8 @@ public class PersonServiceImpl implements PersonService {
 
     @Autowired
     private PersonMapper personMapper;
+
+    public static AtomicInteger atomicInteger = new AtomicInteger();
 
     @Override
     public List<Person> findAll() {
@@ -41,6 +44,10 @@ public class PersonServiceImpl implements PersonService {
     @Transactional(rollbackFor = Exception.class)
     public int updateAge(long id) {
         int result = personMapper.updateAge(id);
+        int i = atomicInteger.getAndIncrement();
+        if (i > 990) {
+            System.out.println(i);
+        }
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
