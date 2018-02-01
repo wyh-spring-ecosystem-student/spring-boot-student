@@ -21,12 +21,13 @@ public class StockController {
         long commodityId = 1;
         // 库存ID
         String redisKey = "redis_key:stock:" + commodityId;
-        long stock = stockService.stock(redisKey, 60 * 60, () -> initStock(commodityId));
-        return stock > 0;
+        long stock = stockService.stock(redisKey, 60 * 60, 2, () -> initStock(commodityId));
+        return stock >= 0;
     }
 
     /**
      * 获取初始的库存
+     *
      * @return
      */
     private int initStock(long commodityId) {
@@ -42,5 +43,15 @@ public class StockController {
         String redisKey = "redis_key:stock:" + commodityId;
 
         return stockService.getStock(redisKey);
+    }
+
+    @RequestMapping(value = "addStock", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Object addStock() {
+        // 商品ID
+        long commodityId = 2;
+        // 库存ID
+        String redisKey = "redis_key:stock:" + commodityId;
+
+        return stockService.addStock(redisKey, 2);
     }
 }
