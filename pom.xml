@@ -99,6 +99,8 @@
 		<module>spring-boot-student-drools</module>	
 		<!-- 基于redis实现的扣减库存 -->
 		<module>spring-boot-student-stock-redis</module>
+		<!-- Spring Boot RabbitMQ 实践 -->
+		<module>spring-boot-student-rabbitmq</module>
     </modules>
 
 </project>

@@ -169,8 +169,9 @@
 ## spring-boot-student-stock-redis
 - [基于redis实现的扣减库存](https://www.jianshu.com/p/76bc0e963172)
 
+## spring-boot-student-rabbitmq
+- [Spring Boot RabbitMQ实践]()
 
-![扫码有红包哦](http://upload-images.jianshu.io/upload_images/6464086-66015db4df45091e?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
 
 
