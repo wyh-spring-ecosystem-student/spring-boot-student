@@ -8,7 +8,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author yuhao.wang
  */
 @Configuration
-@ConditionalOnBean({RabbitTemplate.class})
+@ConditionalOnClass({RabbitTemplate.class})
 public class RabbitConfig {
 
     /**
@@ -44,7 +44,7 @@ public class RabbitConfig {
 
         // 发放奖励队列交换机
         DirectExchange exchange = new DirectExchange(RabbitConstants.MQ_EXCHANGE_SEND_AWARD);
-        
+
         //声明发送优惠券的消息队列（Direct类型的exchange）
         Queue couponQueue = queue(RabbitConstants.QUEUE_NAME_SEND_COUPON);
         rabbitAdmin.declareQueue(couponQueue);
