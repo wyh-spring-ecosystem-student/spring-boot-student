@@ -26,8 +26,8 @@ public class SendMessageListener {
 
     @RabbitListener(queues = RabbitConstants.QUEUE_NAME_SEND_COUPON)
     public void process(SendMessage sendMessage, Channel channel, Message message) throws Exception {
-        logger.info("[{}]处理发放优惠券奖励消息队列接收数据:{}", RabbitConstants.QUEUE_NAME_SEND_COUPON,
-                JSON.toJSONString(sendMessage));
+        logger.info("[{}]处理发放优惠券奖励消息队列接收数据，消息ID：{}，消息体：{}", RabbitConstants.QUEUE_NAME_SEND_COUPON,
+                message.getMessageProperties().getCorrelationIdString(), JSON.toJSONString(sendMessage));
 
         try {
             // 参数校验
@@ -37,12 +37,13 @@ public class SendMessageListener {
             // 确认消息已经消费成功
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
-            logger.error("MQ消息处理异常，消息体:{}", JSON.toJSONString(sendMessage), e);
+            logger.error("MQ消息处理异常，消息ID：{}，消息体:{}", message.getMessageProperties().getCorrelationIdString(),
+                    JSON.toJSONString(sendMessage), e);
 
             try {
                 // TODO 保存消息到数据库
             } catch (Exception e1) {
-                logger.error("保存异常MQ消息到数据库异常，放到死性队列");
+                logger.error("保存异常MQ消息到数据库异常，放到死性队列，消息ID：{}", message.getMessageProperties().getCorrelationIdString());
                 channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
             }
         }
