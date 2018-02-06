@@ -15,6 +15,8 @@ import java.util.List;
  */
 public final class CachedMethodInvocation implements Serializable {
 
+    private static final long serialVersionUID = 4053574712960451939L;
+
     private Object key;
     private String targetBean;
     private String targetMethod;
