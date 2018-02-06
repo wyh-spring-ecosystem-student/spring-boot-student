@@ -8,7 +8,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,7 +21,7 @@ import java.util.Map;
  * @author yuhao.wang
  */
 @Configuration
-@ConditionalOnClass({RabbitTemplate.class})
+@ConditionalOnBean({RabbitTemplate.class})
 public class RabbitConfig {
 
     /**

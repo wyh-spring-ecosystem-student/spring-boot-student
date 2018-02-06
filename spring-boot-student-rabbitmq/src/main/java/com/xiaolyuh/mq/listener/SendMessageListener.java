@@ -34,6 +34,7 @@ public class SendMessageListener {
             Assert.notNull(sendMessage, "sendMessage 消息体不能为NULL");
 
             // TODO 处理消息
+
             // 确认消息已经消费成功
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
@@ -42,8 +43,12 @@ public class SendMessageListener {
 
             try {
                 // TODO 保存消息到数据库
+
+                // 确认消息已经消费成功
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             } catch (Exception e1) {
                 logger.error("保存异常MQ消息到数据库异常，放到死性队列，消息ID：{}", message.getMessageProperties().getCorrelationIdString());
+                // 确认消息将消息放到死信队列
                 channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
             }
         }
