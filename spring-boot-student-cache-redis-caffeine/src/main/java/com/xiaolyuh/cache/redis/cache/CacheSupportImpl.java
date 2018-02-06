@@ -81,10 +81,14 @@ public class CacheSupportImpl implements CacheSupport {
     public void refreshCacheByKey(String cacheName, String cacheKey) {
         RedisTemplate<String, Object> redisTemplate = RedisTemplateUtils.getRedisTemplate(redisConnectionFactory);
         //在redis拿到方法信息，然后刷新缓存
-        CachedMethodInvocation invocation = (CachedMethodInvocation) redisTemplate.opsForValue().get(getInvocationCacheKey(cacheKey));
-        if (invocation != null) {
+        Object result = redisTemplate.opsForValue().get(getInvocationCacheKey(cacheKey));
+
+        if (result != null && result instanceof CachedMethodInvocation) {
+            CachedMethodInvocation invocation = (CachedMethodInvocation) result;
             // 执行刷新方法
             refreshCache(invocation, cacheName);
+        } else {
+            logger.error("刷新redis缓存，反序列化方法信息异常");
         }
 
     }

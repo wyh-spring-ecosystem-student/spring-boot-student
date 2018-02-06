@@ -43,7 +43,6 @@ public class PersonServiceImpl implements PersonService {
      */
     @Override
     @Cacheable(value = "people", key = "#person.id", sync = true)
-//3
     public Person findOne(Person person, String a, String[] b, List<Long> c) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");
