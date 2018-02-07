@@ -173,7 +173,7 @@
 - [Docker 安装部署RabbitMQ](https://www.jianshu.com/p/14ffe0f3db94)
 - [RabbitMQ基础概念详细介绍](https://www.jianshu.com/p/e55e971aebd8)
 - [RabbitMQ 快速入门](http://www.jianshu.com/p/b3d9e189323c)
-- [Spring Boot RabbitMQ实践]()
+- [Spring Boot RabbitMQ实践](https://www.jianshu.com/p/86b8171e4be4)
 
 
 
