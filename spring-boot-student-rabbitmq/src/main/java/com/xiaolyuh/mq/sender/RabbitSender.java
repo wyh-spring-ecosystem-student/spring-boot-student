@@ -59,7 +59,7 @@ public class RabbitSender implements RabbitTemplate.ConfirmCallback, RabbitTempl
 
     /**
      * 用于实现消息发送到RabbitMQ交换器后接收ack回调。
-     * 如果消息发送确认失败就进行。
+     * 如果消息发送确认失败就进行重试。
      *
      * @param correlationData
      * @param ack
@@ -96,7 +96,7 @@ public class RabbitSender implements RabbitTemplate.ConfirmCallback, RabbitTempl
 
     /**
      * 用于实现消息发送到RabbitMQ交换器，但无相应队列与交换器绑定时的回调。
-     * 基本上来说线程不可能出现这种情况，除非手动将已经存在的队列删掉，否则在测试阶段肯定能测试出来。
+     * 基本上来说线上不可能出现这种情况，除非手动将已经存在的队列删掉，否则在测试阶段肯定能测试出来。
      */
     @Override
     public void returnedMessage(Message message, int replyCode, String replyText, String exchange, String routingKey) {
