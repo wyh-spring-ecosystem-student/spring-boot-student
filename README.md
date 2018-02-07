@@ -170,6 +170,9 @@
 - [基于redis实现的扣减库存](https://www.jianshu.com/p/76bc0e963172)
 
 ## spring-boot-student-rabbitmq
+- [Docker 安装部署RabbitMQ](https://www.jianshu.com/p/14ffe0f3db94)
+- [RabbitMQ基础概念详细介绍](https://www.jianshu.com/p/e55e971aebd8)
+- [RabbitMQ 快速入门](http://www.jianshu.com/p/b3d9e189323c)
 - [Spring Boot RabbitMQ实践]()
 
 
