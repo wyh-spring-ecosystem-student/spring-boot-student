@@ -101,6 +101,8 @@
 		<module>spring-boot-student-stock-redis</module>
 		<!-- Spring Boot RabbitMQ 实践 -->
 		<module>spring-boot-student-rabbitmq</module>
+		<!-- Spring Boot 监控 -->
+		<module>spring-boot-student-monitor</module>
     </modules>
 
 </project>

@@ -175,7 +175,8 @@
 - [RabbitMQ 快速入门](http://www.jianshu.com/p/b3d9e189323c)
 - [Spring Boot RabbitMQ实践](https://www.jianshu.com/p/86b8171e4be4)
 
-
+## spring-boot-student-monitor 
+- [使用Spring Boot Actuator监控应用](http://blog.csdn.net/xiaolyuh123/article/details/79312291)
 
 
 
