@@ -1,8 +1,8 @@
 # spring-boot-student
 ## spring-boot-student-banner
 - 修改Spring Boot启动时的默认图案（Banner）
-
-[Spring Boot核心-基本配置](http://blog.csdn.net/xiaolyuh123/article/details/70698659)
+- [基于Docker的部署](https://www.jianshu.com/p/a04eaa881396)
+- [Spring Boot核心-基本配置](http://blog.csdn.net/xiaolyuh123/article/details/70698659)
 
 ## spring-boot-student-config
 - Spring 安全配置@ConfigurationProperties的使用
