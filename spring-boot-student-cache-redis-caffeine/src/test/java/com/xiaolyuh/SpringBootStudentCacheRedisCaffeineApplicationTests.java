@@ -1,6 +1,7 @@
 package com.xiaolyuh;
 
 import com.xiaolyuh.entity.Person;
+import com.xiaolyuh.service.impl.PersonServiceImpl;
 import net.minidev.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.PropertySources;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -58,6 +60,9 @@ public class SpringBootStudentCacheRedisCaffeineApplicationTests {
 
     @Autowired
     DefaultListableBeanFactory beanFactory;
+
+    @Autowired
+    RedisTemplate<String, Object> redisTemplate;
 
     @Before // 在测试开始前初始化工作  
     public void setup() {
@@ -179,5 +184,15 @@ public class SpringBootStudentCacheRedisCaffeineApplicationTests {
         String strVal = beanFactory.resolveEmbeddedValue("${select.cache.timeout:1800}");
 
         System.out.println(strVal);
+    }
+
+    @Test
+    public void testRedisSerializer() {
+        redisTemplate.opsForValue().set("ddd", null);
+        Object o = redisTemplate.opsForValue().get("ddd");
+
+        System.out.println(o);
+
+        PersonServiceImpl personService = null;
     }
 }
