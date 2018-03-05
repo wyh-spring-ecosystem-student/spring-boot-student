@@ -51,7 +51,7 @@ public class RedisConfig {
 
         KryoRedisSerializer<Object> kryoRedisSerializer = new KryoRedisSerializer<>(Object.class);
 
-        // 设置值（value）的序列化采用FastJsonRedisSerializer。
+        // 设置值（value）的序列化采用KryoRedisSerializer。
         redisTemplate.setValueSerializer(kryoRedisSerializer);
         redisTemplate.setHashValueSerializer(kryoRedisSerializer);
         // 设置键（key）的序列化采用StringRedisSerializer。
