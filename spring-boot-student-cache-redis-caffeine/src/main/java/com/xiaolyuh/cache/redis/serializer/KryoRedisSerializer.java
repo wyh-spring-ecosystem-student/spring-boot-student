@@ -18,7 +18,6 @@ public class KryoRedisSerializer<T> implements RedisSerializer<T> {
     Logger logger = LoggerFactory.getLogger(KryoRedisSerializer.class);
 
     public static final byte[] EMPTY_BYTE_ARRAY = new byte[0];
-    ;
 
     private static final ThreadLocal<Kryo> kryos = ThreadLocal.withInitial(Kryo::new);
 
