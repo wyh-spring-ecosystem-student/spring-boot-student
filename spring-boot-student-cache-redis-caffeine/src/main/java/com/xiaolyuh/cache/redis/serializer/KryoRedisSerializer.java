@@ -68,5 +68,4 @@ public class KryoRedisSerializer<T> implements RedisSerializer<T> {
 
         return null;
     }
-
 }
