@@ -134,7 +134,7 @@
 
 [Spring Boot Cache + redis 设置有效时间和自动刷新缓存，时间支持在配置文件中配置](http://blog.csdn.net/xiaolyuh123/article/details/78620302)
 
-[Redis 序列化方式StringRedisSerializer、FastJsonRedisSerializer和KryoRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
+[Redis 序列化方式StringRedisSerializer、FastJsonRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
 
 [Spring Redis Cache @Cacheable 大并发下返回null](http://blog.csdn.net/xiaolyuh123/article/details/78613041)
 
@@ -148,6 +148,10 @@
 
 ## spring-boot-student-cache-redis-caffeine
 - 基于redis + caffeine实现的多级缓存
+
+[Redis 序列化方式StringRedisSerializer、FastJsonRedisSerializer和KryoRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
+
+[Spring Boot缓存实战 Redis + Caffeine 实现多级缓存](https://www.jianshu.com/p/ef9042c068fd)
 
 ## spring-boot-student-data-mongo
 - Spring Boot 使用Spring data mongo 操作mongodb数据库
