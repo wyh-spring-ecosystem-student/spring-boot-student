@@ -134,7 +134,7 @@
 
 [Spring Boot Cache + redis 设置有效时间和自动刷新缓存，时间支持在配置文件中配置](http://blog.csdn.net/xiaolyuh123/article/details/78620302)
 
-[Spring Boot Cache redis 序列化方式StringRedisSerializer和FastJsonRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
+[Redis 序列化方式StringRedisSerializer、FastJsonRedisSerializer和KryoRedisSerializer](http://blog.csdn.net/xiaolyuh123/article/details/78682200)
 
 [Spring Redis Cache @Cacheable 大并发下返回null](http://blog.csdn.net/xiaolyuh123/article/details/78613041)
 
