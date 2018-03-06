@@ -79,7 +79,7 @@ public class CacheConfig {
         // 设置每个二级缓存的过期时间和自动刷新时间
         Map<String, SecondaryCacheSetting> secondaryCacheSettings = new HashMap<>();
         secondaryCacheSettings.put("people", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh));
-        secondaryCacheSettings.put("people1", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh, false,true));
+        secondaryCacheSettings.put("people1", new SecondaryCacheSetting(50, 0, false,true));
         secondaryCacheSettings.put("people2", new SecondaryCacheSetting(false, selectCacheTimeout, selectCacheRefresh));
         secondaryCacheSettings.put("people3", new SecondaryCacheSetting(selectCacheTimeout, selectCacheRefresh, false, true));
         layeringCacheManager.setSecondaryCacheSettings(secondaryCacheSettings);

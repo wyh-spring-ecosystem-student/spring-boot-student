@@ -1,12 +1,16 @@
 package com.xiaolyuh.cache.redis.cache;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCacheElement;
 import org.springframework.data.redis.cache.RedisCacheKey;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
@@ -116,6 +120,41 @@ public class CustomizedRedisCache extends RedisCache {
         }
 
         return new RedisCacheElement(cacheKey, fromStoreValue(result));
+    }
+
+    @Override
+    public <T> T get(final Object key, final Callable<T> valueLoader) {
+        // 先获取缓存，如果有直接返回
+        ValueWrapper val = get(key);
+        if (val != null) {
+            return (T) val.get();
+        }
+
+        String cacheKeyStr = getCacheKey(key);
+        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_sync_lock");
+        // 重试5次，每次间隔20毫秒
+        for (int i = 0;i< 5; i++) {
+            // 先获取缓存，如果有直接返回，不用再去做拿锁操作
+            val = get(key);
+            if (val != null) {
+                return (T) val.get();
+            }
+
+            try {
+                // 获取分布式锁去后台查询数据
+                if (redisLock.lock()) {
+                    return super.get(key, valueLoader);
+                }
+                // 没拿到锁就等待100毫秒
+                Thread.sleep(20);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                redisLock.unlock();
+            }
+        }
+
+        return super.get(key, valueLoader);
     }
 
     /**
