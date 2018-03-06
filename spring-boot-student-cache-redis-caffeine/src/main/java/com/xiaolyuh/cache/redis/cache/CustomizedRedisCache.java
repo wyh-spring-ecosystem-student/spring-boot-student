@@ -134,13 +134,13 @@ public class CustomizedRedisCache extends RedisCache {
         RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_sync_lock");
         // 重试5次，每次间隔20毫秒
         for (int i = 0;i< 5; i++) {
-            // 先获取缓存，如果有直接返回，不用再去做拿锁操作
-            val = get(key);
-            if (val != null) {
-                return (T) val.get();
-            }
-
             try {
+                // 先获取缓存，如果有直接返回，不用再去做拿锁操作
+                val = get(key);
+                if (val != null) {
+                    return (T) val.get();
+                }
+
                 // 获取分布式锁去后台查询数据
                 if (redisLock.lock()) {
                     return super.get(key, valueLoader);
