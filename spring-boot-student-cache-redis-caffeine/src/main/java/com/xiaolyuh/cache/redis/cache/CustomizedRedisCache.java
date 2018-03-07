@@ -26,6 +26,11 @@ public class CustomizedRedisCache extends RedisCache {
 
     public static final String INVOCATION_CACHE_KEY_SUFFIX = ":invocation_suffix";
 
+    /**
+     * 刷新缓存重试次数
+     */
+    private static final int RETRY_COUNT = 5;
+
     private CacheSupport getCacheSupport() {
         return SpringContextUtils.getBean(CacheSupport.class);
     }
@@ -131,24 +136,29 @@ public class CustomizedRedisCache extends RedisCache {
         }
 
         RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_sync_lock");
-        try {
-            // 获取分布式锁去后台查询数据
-            if (redisLock.lock()) {
-                T t = super.get(key, valueLoader);
-                container.signalAll(cacheKeyStr);
-                return t;
-            }
-            container.await(cacheKeyStr);
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-        } finally {
-            redisLock.unlock();
-        }
 
-        // 再取缓存，如果有直接返回，没有查库不用再去做拿锁操作
-        result = redisOperations.opsForValue().get(key);
-        if (result != null) {
-            return (T) result;
+        for (int i = 0; i < RETRY_COUNT; i++) {
+            try {
+                // 先取缓存，如果有直接返回，没有再去做拿锁操作
+                result = redisOperations.opsForValue().get(key);
+                if (result != null) {
+                    return (T) result;
+                }
+
+                // 获取分布式锁去后台查询数据
+                if (redisLock.lock()) {
+                    T t = super.get(key, valueLoader);
+                    // 唤醒线程
+                    container.signalAll(cacheKeyStr);
+                    return t;
+                }
+                // 线程等待
+                container.await(cacheKeyStr, 20);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            } finally {
+                redisLock.unlock();
+            }
         }
 
         return super.get(key, valueLoader);

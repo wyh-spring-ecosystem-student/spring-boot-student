@@ -18,10 +18,11 @@ public class ThreadAwaitContainer {
 
     /**
      * 线程等待,最大等待100毫秒
-     * @param key
+     * @param key 缓存Key
+     * @param milliseconds 等待时间
      * @throws InterruptedException
      */
-    public final void await(String key) throws InterruptedException {
+    public final void await(String key, long milliseconds) throws InterruptedException {
         if (Thread.interrupted()) {
             throw new InterruptedException();
         }
@@ -32,7 +33,7 @@ public class ThreadAwaitContainer {
         }
         threadSet.add(Thread.currentThread());
         // 阻塞一定的时间
-        LockSupport.parkNanos(this, TimeUnit.MILLISECONDS.toNanos(100));
+        LockSupport.parkNanos(this, TimeUnit.MILLISECONDS.toNanos(milliseconds));
     }
 
     /**
