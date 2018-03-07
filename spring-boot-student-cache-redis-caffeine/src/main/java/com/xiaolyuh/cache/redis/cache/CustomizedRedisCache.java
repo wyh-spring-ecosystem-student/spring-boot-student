@@ -1,23 +1,19 @@
 package com.xiaolyuh.cache.redis.cache;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
-
+import com.xiaolyuh.cache.redis.lock.RedisLock;
+import com.xiaolyuh.cache.redis.utils.SpringContextUtils;
+import com.xiaolyuh.cache.redis.utils.ThreadTaskUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.data.redis.cache.RedisCacheElement;
 import org.springframework.data.redis.cache.RedisCacheKey;
-import org.springframework.data.redis.connection.RedisConnection;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.util.Assert;
 
-import com.xiaolyuh.cache.redis.lock.RedisLock;
-import com.xiaolyuh.cache.redis.utils.SpringContextUtils;
-import com.xiaolyuh.cache.redis.utils.ThreadTaskUtils;
+import java.util.concurrent.Callable;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 自定义的redis缓存
@@ -34,8 +30,10 @@ public class CustomizedRedisCache extends RedisCache {
         return SpringContextUtils.getBean(CacheSupport.class);
     }
 
+    ThreadAwaitContainer container = new ThreadAwaitContainer();
+
     @SuppressWarnings("rawtypes")
-	private final RedisOperations redisOperations;
+    private final RedisOperations redisOperations;
 
     private final byte[] prefix;
 
@@ -69,7 +67,7 @@ public class CustomizedRedisCache extends RedisCache {
     }
 
     @SuppressWarnings("unchecked")
-	@Override
+    @Override
     public void evict(Object key) {
         super.evict(key);
         redisOperations.delete(getCacheKey(key) + INVOCATION_CACHE_KEY_SUFFIX);
@@ -124,34 +122,33 @@ public class CustomizedRedisCache extends RedisCache {
 
     @Override
     public <T> T get(final Object key, final Callable<T> valueLoader) {
-        // 先获取缓存，如果有直接返回
-        ValueWrapper val = get(key);
-        if (val != null) {
-            return (T) val.get();
-        }
 
         String cacheKeyStr = getCacheKey(key);
-        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_sync_lock");
-        // 重试5次，每次间隔20毫秒
-        for (int i = 0;i< 5; i++) {
-            try {
-                // 先获取缓存，如果有直接返回，不用再去做拿锁操作
-                val = get(key);
-                if (val != null) {
-                    return (T) val.get();
-                }
+        // 先获取缓存，如果有直接返回
+        Object result = redisOperations.opsForValue().get(cacheKeyStr);
+        if (result != null) {
+            return (T) result;
+        }
 
-                // 获取分布式锁去后台查询数据
-                if (redisLock.lock()) {
-                    return super.get(key, valueLoader);
-                }
-                // 没拿到锁就等待100毫秒
-                Thread.sleep(20);
-            } catch (Exception e) {
-                logger.error(e.getMessage(), e);
-            } finally {
-                redisLock.unlock();
+        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_sync_lock");
+        try {
+            // 获取分布式锁去后台查询数据
+            if (redisLock.lock()) {
+                T t = super.get(key, valueLoader);
+                container.signalAll(cacheKeyStr);
+                return t;
             }
+            container.await(cacheKeyStr);
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+        } finally {
+            redisLock.unlock();
+        }
+
+        // 再取缓存，如果有直接返回，没有查库不用再去做拿锁操作
+        result = redisOperations.opsForValue().get(key);
+        if (result != null) {
+            return (T) result;
         }
 
         return super.get(key, valueLoader);
@@ -162,7 +159,7 @@ public class CustomizedRedisCache extends RedisCache {
      */
     @SuppressWarnings("unchecked")
     private void refreshCache(Object key, String cacheKeyStr) {
-		Long ttl = this.redisOperations.getExpire(cacheKeyStr);
+        Long ttl = this.redisOperations.getExpire(cacheKeyStr);
         if (null != ttl && ttl <= CustomizedRedisCache.this.preloadSecondTime) {
             // 判断是否需要强制刷新在开启刷新线程
             if (!getForceRefresh()) {
@@ -175,12 +172,13 @@ public class CustomizedRedisCache extends RedisCache {
 
     /**
      * 软刷新，直接修改缓存时间
+     *
      * @param cacheKeyStr 缓存key
      */
     @SuppressWarnings("unchecked")
-    private void  softRefresh(String cacheKeyStr) {
+    private void softRefresh(String cacheKeyStr) {
         // 加一个分布式锁，只放一个请求去刷新缓存
-		RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
+        RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
         try {
             if (redisLock.tryLock()) {
                 redisOperations.expire(cacheKeyStr, this.expirationSecondTime, TimeUnit.SECONDS);
@@ -194,16 +192,17 @@ public class CustomizedRedisCache extends RedisCache {
 
     /**
      * 硬刷新（走数据库）
+     *
      * @param cacheKeyStr
      */
     @SuppressWarnings("unchecked")
-    private void  forceRefresh(String cacheKeyStr) {
+    private void forceRefresh(String cacheKeyStr) {
         // 尽量少的去开启线程，因为线程池是有限的
         ThreadTaskUtils.run(new Runnable() {
             @Override
             public void run() {
                 // 加一个分布式锁，只放一个请求去刷新缓存
-				RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
+                RedisLock redisLock = new RedisLock((RedisTemplate<String, Object>) redisOperations, cacheKeyStr + "_lock");
                 try {
                     if (redisLock.lock()) {
                         // 获取锁之后再判断一下过期时间，看是否需要加载数据
@@ -224,6 +223,7 @@ public class CustomizedRedisCache extends RedisCache {
 
     /**
      * 获取缓存的有效时间
+     *
      * @return
      */
     public long getExpirationSecondTime() {
@@ -254,6 +254,7 @@ public class CustomizedRedisCache extends RedisCache {
 
     /**
      * 是否强制刷新（走数据库），默认是false
+     *
      * @return
      */
     public boolean getForceRefresh() {
