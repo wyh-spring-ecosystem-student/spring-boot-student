@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
 /**
@@ -16,7 +17,7 @@ public class ThreadAwaitContainer {
     private final Map<String, Set<Thread>> threadMap = new ConcurrentHashMap<>();
 
     /**
-     * 线程等待
+     * 线程等待,最大等待100毫秒
      * @param key
      * @throws InterruptedException
      */
@@ -30,7 +31,8 @@ public class ThreadAwaitContainer {
             threadMap.put(key, threadSet);
         }
         threadSet.add(Thread.currentThread());
-        LockSupport.park(this);
+        // 阻塞一定的时间
+        LockSupport.parkNanos(this, TimeUnit.MILLISECONDS.toNanos(100));
     }
 
     /**
@@ -45,4 +47,5 @@ public class ThreadAwaitContainer {
             }
         }
     }
+
 }
