@@ -102,7 +102,9 @@
 		<!-- Spring Boot RabbitMQ 实践 -->
 		<module>spring-boot-student-rabbitmq</module>
 		<!-- Spring Boot 监控 -->
-		<module>spring-boot-student-monitor</module>
+		<module>spring-boot-student-monitor</module>		
+		<!-- Spring Boot 参数校验 -->
+		<module>spring-boot-student-validated</module>
     </modules>
 
 </project>

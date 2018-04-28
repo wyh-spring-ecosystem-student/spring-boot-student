@@ -182,6 +182,9 @@
 ## spring-boot-student-monitor 
 - [使用Spring Boot Actuator监控应用](http://blog.csdn.net/xiaolyuh123/article/details/79312291)
 
+## spring-boot-student-validated
+- [使用Spring Boot 参数校验]()
+
 
 
 
