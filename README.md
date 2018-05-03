@@ -185,6 +185,9 @@
 ## spring-boot-student-validated
 - [使用Spring Boot 参数校验]()
 
+## spring-boot-student-guava-retrying
+- [guava-retrying 重试机制]()
+
 
 
 
