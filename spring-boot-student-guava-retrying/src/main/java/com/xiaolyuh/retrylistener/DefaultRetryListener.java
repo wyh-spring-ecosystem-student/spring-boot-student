@@ -1,6 +1,5 @@
 package com.xiaolyuh.retrylistener;
 
-import com.alibaba.fastjson.JSON;
 import com.github.rholder.retry.Attempt;
 import com.github.rholder.retry.RetryListener;
 
