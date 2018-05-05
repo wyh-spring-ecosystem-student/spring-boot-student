@@ -1,5 +1,8 @@
 package com.xiaolyuh.annotation;
 
+import com.github.rholder.retry.RetryListener;
+import com.xiaolyuh.retrylistener.DefaultRetryListener;
+
 import java.lang.annotation.*;
 import java.util.concurrent.TimeUnit;
 
@@ -27,4 +30,9 @@ public @interface Retryable {
      * 时间单位
      */
     TimeUnit timeUnit() default TimeUnit.SECONDS;
+
+    /**
+     * 监听器
+     */
+    Class<? extends RetryListener> retryListener() default DefaultRetryListener.class;
 }

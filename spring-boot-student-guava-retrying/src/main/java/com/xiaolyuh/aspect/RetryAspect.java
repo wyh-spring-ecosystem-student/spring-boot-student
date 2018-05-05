@@ -33,19 +33,30 @@ public class RetryAspect {
     }
 
     @Around("pointcut()")
-    public Object retry(ProceedingJoinPoint joinPoint) {
+    public Object retry(ProceedingJoinPoint joinPoint) throws Exception {
         // 获取注解
         Retryable retryable = AnnotationUtils.findAnnotation(getSpecificmethod(joinPoint), Retryable.class);
         // 声明Callable
         Callable<Object> task = () -> getTask(joinPoint);
         // 声明guava retry对象
-        Retryer<Object> retryer = RetryerBuilder.newBuilder()
-                .retryIfResult(Predicates.isNull())
-                .retryIfExceptionOfType(retryable.exception())// 抛出Exception异常时重试
-                .withStopStrategy(StopStrategies.stopAfterAttempt(retryable.attemptNumber())) // 重试3次后停止
-                .withWaitStrategy(WaitStrategies.fixedWait(retryable.sleepTime(), retryable.timeUnit()))// 等待300毫秒
-                .build();
-
+        Retryer<Object> retryer = null;
+        try {
+            retryer = RetryerBuilder.newBuilder()
+                    // 指定触发重试的条件
+                    .retryIfResult(Predicates.isNull())
+                    // 指定触发重试的异常
+                    .retryIfExceptionOfType(retryable.exception())// 抛出Exception异常时重试
+                    // 尝试次数
+                    .withStopStrategy(StopStrategies.stopAfterAttempt(retryable.attemptNumber()))
+                    // 重调策略
+                    .withWaitStrategy(WaitStrategies.fixedWait(retryable.sleepTime(), retryable.timeUnit()))// 等待300毫秒
+                    // 指定监听器RetryListener
+                    .withRetryListener(retryable.retryListener().newInstance())
+                    .build();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            throw e;
+        }
         try {
             // 执行方法
             return retryer.call(task);
