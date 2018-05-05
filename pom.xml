@@ -107,6 +107,8 @@
 		<module>spring-boot-student-validated</module>
 		<!-- Spring Boot guava-retrying 重试机制 -->
 		<module>spring-boot-student-guava-retrying</module>
+		<!-- Spring Boot spring-retry 重试机制 -->
+		<module>spring-boot-student-spring-retry</module>
     </modules>
 
 </project>
