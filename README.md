@@ -190,6 +190,7 @@
 
 ## spring-boot-student-spring-retry
 - [spring-retry 重试机制](https://www.cnblogs.com/EasonJim/p/7684649.html)
+- [spring-retry重试与熔断详解](http://www.broadview.com.cn/article/233)
 
 
 
