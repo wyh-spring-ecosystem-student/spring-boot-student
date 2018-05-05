@@ -33,9 +33,12 @@ public class RetryAspect {
     }
 
     @Around("pointcut()")
-    public Object retry(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object retry(ProceedingJoinPoint joinPoint) {
+        // 获取注解
         Retryable retryable = AnnotationUtils.findAnnotation(getSpecificmethod(joinPoint), Retryable.class);
+        // 声明Callable
         Callable<Object> task = () -> getTask(joinPoint);
+        // 声明guava retry对象
         Retryer<Object> retryer = RetryerBuilder.newBuilder()
                 .retryIfResult(Predicates.isNull())
                 .retryIfExceptionOfType(retryable.exception())// 抛出Exception异常时重试
@@ -44,6 +47,7 @@ public class RetryAspect {
                 .build();
 
         try {
+            // 执行方法
             return retryer.call(task);
         } catch (ExecutionException e) {
             logger.error(e.getMessage(), e);
