@@ -14,19 +14,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 /**
- * 死信队列处理消息
+ * 发放优惠券的MQ处理
  *
  * @author yuhao.wang
  */
 @Service
 @ConditionalOnClass({RabbitTemplate.class})
-public class SendMessageListener {
+public class DeadMessageListener {
 
-    private final Logger logger = LoggerFactory.getLogger(SendMessageListener.class);
+    private final Logger logger = LoggerFactory.getLogger(DeadMessageListener.class);
 
-    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_DEAD_QUEUE)
+    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_SEND_COUPON)
     public void process(SendMessage sendMessage, Channel channel, Message message) throws Exception {
-        logger.info("[{}]处理死信队列消息队列接收数据，消息体：{}", RabbitConstants.QUEUE_NAME_DEAD_QUEUE, JSON.toJSONString(sendMessage));
+        logger.info("[{}]处理发放优惠券奖励消息队列接收数据，消息体：{}", RabbitConstants.QUEUE_NAME_SEND_COUPON, JSON.toJSONString(sendMessage));
 
         System.out.println(message.getMessageProperties().getDeliveryTag());
 
@@ -41,8 +41,16 @@ public class SendMessageListener {
         } catch (Exception e) {
             logger.error("MQ消息处理异常，消息体:{}", message.getMessageProperties().getCorrelationIdString(), JSON.toJSONString(sendMessage), e);
 
-            // 确认消息已经消费消费失败，将消息发给下一个消费者
-            channel.basicAck(message.getMessageProperties().getDeliveryTag(), true);
+            try {
+                // TODO 保存消息到数据库
+
+                // 确认消息已经消费成功
+                channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            } catch (Exception dbe) {
+                logger.error("保存异常MQ消息到数据库异常，放到死性队列，消息体：{}", JSON.toJSONString(sendMessage), dbe);
+                // 确认消息将消息放到死信队列
+                channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, false);
+            }
         }
     }
 }

@@ -56,8 +56,11 @@ public class RabbitConfig {
 
     public Queue queue(String name) {
         Map<String, Object> args = new HashMap<>(2);
+        // 设置死信队列
         args.put("x-dead-letter-exchange", RabbitConstants.MQ_EXCHANGE_DEAD_QUEUE);
         args.put("x-dead-letter-routing-key", RabbitConstants.MQ_ROUTING_KEY_DEAD_QUEUE);
+        // 设置消息的过期时间， 单位是毫秒
+        args.put("x-message-ttl", 5000);
 
         // 是否持久化
         boolean durable = true;
