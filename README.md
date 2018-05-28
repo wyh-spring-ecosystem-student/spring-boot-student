@@ -186,7 +186,11 @@
 - [使用Spring Boot 参数校验]()
 
 ## spring-boot-student-guava-retrying
-- [guava-retrying 重试机制]()
+- [guava-retrying 重试机制](https://blog.csdn.net/xiaolyuh123/article/details/80209858)
+
+## spring-boot-student-spring-retry
+- [spring-retry 重试机制](https://blog.csdn.net/xiaolyuh123/article/details/80209831)
+- [spring-retry重试与熔断详解](https://blog.csdn.net/xiaolyuh123/article/details/80209815)
 
 
 

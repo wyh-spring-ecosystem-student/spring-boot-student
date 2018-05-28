@@ -1,5 +1,7 @@
 package com.xiaolyuh.service.impl;
 
+import com.xiaolyuh.cache.LayCacheable;
+import com.xiaolyuh.cache.setting.FirstCacheSetting;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.repository.PersonRepository;
 import com.xiaolyuh.service.PersonService;
@@ -39,7 +41,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     /**
-     * Cacheable
+     * LayCacheable
      * value：缓存key的前缀。
      * key：缓存key的后缀。
      * sync：设置如果缓存过期是不是只放一个请求去请求数据库，其他请求阻塞，默认是false。
@@ -54,6 +56,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Cacheable(value = "people1", key = "#person.id", sync = true)//3
+    @LayCacheable(fcs = FirstCacheSetting.class, ccc = @Cacheable(value = "people1", key = "#person.id", sync = true))
     public Person findOne1(Person person, String a, String[] b, List<Long> c) {
         Person p = personRepository.findOne(person.getId());
         if (p != null) {
