@@ -13,19 +13,14 @@ public class LogService {
 
     public void log() {
         logger.debug("==============================================");
-        logger.debug("==============================================");
-        logger.debug("==============================================");
         ThreadTaskUtils.run(() -> run());
         FutureTask<String> futureTask = new FutureTask<String>(() -> call());
         ThreadTaskUtils.run(futureTask);
-
         try {
             logger.debug("===================: {}", futureTask.get());
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
         }
-
-        logger.debug("==============================================");
         logger.debug("==============================================");
     }
 
