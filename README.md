@@ -16,8 +16,11 @@
 - Spring Boot 使用XML配置日志
 - Spring Boot 切换日志框架
 - logback配置异步日志
+- Logback 快速定位用户在一次请求中的所有日志
 
 [Spring Boot 日志配置](http://blog.csdn.net/xiaolyuh123/article/details/70740598)
+
+[Logback 快速定位用户在一次请求中的所有日志](https://www.jianshu.com/p/3dca4aeb6edd)
 
 ## spring-boot-student-profile
 - Spring Boot Profile配置
