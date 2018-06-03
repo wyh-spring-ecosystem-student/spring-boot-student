@@ -36,7 +36,7 @@ public class LogInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response, Object handler) throws Exception {
 
-        // 放SessionId
+        // 设置SessionId
         String token = UUID.randomUUID().toString().replace("-", "");
         MDC.put(SESSION_KEY, token);
         return true;
