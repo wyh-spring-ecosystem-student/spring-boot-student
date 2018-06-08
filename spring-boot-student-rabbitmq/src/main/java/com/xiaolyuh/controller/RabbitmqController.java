@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -26,6 +27,7 @@ public class RabbitmqController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", value = "用户名称", required = false, dataType = "String", paramType = "query")})
     @PostMapping(value = "sendMsg", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
     public Object sendMsg(String name) {
         SendMessage sendMessage = new SendMessage();
         sendMessage.setId(1);

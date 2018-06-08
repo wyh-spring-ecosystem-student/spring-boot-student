@@ -21,7 +21,7 @@ public class SendMessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(SendMessageListener.class);
 
-    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_DEAD_QUEUE)
+//    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_DEAD_QUEUE)
     public void process(SendMessage sendMessage, Channel channel, Message message) throws Exception {
         logger.info("[{}]处理死信队列消息队列接收数据，消息体：{}", RabbitConstants.QUEUE_NAME_DEAD_QUEUE, JSON.toJSONString(sendMessage));
 
