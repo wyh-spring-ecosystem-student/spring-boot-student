@@ -23,7 +23,7 @@ public class DeadMessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(DeadMessageListener.class);
 
-//    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_DEAD_QUEUE)
+    @RabbitListener(queues = RabbitConstants.QUEUE_NAME_DEAD_QUEUE)
     public void process(SendMessage sendMessage, Channel channel, Message message) throws Exception {
         logger.info("[{}]处理延迟队列消息队列接收数据，消息体：{}", RabbitConstants.QUEUE_NAME_SEND_COUPON, JSON.toJSONString(sendMessage));
 

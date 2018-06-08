@@ -8,8 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -19,7 +17,6 @@ import org.springframework.util.Assert;
  * @author yuhao.wang
  */
 @Service
-@ConditionalOnClass({RabbitTemplate.class})
 public class SendMessageListener {
 
     private final Logger logger = LoggerFactory.getLogger(SendMessageListener.class);
