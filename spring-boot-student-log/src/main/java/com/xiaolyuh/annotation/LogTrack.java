@@ -7,9 +7,8 @@ import java.lang.annotation.*;
  *
  * @author yuhao.wang3
  */
-@Target({ElementType.METHOD})
+@Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 @Documented
 public @interface LogTrack {
 

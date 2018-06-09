@@ -37,9 +37,13 @@ public class LogTrackAspect {
         } catch (Throwable t) {
             throw t;
         } finally {
-            if (isSuccess) {
-                MDC.remove(MdcConstant.SESSION_KEY);
-                MDC.remove(MdcConstant.REQUEST_KEY);
+            try {
+                if (isSuccess) {
+                    MDC.remove(MdcConstant.SESSION_KEY);
+                    MDC.remove(MdcConstant.REQUEST_KEY);
+                }
+            } catch (Exception e) {
+                logger.warn(e.getMessage(), e);
             }
         }
     }
@@ -50,13 +54,17 @@ public class LogTrackAspect {
      * @return
      */
     private boolean setMdc() {
-        // 设置SessionId
-        if (StringUtils.isEmpty(MDC.get(MdcConstant.SESSION_KEY))) {
-            String sessionId = UUID.randomUUID().toString();
-            String requestId = UUID.randomUUID().toString().replace("-", "");
-            MDC.put(MdcConstant.SESSION_KEY, sessionId);
-            MDC.put(MdcConstant.REQUEST_KEY, requestId);
-            return true;
+        try {
+            // 设置SessionId
+            if (StringUtils.isEmpty(MDC.get(MdcConstant.SESSION_KEY))) {
+                String sessionId = UUID.randomUUID().toString();
+                String requestId = UUID.randomUUID().toString().replace("-", "");
+                MDC.put(MdcConstant.SESSION_KEY, sessionId);
+                MDC.put(MdcConstant.REQUEST_KEY, requestId);
+                return true;
+            }
+        } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
         }
         return false;
     }

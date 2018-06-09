@@ -40,7 +40,13 @@ public class MdcThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
      */
     private void run(Runnable runnable, Map<String, String> context) {
         // 将父线程的MDC内容传给子线程
-        MDC.setContextMap(context);
+        if (context != null) {
+            try {
+                MDC.setContextMap(context);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
+        }
         try {
             // 执行异步操作
             runnable.run();
