@@ -17,7 +17,7 @@ public class SpringBootStudentLogApplicationTests {
 	
 	@Test
 	public void contextLoads() {
-		logService.log();
+		logService.log2();
 	}
 
 }

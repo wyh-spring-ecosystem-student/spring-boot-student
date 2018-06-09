@@ -1,5 +1,6 @@
 package com.xiaolyuh.interceptors;
 
+import com.xiaolyuh.constants.MdcConstant;
 import org.slf4j.MDC;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
@@ -14,17 +15,14 @@ import java.util.UUID;
  * @author yuhao.wang3
  */
 public class LogInterceptor extends HandlerInterceptorAdapter {
-    /**
-     * 会话ID
-     */
-    private final static String SESSION_KEY = "sessionId";
 
     @Override
     public void afterCompletion(HttpServletRequest arg0, HttpServletResponse arg1, Object arg2, Exception arg3)
             throws Exception {
 
         // 删除SessionId
-        MDC.remove(SESSION_KEY);
+        MDC.remove(MdcConstant.SESSION_KEY);
+        MDC.remove(MdcConstant.REQUEST_KEY);
     }
 
     @Override
@@ -37,8 +35,9 @@ public class LogInterceptor extends HandlerInterceptorAdapter {
                              HttpServletResponse response, Object handler) throws Exception {
 
         // 设置SessionId
-        String token = UUID.randomUUID().toString().replace("-", "");
-        MDC.put(SESSION_KEY, token);
+        String requestId = UUID.randomUUID().toString().replace("-", "");
+        MDC.put(MdcConstant.SESSION_KEY, request.getSession().getId());
+        MDC.put(MdcConstant.REQUEST_KEY, requestId);
         return true;
     }
 }
