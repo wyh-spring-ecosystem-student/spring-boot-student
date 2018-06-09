@@ -9,6 +9,7 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -21,10 +22,11 @@ import java.util.UUID;
  */
 @Aspect
 @Component
+@Order(-10000)
 public class LogTrackAspect {
     private static final Logger logger = LoggerFactory.getLogger(LogTrackAspect.class);
 
-    @Pointcut("@annotation(com.xiaolyuh.annotation.LogTrack)")
+    @Pointcut("@annotation(com.xiaolyuh.annotation.Log) || @annotation(com.xiaolyuh.annotation.LogTrack)")
     public void pointcut() {
     }
 
