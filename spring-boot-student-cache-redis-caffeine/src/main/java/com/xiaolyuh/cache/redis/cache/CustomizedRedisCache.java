@@ -194,7 +194,7 @@ public class CustomizedRedisCache extends RedisCache {
                 redisOperations.expire(cacheKeyStr, this.expirationSecondTime, TimeUnit.SECONDS);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error(e.getMessage(), e);
         } finally {
             redisLock.unlock();
         }
