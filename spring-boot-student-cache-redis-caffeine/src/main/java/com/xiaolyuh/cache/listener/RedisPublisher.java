@@ -2,7 +2,7 @@ package com.xiaolyuh.cache.listener;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.listener.ChannelTopic;
 
 /**
@@ -13,20 +13,20 @@ import org.springframework.data.redis.listener.ChannelTopic;
 public class RedisPublisher {
     private static final Logger logger = LoggerFactory.getLogger(RedisPublisher.class);
 
-    private RedisTemplate<? extends Object, ? extends Object> redisTemplate;
+    RedisOperations<? extends Object, ? extends Object> redisOperations;
 
     /**
      * 频道名称
      */
-    private ChannelTopic channelTopic;
+    ChannelTopic channelTopic;
 
     /**
-     * @param redisTemplate Redis客户端
-     * @param channelTopic  频道名称
+     * @param redisOperations Redis客户端
+     * @param channelTopic    频道名称
      */
-    public RedisPublisher(RedisTemplate<? extends Object, ? extends Object> redisTemplate, ChannelTopic channelTopic) {
+    public RedisPublisher(RedisOperations<? extends Object, ? extends Object> redisOperations, ChannelTopic channelTopic) {
         this.channelTopic = channelTopic;
-        this.redisTemplate = redisTemplate;
+        this.redisOperations = redisOperations;
     }
 
     /**
@@ -35,7 +35,7 @@ public class RedisPublisher {
      * @param message 消息内容
      */
     public void publisher(Object message) {
-        redisTemplate.convertAndSend(channelTopic.toString(), message);
+        redisOperations.convertAndSend(channelTopic.toString(), message);
         logger.info("redis消息发布者向频道【{}】发布了【{}】消息", channelTopic.toString(), message.toString());
     }
 }
