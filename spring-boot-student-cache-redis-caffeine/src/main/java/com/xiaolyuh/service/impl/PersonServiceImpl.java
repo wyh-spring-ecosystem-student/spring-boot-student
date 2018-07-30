@@ -1,7 +1,5 @@
 package com.xiaolyuh.service.impl;
 
-import com.xiaolyuh.cache.LayCacheable;
-import com.xiaolyuh.cache.setting.FirstCacheSetting;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.repository.PersonRepository;
 import com.xiaolyuh.service.PersonService;
@@ -56,7 +54,6 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     @Cacheable(value = "people1", key = "#person.id", sync = true)//3
-    @LayCacheable(fcs = FirstCacheSetting.class, ccc = @Cacheable(value = "people1", key = "#person.id", sync = true))
     public Person findOne1(Person person, String a, String[] b, List<Long> c) {
         Person p = personRepository.findOne(person.getId());
         if (p != null) {
