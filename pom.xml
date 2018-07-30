@@ -109,6 +109,8 @@
 		<module>spring-boot-student-guava-retrying</module>
 		<!-- Spring Boot spring-retry 重试机制 -->
 		<module>spring-boot-student-spring-retry</module>
+		<!-- Spring Boot 多级缓存测试 -->
+		<module>spring-boot-student-layering-cache</module>
     </modules>
 
 </project>
