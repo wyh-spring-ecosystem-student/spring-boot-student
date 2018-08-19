@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Component
 public class RedisMessageListener extends MessageListenerAdapter {
-    private static final Logger log = LoggerFactory.getLogger(RedisPublisher.class);
+    private static final Logger logger = LoggerFactory.getLogger(RedisPublisher.class);
 
     @Autowired
     CacheManager cacheManager;
@@ -31,7 +31,7 @@ public class RedisMessageListener extends MessageListenerAdapter {
     public void onMessage(Message message, byte[] pattern) {
         super.onMessage(message, pattern);
         ChannelTopicEnum channelTopic = ChannelTopicEnum.getChannelTopicEnum(new String(message.getChannel()));
-        log.info("redis消息订阅者接收到频道【{}】发布的消息。消息内容：{}", channelTopic.getChannelTopicStr(), message.toString().getBytes());
+        logger.info("redis消息订阅者接收到频道【{}】发布的消息。消息内容：{}", channelTopic.getChannelTopicStr(), message.toString().getBytes());
         // 解析订阅发布的信息，获取缓存的名称和缓存的key
         String ms = new String(message.getBody());
         @SuppressWarnings("unchecked")
@@ -48,17 +48,17 @@ public class RedisMessageListener extends MessageListenerAdapter {
                 case REDIS_CACHE_DELETE_TOPIC:
                     // 获取一级缓存，并删除一级缓存数据
                     ((LayeringCache) cache).getFirstCache().evict(key);
-                    log.info("删除一级缓存{}数据,key:{}", cacheName, key.toString().getBytes());
+                    logger.info("删除一级缓存{}数据,key:{}", cacheName, key.toString().getBytes());
                     break;
 
                 case REDIS_CACHE_CLEAR_TOPIC:
                     // 获取一级缓存，并删除一级缓存数据
                     ((LayeringCache) cache).getFirstCache().clear();
-                    log.info("清除一级缓存{}数据", cacheName);
+                    logger.info("清除一级缓存{}数据", cacheName);
                     break;
 
                 default:
-                    log.info("接收到没有定义的订阅消息频道数据");
+                    logger.info("接收到没有定义的订阅消息频道数据");
                     break;
             }
 

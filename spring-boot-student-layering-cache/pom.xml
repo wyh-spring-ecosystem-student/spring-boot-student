@@ -55,8 +55,8 @@
 
         <dependency>
             <groupId>com.xiaolyuh</groupId>
-            <artifactId>layering-cache-aspectj</artifactId>
-            <version>1.0.0</version>
+            <artifactId>layering-cache-starter</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
         </dependency>
 
     </dependencies>

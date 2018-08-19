@@ -8,6 +8,8 @@ import com.xiaolyuh.serializer.FastJsonRedisSerializer;
 import com.xiaolyuh.serializer.StringRedisSerializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.redis.cache.RedisCacheManager;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -56,5 +58,11 @@ public class RedisConfig {
         return redisTemplate;
     }
 
+    @Bean
+    @Primary
+    public RedisCacheManager cacheManager(RedisTemplate<String, Object> redisTemplate) {
+        RedisCacheManager cacheManager = new RedisCacheManager(redisTemplate);
+        return cacheManager;
+    }
 
 }
