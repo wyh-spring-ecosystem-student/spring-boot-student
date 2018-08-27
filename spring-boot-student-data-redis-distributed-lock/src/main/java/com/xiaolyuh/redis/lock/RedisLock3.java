@@ -241,9 +241,8 @@ public class RedisLock3 {
         // 只有加锁成功并且锁还有效才去释放锁
         // 只有加锁成功并且锁还有效才去释放锁
         if (locked) {
-            return redisTemplate.execute(new RedisCallback<Boolean>() {
-                @Override
-                public Boolean doInRedis(RedisConnection connection) throws DataAccessException {
+            try {
+                return redisTemplate.execute((RedisConnection connection) -> {
                     Object nativeConnection = connection.getNativeConnection();
                     Long result = 0L;
 
@@ -263,13 +262,21 @@ public class RedisLock3 {
                     }
 
                     if (result == 0 && !StringUtils.isEmpty(lockKeyLog)) {
-                        logger.info("Redis分布式锁，解锁{}失败！解锁时间：{}", lockKeyLog, System.currentTimeMillis());
+                        logger.debug("Redis分布式锁，解锁{}失败！解锁时间：{}", lockKeyLog, System.currentTimeMillis());
                     }
 
                     locked = result == 0;
                     return result == 1;
+                });
+            } catch (Throwable e) {
+                logger.warn(e.getMessage(), e);
+                String value = (String) redisTemplate.opsForValue().get(lockKey);
+                if (lockValue.equals(value)) {
+                    redisTemplate.delete(lockKey);
+                    return true;
                 }
-            });
+                return false;
+            }
         }
 
         return true;
