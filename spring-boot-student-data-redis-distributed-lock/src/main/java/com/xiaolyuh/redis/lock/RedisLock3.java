@@ -269,7 +269,7 @@ public class RedisLock3 {
                     return result == 1;
                 });
             } catch (Throwable e) {
-                logger.warn(e.getMessage(), e);
+                logger.warn("Redis不支持EVAL命令，使用降级方式解锁：{}",e.getMessage(), e);
                 String value = (String) redisTemplate.opsForValue().get(lockKey);
                 if (lockValue.equals(value)) {
                     redisTemplate.delete(lockKey);
