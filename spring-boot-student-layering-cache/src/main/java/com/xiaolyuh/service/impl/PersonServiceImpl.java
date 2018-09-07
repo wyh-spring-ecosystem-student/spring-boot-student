@@ -1,6 +1,6 @@
 package com.xiaolyuh.service.impl;
 
-import com.xiaolyuh.annotation.*;
+import com.github.xiaolyuh.annotation.*;
 import com.xiaolyuh.entity.Person;
 import com.xiaolyuh.repository.PersonRepository;
 import com.xiaolyuh.service.PersonService;
@@ -37,9 +37,9 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @Cacheable(value = "'people' + ':' + #person.id", key = "#person.id",
+    @Cacheable(value = "'people' + ':' + #person.id", key = "#person.id", depict = "查询用户信息",
             firstCache = @FirstCache(expireTime = 4, timeUnit = TimeUnit.SECONDS),
-            secondaryCache = @SecondaryCache(expiration = 100, preloadTime = 3, forceRefresh = true, timeUnit = TimeUnit.SECONDS))
+            secondaryCache = @SecondaryCache(expireTime = 100, preloadTime = 3, forceRefresh = true, timeUnit = TimeUnit.SECONDS))
     public Person findOne(Person person) {
         Person p = personRepository.findOne(person.getId());
         System.out.println("为id、key为:" + p.getId() + "数据做了缓存");

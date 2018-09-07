@@ -54,9 +54,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.xiaolyuh</groupId>
+            <groupId>com.github.xiaolyuh</groupId>
             <artifactId>layering-cache-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.8-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
