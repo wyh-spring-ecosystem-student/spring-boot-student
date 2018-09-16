@@ -11,4 +11,6 @@ public interface PersonService {
     void removeAll();
 
     Person findOne(Person person);
+
+    Person findOne1(Person person);
 }
