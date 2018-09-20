@@ -19,7 +19,7 @@ public class PersonServiceImpl implements PersonService {
     PersonRepository personRepository;
 
     @Override
-    @CachePut(value = "people", key = "#person.id")
+    @CachePut(value = "people", key = "#person.id", depict = "用户信息缓存")
     public Person save(Person person) {
         Person p = personRepository.save(person);
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
@@ -41,7 +41,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @Cacheable(value = "'people' + ':' + #person.id", key = "#person.id", depict = "查询用户信息",
+    @Cacheable(value = "'people' + ':' + #person.id", key = "#person.id", depict = "用户信息缓存",
             firstCache = @FirstCache(expireTime = 4, timeUnit = TimeUnit.SECONDS),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true, timeUnit = TimeUnit.SECONDS))
     public Person findOne(Person person) {
@@ -51,7 +51,7 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @Cacheable(value = "people1", key = "#person.id", depict = "查询用户信息1",
+    @Cacheable(value = "people1", key = "#person.id", depict = "用户信息缓存1",
             firstCache = @FirstCache(expireTime = 4, timeUnit = TimeUnit.SECONDS),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true, timeUnit = TimeUnit.SECONDS))
     public Person findOne1(Person person) {
