@@ -117,6 +117,8 @@
 		<module>spring-boot-student-spring-retry</module>
 		<!-- Spring Boot 多级缓存测试 -->
 		<module>spring-boot-student-layering-cache</module>
+		<!-- Spring Boot hystrix -->
+		<module>spring-boot-student-hystrix</module>
     </modules>
 
 </project>
