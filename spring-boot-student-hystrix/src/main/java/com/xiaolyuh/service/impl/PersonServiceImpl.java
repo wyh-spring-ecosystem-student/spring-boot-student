@@ -19,7 +19,8 @@ public class PersonServiceImpl implements PersonService {
     @Autowired
     RedisTemplate redisTemplate;
 
-    @HystrixCommand(groupKey = "hystrixSemaphoreTestGroupKey", commandKey = "hystrixSemaphoreTestCommandKey", fallbackMethod = "fallbackMethod",
+    @HystrixCommand(groupKey = "hystrixSemaphoreTestGroupKey", commandKey = "hystrixSemaphoreTestCommandKey",
+            fallbackMethod = "fallbackMethodSemaphore",
             commandProperties = {
                     //指定多久超时，单位毫秒。超时进fallback
                     @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10000"),
@@ -37,7 +38,7 @@ public class PersonServiceImpl implements PersonService {
             }
     )
     @Override
-    public Result semaphore() {
+    public Result semaphore(String arg) {
         redisTemplate.opsForValue().get("semaphore");
         Person person = new Person();
         person.setAge(18);
@@ -48,7 +49,8 @@ public class PersonServiceImpl implements PersonService {
         return Result.success(person);
     }
 
-    @HystrixCommand(groupKey = "hystrixThreadTestGroupKey", commandKey = "hystrixThreadTestCommandKey", fallbackMethod = "fallbackMethod",
+    @HystrixCommand(groupKey = "hystrixThreadTestGroupKey", commandKey = "hystrixThreadTestCommandKey",
+            fallbackMethod = "fallbackMethodThread",
             commandProperties = {
                     //指定多久超时，单位毫秒。超时进fallback
                     @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "10000"),
@@ -74,7 +76,7 @@ public class PersonServiceImpl implements PersonService {
 
     )
     @Override
-    public Result thread() {
+    public Result thread(String arg) {
         redisTemplate.opsForValue().get("thread");
         Person person = new Person();
         person.setAge(18);
@@ -85,7 +87,12 @@ public class PersonServiceImpl implements PersonService {
         return Result.success(person);
     }
 
-    public Result fallbackMethod() {
+    public Result fallbackMethodSemaphore(String arg, Throwable throwable) {
+        logger.info("熔断降级");
+        return Result.error("熔断降级");
+    }
+
+    public Result fallbackMethodThread(String arg) {
         logger.info("熔断降级");
         return Result.error("熔断降级");
     }

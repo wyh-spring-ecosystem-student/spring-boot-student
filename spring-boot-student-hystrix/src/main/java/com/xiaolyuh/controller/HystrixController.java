@@ -20,12 +20,12 @@ public class HystrixController {
     @RequestMapping("/semaphore")
     public Result semaphore() {
 
-        return personService.semaphore();
+        return personService.semaphore("");
     }
 
     @RequestMapping("/thread")
     public Result thread() {
-        return personService.thread();
+        return personService.thread("");
     }
 
 }

@@ -4,7 +4,7 @@ import com.xiaolyuh.entity.Result;
 
 public interface PersonService {
 
-    Result semaphore();
+    Result semaphore(String arg);
 
-    Result thread();
+    Result thread(String arg);
 }
