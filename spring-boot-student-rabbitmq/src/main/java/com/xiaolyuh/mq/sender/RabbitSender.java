@@ -50,6 +50,9 @@ public class RabbitSender implements RabbitTemplate.ConfirmCallback, RabbitTempl
 
         // 获取CorrelationData对象
         CorrelationData correlationData = this.correlationData(message);
+        correlationData.setExchange(exchangeName);
+        correlationData.setRoutingKey(routingKey);
+        correlationData.setMessage(message);
 
         logger.info("发送MQ消息，消息ID：{}，消息体:{}, exchangeName:{}, routingKey:{}",
                 correlationData.getId(), JSON.toJSONString(message), exchangeName, routingKey);
