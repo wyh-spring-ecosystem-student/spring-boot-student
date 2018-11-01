@@ -1,9 +1,12 @@
 package com.xiaolyuh.config;
 
 import com.netflix.hystrix.contrib.javanica.aop.aspectj.HystrixCommandAspect;
-import org.springframework.boot.web.servlet.ServletRegistrationBean;
+import com.netflix.hystrix.strategy.HystrixPlugins;
+import com.xiaolyuh.hystrix.MdcHystrixConcurrencyStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import javax.annotation.PostConstruct;
 
 @Configuration
 public class HystrixConfig {
@@ -12,6 +15,11 @@ public class HystrixConfig {
     @Bean
     public HystrixCommandAspect hystrixAspect() {
         return new HystrixCommandAspect();
+    }
+
+    @PostConstruct
+    public void init() {
+        HystrixPlugins.getInstance().registerConcurrencyStrategy(new MdcHystrixConcurrencyStrategy());
     }
 
 }
