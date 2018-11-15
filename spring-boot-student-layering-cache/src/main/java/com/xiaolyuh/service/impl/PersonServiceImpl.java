@@ -7,6 +7,7 @@ import com.xiaolyuh.service.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -43,7 +44,7 @@ public class PersonServiceImpl implements PersonService {
             firstCache = @FirstCache(expireTime = 4),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true))
     public Person findOne(Person person) {
-        Person p = personRepository.findOne(person.getId());
+        Person p = personRepository.findOne(Example.of(person)).get();
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
@@ -53,7 +54,7 @@ public class PersonServiceImpl implements PersonService {
             firstCache = @FirstCache(expireTime = 4),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true))
     public Person findOne1(Person person) {
-        Person p = personRepository.findOne(person.getId());
+        Person p = personRepository.findOne(Example.of(person)).get();
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }

@@ -11,12 +11,12 @@ public enum LogTypeEnum {
     ALL,
 
     /**
-     * 方法前执行
+     * 只输出参数
      */
-    BEFORE,
+    PARAMETER,
 
     /**
-     * 方法后执行
+     * 只输出结果
      */
-    AFTER
+    RESULT
 }

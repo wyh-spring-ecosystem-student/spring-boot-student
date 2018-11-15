@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.core.BridgeMethodResolver;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
@@ -29,6 +30,7 @@ import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author yuhao.wang
@@ -50,6 +52,9 @@ public class LogAspect {
 
         // 获取注解
         Log log = this.getMethodAnnotations(method, Log.class);
+        if (Objects.isNull(log)) {
+            log = AnnotationUtils.findAnnotation(joinPoint.getTarget().getClass(), Log.class);
+        }
         // 获取日志输出前缀
         String prefix = getPrefix(log, method, requestAttributes.getSessionId());
 
@@ -73,7 +78,7 @@ public class LogAspect {
      */
     private void logBefore(Log log, String prefix, Method method, Object[] args) {
         // 判断是否是方法之后输出日志，不是就输出参数日志
-        if (!LogTypeEnum.AFTER.equals(log.value())) {
+        if (!LogTypeEnum.RESULT.equals(log.value())) {
             Map<String, Object> paramMap = new LinkedHashMap<>();
             // 获取参数注解
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
@@ -109,7 +114,7 @@ public class LogAspect {
      */
     private void logAfter(Log log, String prefix, Object result) {
         // 判断是否是方法之前输出日志，不是就输出参数日志
-        if (!LogTypeEnum.BEFORE.equals(log.value())) {
+        if (!LogTypeEnum.PARAMETER.equals(log.value())) {
             logger.info("【返回参数 {}】：{}", prefix, JSON.toJSON(result));
         }
     }
