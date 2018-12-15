@@ -195,6 +195,9 @@
 - [spring-retry 重试机制](https://blog.csdn.net/xiaolyuh123/article/details/80209831)
 - [spring-retry重试与熔断详解](https://blog.csdn.net/xiaolyuh123/article/details/80209815)
 
+## spring-boot-student-completable-future
+- [CompletableFuture get方法一直阻塞或抛出TimeoutException](https://www.jianshu.com/p/548a6f1763b4)
+
 
 
 
