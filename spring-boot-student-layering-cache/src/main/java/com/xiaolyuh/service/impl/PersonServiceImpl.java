@@ -44,7 +44,7 @@ public class PersonServiceImpl implements PersonService {
             firstCache = @FirstCache(expireTime = 4),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true))
     public Person findOne(Person person) {
-        Person p = personRepository.findOne(Example.of(person)).get();
+        Person p = personRepository.findOne(Example.of(person));
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
@@ -54,7 +54,7 @@ public class PersonServiceImpl implements PersonService {
             firstCache = @FirstCache(expireTime = 4),
             secondaryCache = @SecondaryCache(expireTime = 15, preloadTime = 8, forceRefresh = true))
     public Person findOne1(Person person) {
-        Person p = personRepository.findOne(Example.of(person)).get();
+        Person p = personRepository.findOne(Example.of(person));
         logger.info("为id、key为:" + p.getId() + "数据做了缓存");
         return p;
     }
