@@ -121,6 +121,7 @@
 		<module>spring-boot-student-hystrix</module>
 		<!-- Spring Boot CompletableFuture -->
 		<module>spring-boot-student-completable-future</module>
+		<module>spring-boot-student-mybatis-plus</module>
     </modules>
 
 </project>
