@@ -121,7 +121,10 @@
 		<module>spring-boot-student-hystrix</module>
 		<!-- Spring Boot CompletableFuture -->
 		<module>spring-boot-student-completable-future</module>
+		<!-- mybatis-plus  -->
 		<module>spring-boot-student-mybatis-plus</module>
+		<!-- 并发编程  -->
+		<module>spring-boot-student-concurrent</module>
     </modules>
 
 </project>
