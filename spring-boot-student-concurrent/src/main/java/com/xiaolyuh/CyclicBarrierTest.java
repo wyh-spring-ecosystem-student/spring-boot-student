@@ -39,7 +39,7 @@ public class CyclicBarrierTest {
         }
 
         try {
-//            cyclicBarrier.await();
+            cyclicBarrier.await();
             Thread.sleep(2000);
             System.out.println(Thread.currentThread().getName() + "  主线程完成");
         } catch (Exception e) {
