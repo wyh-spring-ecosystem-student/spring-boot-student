@@ -1,6 +1,7 @@
 package com.xiaolyuh;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 5个初始化线程，6个扣除点，初始化完成后业务线程和住线程才能执行
@@ -22,7 +23,7 @@ public class CountDownLatchTest {
 
         try {
             System.out.println(Thread.currentThread().getName() + "主线程等待初始化线程初始化完成......");
-            countDownLatch.await();
+            countDownLatch.await(1, TimeUnit.MINUTES);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -39,8 +40,11 @@ public class CountDownLatchTest {
         @Override
         public void run() {
             System.out.println(Thread.currentThread().getName() + "初始化任务开始。。。。。。");
-            sleep(5);
-            countDownLatch.countDown();
+            try {
+                sleep(5);
+            } finally {
+                countDownLatch.countDown();
+            }
             sleep(5);
             System.out.println(Thread.currentThread().getName() + "初始化任务完毕后，处理业务逻辑。。。。。。");
         }
@@ -54,8 +58,11 @@ public class CountDownLatchTest {
         @Override
         public void run() {
             System.out.println(Thread.currentThread().getName() + "初始化工作开始第一步》》》》》");
-            sleep(5);
-            countDownLatch.countDown();
+            try {
+                sleep(5);
+            } finally {
+                countDownLatch.countDown();
+            }
             System.out.println(Thread.currentThread().getName() + "初始化工作开始第二步》》》》》");
             sleep(5);
             countDownLatch.countDown();
@@ -73,7 +80,7 @@ public class CountDownLatchTest {
         public void run() {
             try {
                 System.out.println(Thread.currentThread().getName() + "初始化线程还未完成，业务线程阻塞----------");
-                countDownLatch.await();
+                countDownLatch.await(1, TimeUnit.MINUTES);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
