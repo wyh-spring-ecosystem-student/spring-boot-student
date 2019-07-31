@@ -40,6 +40,7 @@ public class ForkJoinCountTask extends RecursiveTask<Long> {
             for (int i = 0; i <= end - start; i++) {
                 count = count + start + i;
             }
+            System.out.println(Thread.currentThread().getName() + " 小计结果: " + count);
             return count;
         } else {
             // 如果任务大于阈值，就分裂成三个子任务计算

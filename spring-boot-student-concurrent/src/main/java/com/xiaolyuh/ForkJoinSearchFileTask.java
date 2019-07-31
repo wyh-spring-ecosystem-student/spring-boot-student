@@ -46,7 +46,7 @@ public class ForkJoinSearchFileTask extends RecursiveAction {
                     fileTasks.add(new ForkJoinSearchFileTask(f, suffix));
                 } else {
                     if (f.getAbsolutePath().endsWith(suffix)) {
-                        System.out.println("文件： " + f.getAbsolutePath());
+                        System.out.println(Thread.currentThread().getName() + "  文件： " + f.getAbsolutePath());
                     }
                 }
             }
