@@ -54,4 +54,25 @@ public class SpringBootStudentConcurrentApplicationTests {
     }
 
 
+    @Test
+    public void testCopyOnWrite() {
+        CopyOnWriteArrayList<Integer> copyOnWriteArrayList = new CopyOnWriteArrayList<>();
+        copyOnWriteArrayList.add(5);
+        copyOnWriteArrayList.add(3);
+        copyOnWriteArrayList.add(4);
+        copyOnWriteArrayList.add(2);
+        copyOnWriteArrayList.add(3);
+
+        System.out.println(copyOnWriteArrayList);
+
+
+        CopyOnWriteArraySet<Integer> copyOnWriteArraySet = new CopyOnWriteArraySet<>();
+        copyOnWriteArraySet.add(5);
+        copyOnWriteArraySet.add(3);
+        copyOnWriteArraySet.add(4);
+        copyOnWriteArraySet.add(2);
+        copyOnWriteArraySet.add(3);
+
+        System.out.println(copyOnWriteArraySet);
+    }
 }
