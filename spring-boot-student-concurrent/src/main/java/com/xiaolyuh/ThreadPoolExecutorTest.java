@@ -7,6 +7,7 @@ import java.util.concurrent.*;
  * @since 2019/8/1 16:38
  */
 public class ThreadPoolExecutorTest {
+
     public static void main(String[] args) {
         ThreadPoolExecutor executor = new ThreadPoolExecutorExt(1, 2, 1L,
                 TimeUnit.SECONDS, new LinkedBlockingQueue<>(2));
