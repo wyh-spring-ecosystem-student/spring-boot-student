@@ -75,4 +75,9 @@ public class SpringBootStudentConcurrentApplicationTests {
 
         System.out.println(copyOnWriteArraySet);
     }
+
+    @Test
+    public void singleton() {
+        System.out.println(EnumSingleton.getInstance());
+    }
 }
