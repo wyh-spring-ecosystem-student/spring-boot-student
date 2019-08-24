@@ -1,32 +1,30 @@
-package com.xiaolyuh.init.destory;
+package com.xiaolyuh.component.scan;
 
 import com.xiaolyuh.PrintSpringBeanUtil;
 import org.junit.After;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.util.Arrays;
+
 /**
- * 测试Bean的三种初始化、销毁方式和执行顺序
- *
  * @author yuhao.wang3
+ * @since 2019/8/24 11:11
  */
-public class SpringIocTest {
+public class ComponentScanTest {
+
     /**
      * 使用容器
      */
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MyConfig.class);
+    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ComponentScanConfig.class);
 
     @Test
     public void contextTest() {
         PrintSpringBeanUtil.printlnBean(context);
-
-        // 测试Bean的三种初始化、销毁方式和执行顺序
-        System.out.println(context.getBean(InitBeanAndDestroyBean.class));
     }
 
     @After
     public void closeContext() {
         context.close();
     }
-
 }
