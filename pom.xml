@@ -124,7 +124,9 @@
 		<!-- mybatis-plus  -->
 		<module>spring-boot-student-mybatis-plus</module>
 		<!-- 并发编程  -->
-		<module>spring-boot-student-concurrent</module>
+		<module>spring-boot-student-concurrent</module>	
+		<!-- Spring  -->
+		<module>spring-boot-student-spring</module>
     </modules>
 
 </project>
