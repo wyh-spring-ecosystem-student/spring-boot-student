@@ -1,20 +1,20 @@
 package com.xiaolyuh.scope;
 
+import com.xiaolyuh.BaseTest;
 import com.xiaolyuh.PrintSpringBeanUtil;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
  * @author yuhao.wang3
  * @since 2019/8/24 11:11
  */
-public class ScopeTest {
+public class ScopeTest extends BaseTest {
 
-    /**
-     * 使用容器
-     */
-    AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(ScopeConfig.class);
+    @Before
+    public void before() {
+        super.before(ScopeConfig.class);
+    }
 
     @Test
     public void contextTest() {
@@ -26,10 +26,5 @@ public class ScopeTest {
         System.out.println(bean1 == bean2);
 
         PrintSpringBeanUtil.printlnBean(context);
-    }
-
-    @After
-    public void closeContext() {
-        context.close();
     }
 }

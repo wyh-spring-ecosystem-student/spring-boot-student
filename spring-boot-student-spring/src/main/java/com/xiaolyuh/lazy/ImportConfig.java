@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Lazy;
  * @since 2019/8/24 15:58
  */
 @Configuration
-public class LazyConfig {
+public class ImportConfig {
 
     @Lazy
     @Bean
