@@ -1,10 +1,6 @@
 package com.xiaolyuh;
 
-import com.xiaolyuh.iimport.ImportTestBean;
-import com.xiaolyuh.lazy.ImportConfig;
 import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 /**
