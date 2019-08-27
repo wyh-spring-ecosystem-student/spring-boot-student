@@ -25,6 +25,11 @@ public class InitBeanAndDestroyBean implements InitializingBean, DisposableBean 
         System.out.println("接口-执行InitBeanAndDestroyBeanTest：destroy方法");
     }
 
+    /**
+     * Bean所有属性设置完(初始化完)之后调用
+     *
+     * @throws Exception Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         System.out.println("接口-执行InitBeanAndDestroyBeanTest：afterPropertiesSet方法");
@@ -40,10 +45,16 @@ public class InitBeanAndDestroyBean implements InitializingBean, DisposableBean 
         System.out.println("注解--执行InitBeanAndDestroyBeanTest：preDestroy方法");
     }
 
+    /**
+     * 真正的Bean初始化方法
+     */
     public void initMethod() {
         System.out.println("XML配置-执行InitBeanAndDestroyBeanTest：init-method方法");
     }
 
+    /**
+     * 真正的Bean销毁方法
+     */
     public void destroyMethod() {
         System.out.println("XML配置-执行InitBeanAndDestroyBeanTest：destroy-method方法");
     }
