@@ -23,6 +23,7 @@ public class SpringIocTest extends BaseTest {
 
         // 测试Bean的三种初始化、销毁方式和执行顺序
         System.out.println(context.getBean(InitBeanAndDestroyBean.class));
+        System.out.println(context.getBean(InitBeanAndDestroyBean.class));
     }
 
 }

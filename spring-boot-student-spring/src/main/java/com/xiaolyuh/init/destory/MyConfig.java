@@ -17,6 +17,7 @@ public class MyConfig {
 
     // 测试Bean的几种初始化和销毁方式，和执行顺序
     @Bean(initMethod = "initMethod", destroyMethod = "destroyMethod")
+//    @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     public InitBeanAndDestroyBean initBeanAndDestroyBean() {
         return new InitBeanAndDestroyBean();
     }
