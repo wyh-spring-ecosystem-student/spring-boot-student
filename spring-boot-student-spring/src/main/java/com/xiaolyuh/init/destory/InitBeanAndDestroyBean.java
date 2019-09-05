@@ -1,7 +1,10 @@
 package com.xiaolyuh.init.destory;
 
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -11,13 +14,21 @@ import javax.annotation.PreDestroy;
  *
  * @author yuhao.wang3
  */
-public class InitBeanAndDestroyBean implements InitializingBean, DisposableBean {
+public class InitBeanAndDestroyBean implements InitializingBean, DisposableBean, ApplicationContextAware {
+    ApplicationContext applicationContext;
+
     public String say() {
         return "Hello!" + this.getClass().getName();
     }
 
     public InitBeanAndDestroyBean() {
         System.out.println("执行InitBeanAndDestroyBean构造方法");
+    }
+
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 
     @Override
