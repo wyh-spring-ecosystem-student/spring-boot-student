@@ -1,6 +1,5 @@
 package com.xiaolyuh.di;
 
-import com.wlqq.etc.common.log.annotations.EnableAspectJLog;
 import com.xiaolyuh.di.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -12,7 +11,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 @ComponentScan({"com.xiaolyuh.di"})
-@EnableAspectJLog
 public class DiConfig {
 
     @Bean
