@@ -24,7 +24,7 @@ public class InitBeanInstantiationAwareBeanPostProcessor implements Instantiatio
     @Override
     public boolean postProcessAfterInstantiation(Object bean, String beanName) throws BeansException {
         System.out.println("Bean实例化的后置处理器-执行：InitBeanInstantiationAwareBeanPostProcessor.postProcessAfterInstantiation 方法 处理：" + beanName);
-        return false;
+        return true;
     }
 
     @Override
