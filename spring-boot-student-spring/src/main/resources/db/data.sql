@@ -1,0 +1,1 @@
+INSERT INTO `person` (`id`, `name`, `age`, `address`) VALUES ('1', 'wyf', '32', '合肥');
