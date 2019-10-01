@@ -17,6 +17,7 @@ public class EnhancerTest {
         EnhancerDemo proxy = (EnhancerDemo) enhancer.create();
 
         proxy.test();
+        proxy.test2();
         System.out.println(proxy);
     }
 }
