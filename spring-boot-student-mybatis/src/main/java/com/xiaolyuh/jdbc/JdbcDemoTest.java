@@ -17,7 +17,7 @@ import java.util.Objects;
 public class JdbcDemoTest extends BaseTest {
 
     @Test
-    public void jdbcDemo() {
+    public void testJdbcDemo() {
         String sql = "select `id`, `name`, `age`, `address` from person where name = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -76,6 +76,5 @@ public class JdbcDemoTest extends BaseTest {
                 }
             }
         }
-
     }
 }
