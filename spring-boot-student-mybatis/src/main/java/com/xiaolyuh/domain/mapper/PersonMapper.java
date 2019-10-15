@@ -7,7 +7,8 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-@Mapper//声明成mybatis Dao层的Bean，也可以在配置类上使用@MapperScan("com.xiaolyuh.domain.mapper")注解声明
+@Mapper
+//声明成mybatis Dao层的Bean，也可以在配置类上使用@MapperScan("com.xiaolyuh.domain.mapper")注解声明
 public interface PersonMapper {
 
     int deleteByPrimaryKey(Long id);

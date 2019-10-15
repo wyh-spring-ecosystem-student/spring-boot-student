@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <properties resource="application.properties"/>
+
+    <settings>
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+    </settings>
+
+    <!-- 别名定义 -->
+    <typeAliases>
+        <package name="com.xiaolyuh.domain.model"/>
+    </typeAliases>
+
+    <!--配置environment环境 -->
+    <environments default="development">
+        <!-- 环境配置1，每个SqlSessionFactory对应一个环境 -->
+        <environment id="development">
+            <transactionManager type="JDBC"/>
+            <dataSource type="UNPOOLED">
+                <property name="driver" value="${spring.datasource.driver-class-name}"/>
+                <property name="url" value="${spring.datasource.url}"/>
+                <property name="username" value="${spring.datasource.username}"/>
+                <property name="password" value="${spring.datasource.password}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+    <!-- 映射文件，mapper的配置文件 -->
+    <mappers>
+        <!--直接映射到相应的mapper文件 -->
+        <mapper resource="classpath*:/mybaits/*Mapper.xml"/>
+        <!-- <mapper class="com.xiaolyuh.domain.mapper.PersonMapper"/> -->
+    </mappers>
+</configuration>  

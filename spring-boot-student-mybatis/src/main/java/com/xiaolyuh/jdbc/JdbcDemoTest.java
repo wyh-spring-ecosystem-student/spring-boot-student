@@ -18,7 +18,7 @@ public class JdbcDemoTest extends BaseTest {
 
     @Test
     public void testJdbcDemo() {
-        String sql = "select `id`, `name`, `age`, `address` from person where name = ?";
+        String sql = "select `id`, `user_name`, `age`, `address` from person where user_name = ?";
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet resultSet = null;
@@ -44,7 +44,7 @@ public class JdbcDemoTest extends BaseTest {
                 Person person = new Person();
                 // 通过字段检索
                 person.setId(resultSet.getLong("id"));
-                person.setName(resultSet.getString("name"));
+                person.setUserName(resultSet.getString("user_name"));
                 person.setAge(resultSet.getInt("age"));
                 person.setAddress(resultSet.getString("address"));
                 peoples.add(person);
