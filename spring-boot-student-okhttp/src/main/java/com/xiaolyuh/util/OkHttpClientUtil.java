@@ -6,6 +6,7 @@ import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.remoting.RemoteAccessException;
+import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Map;
@@ -89,8 +90,8 @@ public abstract class OkHttpClientUtil {
             //创建/Call
             response = okHttpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
-                logger.error("访问外部系统异常 {}: {}", url, JSON.toJSONString(response));
-                throw new RemoteAccessException("访问外部系统异常 " + url);
+                logger.error("访问外部系统异常 {}: {}", url, response.toString());
+                throw new RemoteAccessException("访问外部系统异常 " + response.toString());
             }
             result = response.body().string();
         } catch (RemoteAccessException e) {
@@ -101,7 +102,8 @@ public abstract class OkHttpClientUtil {
             }
             throw new RemoteAccessException("访问外部系统异常: " + response.toString(), e);
         } finally {
-            logger.info("请求 {}  {}，请求参数：{}， 返回参数：{}", interfaceName, url, JSON.toJSONString(param), result);
+            logger.info("请求 {}  {}，请求参数：{}， 返回参数：{}", interfaceName, url, JSON.toJSONString(param),
+                    StringUtils.isEmpty(result) ? response.toString() : request);
         }
 
         return JSON.parseObject(result, clazz);
