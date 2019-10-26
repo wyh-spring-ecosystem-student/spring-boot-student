@@ -127,6 +127,8 @@
 		<module>spring-boot-student-concurrent</module>	
 		<!-- Spring  -->
 		<module>spring-boot-student-spring</module>
+		<!-- okhttp  -->
+		<module>spring-boot-student-okhttp</module>
     </modules>
 
 </project>

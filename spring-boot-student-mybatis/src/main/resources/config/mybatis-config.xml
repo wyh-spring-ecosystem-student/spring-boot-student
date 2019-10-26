@@ -53,7 +53,7 @@
 	<typeHandlers>
 		<!-- <typeHandler handler="com.xhm.util.BooleanTypeHandlder" /> -->
 		<!--扫描整个包下的自定义类型处理器 -->
-		<package name="com.xiaolyuh.util" />
+		<package name="com.xiaolyuh.utils" />
 	</typeHandlers>
 
 	<!--plugins插件之 分页拦截器 -->

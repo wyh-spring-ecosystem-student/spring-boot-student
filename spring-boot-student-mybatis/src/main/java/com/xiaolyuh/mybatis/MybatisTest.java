@@ -24,10 +24,10 @@ public class MybatisTest extends BaseTest {
     @Before
     public void init() throws IOException {
         String resource = "config/mybatis-config.xml";
-        InputStream inputStream = Resources.getResourceAsStream(resource);
-        // 1.读取mybatis配置文件创SqlSessionFactory
-        sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-        inputStream.close();
+        try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
+            // 1.读取mybatis配置文件创SqlSessionFactory
+            sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
+        }
     }
 
     @Test
@@ -39,6 +39,7 @@ public class MybatisTest extends BaseTest {
 
             // 3.获取对应mapper
             PersonMapper mapper = sqlSession.getMapper(PersonMapper.class);
+            JdkProxySourceClassUtil.writeClassToDisk(mapper.getClass().getSimpleName(), mapper.getClass());
             // 4.执行查询语句并返回结果
             Person person = mapper.selectByPrimaryKey(1L);
             System.out.println(person.toString());
