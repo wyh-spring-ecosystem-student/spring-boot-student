@@ -103,7 +103,7 @@ public abstract class OkHttpClientUtil {
             throw new RemoteAccessException("访问外部系统异常: " + response.toString(), e);
         } finally {
             logger.info("请求 {}  {}，请求参数：{}， 返回参数：{}", interfaceName, url, JSON.toJSONString(param),
-                    StringUtils.isEmpty(result) ? response.toString() : request);
+                    StringUtils.isEmpty(result) ? response.toString() : result);
         }
 
         return JSON.parseObject(result, clazz);
