@@ -1,5 +1,6 @@
 package com.xiaolyuh.util;
 
+
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import okhttp3.*;
@@ -88,24 +89,31 @@ public abstract class OkHttpClientUtil {
 
         Response response = null;
         String result = "";
+        String errorMsg = "";
         try {
             //创建/Call
             response = okHttpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
                 logger.error("访问外部系统异常 {}: {}", url, response.toString());
-                throw new RemoteAccessException("访问外部系统异常 " + response.toString());
+                errorMsg = String.format("访问外部系统异常:%s", response.toString());
+                throw new RemoteAccessException(errorMsg);
             }
             result = response.body().string();
         } catch (RemoteAccessException e) {
+            logger.warn(e.getMessage(), e);
+            result = e.getMessage();
             throw e;
         } catch (Exception e) {
+            logger.warn(e.getMessage(), e);
             if (Objects.isNull(response)) {
-                throw new RemoteAccessException("访问外部系统异常: " + e.getMessage(), e);
+                errorMsg = String.format("访问外部系统异常::%s", e.getMessage());
+                throw new RemoteAccessException(errorMsg, e);
             }
-            throw new RemoteAccessException("访问外部系统异常: " + response.toString(), e);
+            errorMsg = String.format("访问外部系统异常:::%s", response.toString());
+            throw new RemoteAccessException(errorMsg, e);
         } finally {
             logger.info("请求 {}  {}，请求参数：{}， 返回参数：{}", interfaceName, url, JSON.toJSONString(param),
-                    StringUtils.isEmpty(result) ? response.toString() : result);
+                    StringUtils.isEmpty(result) ? errorMsg : result);
         }
 
         return JSON.parseObject(result, clazz);
