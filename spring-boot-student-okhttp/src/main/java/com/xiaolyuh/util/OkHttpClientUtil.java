@@ -61,7 +61,9 @@ public abstract class OkHttpClientUtil {
         for (Map.Entry<String, String> entry : paramMap.entrySet()) {
             content.append(entry.getKey()).append("=").append(entry.getValue()).append("&");
         }
-        content.deleteCharAt(content.length() - 1);
+        if (content.length() > 0) {
+            content.deleteCharAt(content.length() - 1);
+        }
 
         RequestBody requestBody = FormBody.create(MediaType.parse("application/x-www-form-urlencoded"), content.toString());
 
