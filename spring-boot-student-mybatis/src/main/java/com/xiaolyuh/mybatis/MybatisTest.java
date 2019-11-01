@@ -31,7 +31,7 @@ public class MybatisTest extends BaseTest {
     }
 
     @Test
-    // 测试自动映射以及下划线自动转化驼峰
+    // 面向接口编程模型
     public void quickStart() throws Exception {
         // 2.获取sqlSession
         try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
@@ -42,6 +42,18 @@ public class MybatisTest extends BaseTest {
             JdkProxySourceClassUtil.writeClassToDisk(mapper.getClass().getSimpleName(), mapper.getClass());
             // 4.执行查询语句并返回结果
             Person person = mapper.selectByPrimaryKey(1L);
+            System.out.println(person.toString());
+        }
+    }
+
+    @Test
+    // ibatis编程模型
+    public void quickStartIBatis() throws Exception {
+        // 2.获取sqlSession
+        try (SqlSession sqlSession = sqlSessionFactory.openSession()) {
+            initH2dbMybatis(sqlSession);
+            // ibatis编程模型(与配置文件耦合严重)
+            Person person = sqlSession.selectOne("com.xiaolyuh.domain.mapper.PersonMapper.selectByPrimaryKey", 1L);
             System.out.println(person.toString());
         }
     }
