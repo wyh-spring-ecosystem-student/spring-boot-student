@@ -129,6 +129,8 @@
 		<module>spring-boot-student-spring</module>
 		<!-- okhttp  -->
 		<module>spring-boot-student-okhttp</module>
+		<!-- jvm 测试类  -->
+		<module>spring-boot-student-jvm</module>
     </modules>
 
 </project>
