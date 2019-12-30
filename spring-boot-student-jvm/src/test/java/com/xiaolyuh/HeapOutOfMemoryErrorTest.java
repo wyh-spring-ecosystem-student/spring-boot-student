@@ -23,7 +23,7 @@ public class HeapOutOfMemoryErrorTest {
         List<OOMObject> list = Lists.newArrayList();
         for (long i = 1; i > 0; i++) {
             list.add(new OOMObject());
-            if (i % 100_000 == 0) {
+            if (i % 100000 == 0) {
                 System.out.println(Thread.currentThread().getName() + "::" + i);
             }
         }
