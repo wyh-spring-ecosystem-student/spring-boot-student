@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
@@ -31,8 +32,8 @@ public class RsaClassLoader extends ClassLoader {
 
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        String fileName = name.substring(name.lastIndexOf(".") + 1) + ".class";
-        try (InputStream inputStream = getClass().getResourceAsStream(fileName)) {
+        String fileName = name.replace('.', File.separatorChar) + ".class";
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream(fileName)) {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
             logger.warn("请输入解密私钥，否则无法启动服务");
@@ -47,4 +48,5 @@ public class RsaClassLoader extends ClassLoader {
             throw new ClassNotFoundException(String.format("解密 [%s] 文件异常: %s", name, e.getCause()));
         }
     }
+
 }
