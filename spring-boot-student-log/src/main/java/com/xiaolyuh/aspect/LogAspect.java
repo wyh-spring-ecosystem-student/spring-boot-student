@@ -1,70 +1,103 @@
 package com.xiaolyuh.aspect;
 
-
 import com.alibaba.fastjson.JSON;
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Maps;
 import com.xiaolyuh.annotation.Log;
-import com.xiaolyuh.annotation.LogMask;
+import com.xiaolyuh.annotation.LogIgnore;
 import com.xiaolyuh.annotation.LogTypeEnum;
+import com.xiaolyuh.core.TrackLoggerFactory;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.util.ReflectionUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
+ * 日志输出切面
+ *
  * @author yuhao.wang
  */
 @Aspect
-@Component
 public class LogAspect {
-    private static final Logger logger = LoggerFactory.getLogger(LogAspect.class);
+    private static final Logger logger = TrackLoggerFactory.getLogger(LogAspect.class);
 
-    @Pointcut("@annotation(com.xiaolyuh.annotation.Log)")
-    public void pointcut() {
+    private Map<String, String> prefixMap = Maps.newConcurrentMap();
+
+    @Pointcut("@within(com.xiaolyuh.annotation.Log)")
+    public void pointcutWithin() {
     }
 
-    @Around("pointcut()")
-    public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
-        Method method = this.getSpecificmethod(joinPoint);
-        // 获取sessionId
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+    @Pointcut("@annotation(com.xiaolyuh.annotation.Log)")
+    public void pointcutAnnotation() {
+    }
 
+    @Around("pointcutWithin() || pointcutAnnotation()")
+    public Object log(ProceedingJoinPoint joinPoint) throws Throwable {
+        Stopwatch stopwatch = Stopwatch.createStarted();
+        Method method = getSpecificmethod(joinPoint);
         // 获取注解
-        Log log = this.getMethodAnnotations(method, Log.class);
+        Log log = AnnotationUtils.findAnnotation(method, Log.class);
         if (Objects.isNull(log)) {
             log = AnnotationUtils.findAnnotation(joinPoint.getTarget().getClass(), Log.class);
         }
         // 获取日志输出前缀
-        String prefix = getPrefix(log, method, requestAttributes.getSessionId());
+        String prefix = getPrefix(log, method);
 
         // 执行方法前输出日志
         logBefore(log, prefix, method, joinPoint.getArgs());
-        // 执行方法，并获取返回值
-        Object result = joinPoint.proceed();
+        Object result = null;
+        try {
+            // 执行方法，并获取返回值
+            result = joinPoint.proceed();
+        } catch (Throwable throwable) {
+            if (throwable.getClass().getSimpleName().toUpperCase().startsWith("ETC")) {
+                Field errorCode = ReflectionUtils.findField(throwable.getClass(), "errorCode");
+                Field errorMsg = ReflectionUtils.findField(throwable.getClass(), "errorMsg");
+                if (Objects.nonNull(errorCode) && Objects.nonNull(errorMsg)) {
+                    ReflectionUtils.makeAccessible(errorCode);
+                    ReflectionUtils.makeAccessible(errorMsg);
+                    logger.warn("异常【{}】 {}", prefix, ReflectionUtils.getField(errorMsg, throwable).toString(), throwable);
 
-        // 执行方法后输出日志
-        logAfter(log, prefix, result);
+                    result = getResult(method, ReflectionUtils.getField(errorCode, throwable).toString(), ReflectionUtils.getField(errorMsg, throwable).toString());
+                }
+            }
+
+            if (Objects.isNull(result)) {
+                logger.error("异常【{}】 {}", prefix, throwable.getMessage(), throwable);
+                result = getResult(method, "22159999", "系统异常");
+            }
+        } finally {
+            // 执行方法后输出日志
+            logAfter(log, prefix, result, stopwatch);
+        }
+
+        return result;
+    }
+
+    private Object getResult(Method method, String errorCode, String errorMsg) throws IllegalAccessException, InstantiationException {
+        Object result = method.getReturnType().newInstance();
+        // TODO
         return result;
     }
 
@@ -84,24 +117,21 @@ public class LogAspect {
             Annotation[][] parameterAnnotations = method.getParameterAnnotations();
 
             for (int i = 0; i < parameterAnnotations.length; i++) {
-                Annotation[] parameterAnnotation = parameterAnnotations[i];
-                // 找到参数上面的注解，并根据注解获取脱敏的类型
-                LogMask logMask = getLogMask(parameterAnnotation);
-                String paramName = "args" + (i + 1);
-                if (logMask != null) {
-                    paramName = StringUtils.isEmpty(logMask.paramName()) ? paramName : logMask.paramName();
+                if (isLogIgnore(parameterAnnotations[i])) {
+                    continue;
                 }
-
+                String paramName = "args" + (i + 1);
                 // 忽略这些类型参数的输出
                 if (args[i] instanceof ServletResponse || args[i] instanceof ServletRequest
-                        || args[i] instanceof HttpSession || args[i] instanceof Model) {
+                        || args[i] instanceof HttpSession || args[i] instanceof Model
+                        || args[i] instanceof MultipartFile) {
 
-                    break;
+                    continue;
                 }
 
                 paramMap.put(paramName, args[i]);
             }
-            logger.info("【请求参数 {}】：{}", prefix, JSON.toJSON(paramMap));
+            logger.info("【请求参数 {}】：{}", prefix, JSON.toJSONString(paramMap));
         }
     }
 
@@ -112,57 +142,55 @@ public class LogAspect {
      * @param prefix 输出前缀
      * @param result 方法执行结果
      */
-    private void logAfter(Log log, String prefix, Object result) {
+    private void logAfter(Log log, String prefix, Object result, Stopwatch stopwatch) {
         // 判断是否是方法之前输出日志，不是就输出参数日志
         if (!LogTypeEnum.PARAMETER.equals(log.value())) {
-            logger.info("【返回参数 {}】：{}", prefix, JSON.toJSON(result));
+            logger.info("【返回参数 {} 】：{} ，耗时:{} 毫秒", prefix, JSON.toJSONString(result), stopwatch.elapsed(TimeUnit.MILLISECONDS));
         }
     }
 
     /**
      * 获取日志前缀对象
      *
-     * @param log       日志注解对象
-     * @param method    注解日志的方法对象
-     * @param sessionId
+     * @param log    日志注解对象
+     * @param method 注解日志的方法对象
      * @return
      */
-    private String getPrefix(Log log, Method method, String sessionId) {
-        // 日志格式：流水号 + 注解的日志前缀 + 方法的全类名
-        StringBuilder sb = new StringBuilder();
-        sb.append(log.prefix());
-        sb.append(":");
-        sb.append(method.getDeclaringClass().getName());
-        sb.append(".");
-        sb.append(method.getName());
-        sb.append("() ");
+    private String getPrefix(Log log, Method method) {
+        return prefixMap.computeIfAbsent(method.getDeclaringClass().getName() + "." + method.getName(), s -> {
+            // 获取类注解
+            RequestMapping classRequestMapping = AnnotationUtils.findAnnotation(method.getDeclaringClass(), RequestMapping.class);
+            // 获取方法注解
+            RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
 
-        return sb.toString();
-    }
+            // 日志格式：流水号 + 注解的日志前缀 + 请求地址 + 方法的全类名
+            StringBuilder sb = new StringBuilder();
+            sb.append(log.prefix());
+            sb.append(" ");
 
-    /**
-     * 获取参数上的LogMask注解
-     *
-     * @param parameterAnnotation
-     * @return
-     */
-    private LogMask getLogMask(Annotation[] parameterAnnotation) {
-        for (Annotation annotation : parameterAnnotation) {
-            // 检查参数是否需要脱敏
-            if (annotation instanceof LogMask) {
-                return (LogMask) annotation;
+            sb.append("/");
+            if (Objects.nonNull(classRequestMapping) && classRequestMapping.value().length > 0) {
+                sb.append(classRequestMapping.value()[0]);
+                sb.append("/");
             }
-        }
-        return null;
+            if (Objects.nonNull(methodRequestMapping) && methodRequestMapping.value().length > 0) {
+                sb.append(methodRequestMapping.value()[0]);
+            }
+
+            sb.append(" ");
+            sb.append(":");
+            sb.append(method.getDeclaringClass().getName());
+            sb.append(".");
+            sb.append(method.getName());
+            sb.append("() ");
+
+            return sb.toString().replace("///", "/").replace("//", "/");
+        });
+
+
     }
 
-    private <T extends Annotation> T getMethodAnnotations(AnnotatedElement ae, Class<T> annotationType) {
-        // look for raw annotation
-        T ann = ae.getAnnotation(annotationType);
-        return ann;
-    }
-
-    private Method getSpecificmethod(ProceedingJoinPoint pjp) {
+    public static Method getSpecificmethod(ProceedingJoinPoint pjp) {
         MethodSignature methodSignature = (MethodSignature) pjp.getSignature();
         Method method = methodSignature.getMethod();
         // The method may be on an interface, but we need attributes from the
@@ -179,4 +207,19 @@ public class LogAspect {
         return specificMethod;
     }
 
+    /**
+     * 获取参数上的LogIgnore注解
+     *
+     * @param parameterAnnotation
+     * @return
+     */
+    private boolean isLogIgnore(Annotation[] parameterAnnotation) {
+        for (Annotation annotation : parameterAnnotation) {
+            // 检查参数是否需要脱敏
+            if (annotation instanceof LogIgnore) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
