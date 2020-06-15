@@ -1,144 +1,146 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.xiaolyuh</groupId>
-	<artifactId>spring-boot-student</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>pom</packaging>
-	<name>spring-boot-student</name>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.xiaolyuh</groupId>
+    <artifactId>spring-boot-student</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>spring-boot-student</name>
 
-	<!-- 添加Spring Boot的父类依赖，这样当前项目就是Spring Boot项目了。 spring-boot-starter-parent是一个特殊的starter，他用来 
-		提供相关的maven默认依赖， 使用它之后，常用的依赖可以省去version标签 -->
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.13.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
-	</parent>
+    <!-- 添加Spring Boot的父类依赖，这样当前项目就是Spring Boot项目了。 spring-boot-starter-parent是一个特殊的starter，他用来
+        提供相关的maven默认依赖， 使用它之后，常用的依赖可以省去version标签 -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>1.5.13.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-	<repositories>
-		<repository>
-			<id>alimaven</id>
-			<name>aliyun maven</name>
-			<url>http://maven.aliyun.com/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
+    <repositories>
+        <repository>
+            <id>alimaven</id>
+            <name>aliyun maven</name>
+            <url>http://maven.aliyun.com/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+    </properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-		</dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
 
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.8</source>
-					<target>1.8</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-	<modules>
-		<!-- 设置Spring Boot启动Banner -->
-		<module>spring-boot-student-banner</module>
-		<!-- Spring Boot 读取配置文件 -->
-		<module>spring-boot-student-config</module>
-		<!-- Spring Boot启Banner 日志配置 -->
-		<module>spring-boot-student-log</module>
-		<!-- Spring Boot profile配置 -->
-		<module>spring-boot-student-profile</module>
-		<!-- Spring Boot 使用data-jpa操作数据库 -->
-		<module>spring-boot-student-data-jpa</module>
-		<!-- Spring Boot 使用Mybatis操作数据库 -->
-		<module>spring-boot-student-mybatis</module>
-		<!-- Spring Boot 使用ehcache作为Mybatis的二级缓存 -->
-		<module>spring-boot-student-mybatis-ehcache</module>
-		<!-- Spring Boot 使用redis作为Mybatis的二级缓存 -->
-		<module>spring-boot-student-mybatis-redis</module>
-		<!-- Spring Boot 使用druid连接池连接数据库（自己定制） -->
-		<module>spring-boot-student-mybatis-druid</module>
-		<!-- Spring Boot JAVA中常用的加密算法 -->
-		<module>spring-boot-student-encode</module>
-		<!-- Spring Boot 使用druid连接池连接数据库（官方start） -->
-		<module>spring-boot-student-mybatis-druid-2</module>
-		<!-- Spring Boot Spring事务管理 -->
-		<module>spring-boot-student-data-jpa-transaction</module>
-		<!-- Spring Boot Spring 缓存 -->
-		<module>spring-boot-student-cache</module>
-		<!-- Spring Boot 使用 ehcache作为 Spring 缓存 -->
-		<module>spring-boot-student-cache-ehcache</module>
-		<!-- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存） -->
-		<module>spring-boot-student-cache-redis</module>
-		<!-- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存2） -->
-		<module>spring-boot-student-cache-redis-2</module>
-		<!-- Spring Boot 使用 caffeine作为 Spring 缓存 -->
-		<module>spring-boot-student-cache-caffeine</module>
-		<!-- 基于redis + caffeine实现的多级缓存 -->
-		<module>spring-boot-student-cache-redis-caffeine</module>	
-		<!-- Spring Boot 使用Spring data mongo 操作mongodb数据库 -->
-		<module>spring-boot-student-data-mongo</module>
-		<!-- Spring Boot 使用Spring data redis 操作redis数据库 -->
-		<module>spring-boot-student-data-redis</module>
-		<!-- 基于redis实现的分布式锁 -->
-		<module>spring-boot-student-data-redis-distributed-lock</module>		
-		<!-- drools规则引擎入门 -->
-		<module>spring-boot-student-drools</module>	
-		<!-- 基于redis实现的扣减库存 -->
-		<module>spring-boot-student-stock-redis</module>
-		<!-- Spring Boot RabbitMQ 实践 -->
-		<module>spring-boot-student-rabbitmq</module>
-		<!-- Spring Boot 监控 -->
-		<module>spring-boot-student-monitor</module>		
-		<!-- Spring Boot 参数校验 -->
-		<module>spring-boot-student-validated</module>
-		<!-- Spring Boot guava-retrying 重试机制 -->
-		<module>spring-boot-student-guava-retrying</module>
-		<!-- Spring Boot spring-retry 重试机制 -->
-		<module>spring-boot-student-spring-retry</module>
-		<!-- Spring Boot 多级缓存测试 -->
-		<module>spring-boot-student-layering-cache</module>
-		<!-- Spring Boot hystrix -->
-		<module>spring-boot-student-hystrix</module>
-		<!-- Spring Boot CompletableFuture -->
-		<module>spring-boot-student-completable-future</module>
-		<!-- mybatis-plus  -->
-		<module>spring-boot-student-mybatis-plus</module>
-		<!-- 并发编程  -->
-		<module>spring-boot-student-concurrent</module>	
-		<!-- Spring  -->
-		<module>spring-boot-student-spring</module>
-		<!-- okhttp  -->
-		<module>spring-boot-student-okhttp</module>
-		<!-- jvm 测试类  -->
-		<module>spring-boot-student-jvm</module>
+    <modules>
+        <!-- 设置Spring Boot启动Banner -->
+        <module>spring-boot-student-banner</module>
+        <!-- Spring Boot 读取配置文件 -->
+        <module>spring-boot-student-config</module>
+        <!-- Spring Boot启Banner 日志配置 -->
+        <module>spring-boot-student-log</module>
+        <!-- Spring Boot profile配置 -->
+        <module>spring-boot-student-profile</module>
+        <!-- Spring Boot 使用data-jpa操作数据库 -->
+        <module>spring-boot-student-data-jpa</module>
+        <!-- Spring Boot 使用Mybatis操作数据库 -->
+        <module>spring-boot-student-mybatis</module>
+        <!-- Spring Boot 使用ehcache作为Mybatis的二级缓存 -->
+        <module>spring-boot-student-mybatis-ehcache</module>
+        <!-- Spring Boot 使用redis作为Mybatis的二级缓存 -->
+        <module>spring-boot-student-mybatis-redis</module>
+        <!-- Spring Boot 使用druid连接池连接数据库（自己定制） -->
+        <module>spring-boot-student-mybatis-druid</module>
+        <!-- Spring Boot JAVA中常用的加密算法 -->
+        <module>spring-boot-student-encode</module>
+        <!-- Spring Boot 使用druid连接池连接数据库（官方start） -->
+        <module>spring-boot-student-mybatis-druid-2</module>
+        <!-- Spring Boot Spring事务管理 -->
+        <module>spring-boot-student-data-jpa-transaction</module>
+        <!-- Spring Boot Spring 缓存 -->
+        <module>spring-boot-student-cache</module>
+        <!-- Spring Boot 使用 ehcache作为 Spring 缓存 -->
+        <module>spring-boot-student-cache-ehcache</module>
+        <!-- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存） -->
+        <module>spring-boot-student-cache-redis</module>
+        <!-- Spring Boot 使用 redis作为 Spring 缓存（自动刷新缓存2） -->
+        <module>spring-boot-student-cache-redis-2</module>
+        <!-- Spring Boot 使用 caffeine作为 Spring 缓存 -->
+        <module>spring-boot-student-cache-caffeine</module>
+        <!-- 基于redis + caffeine实现的多级缓存 -->
+        <module>spring-boot-student-cache-redis-caffeine</module>
+        <!-- Spring Boot 使用Spring data mongo 操作mongodb数据库 -->
+        <module>spring-boot-student-data-mongo</module>
+        <!-- Spring Boot 使用Spring data redis 操作redis数据库 -->
+        <module>spring-boot-student-data-redis</module>
+        <!-- 基于redis实现的分布式锁 -->
+        <module>spring-boot-student-data-redis-distributed-lock</module>
+        <!-- drools规则引擎入门 -->
+        <module>spring-boot-student-drools</module>
+        <!-- 基于redis实现的扣减库存 -->
+        <module>spring-boot-student-stock-redis</module>
+        <!-- Spring Boot RabbitMQ 实践 -->
+        <module>spring-boot-student-rabbitmq</module>
+        <!-- Spring Boot 监控 -->
+        <module>spring-boot-student-monitor</module>
+        <!-- Spring Boot 参数校验 -->
+        <module>spring-boot-student-validated</module>
+        <!-- Spring Boot guava-retrying 重试机制 -->
+        <module>spring-boot-student-guava-retrying</module>
+        <!-- Spring Boot spring-retry 重试机制 -->
+        <module>spring-boot-student-spring-retry</module>
+        <!-- Spring Boot 多级缓存测试 -->
+        <module>spring-boot-student-layering-cache</module>
+        <!-- Spring Boot hystrix -->
+        <module>spring-boot-student-hystrix</module>
+        <!-- Spring Boot CompletableFuture -->
+        <module>spring-boot-student-completable-future</module>
+        <!-- mybatis-plus  -->
+        <module>spring-boot-student-mybatis-plus</module>
+        <!-- 并发编程  -->
+        <module>spring-boot-student-concurrent</module>
+        <!-- Spring  -->
+        <module>spring-boot-student-spring</module>
+        <!-- okhttp  -->
+        <module>spring-boot-student-okhttp</module>
+        <!-- jvm 测试类  -->
+        <module>spring-boot-student-jvm</module>
+        <!-- netty 网络编程模块  -->
+        <module>spring-boot-student-netty</module>
     </modules>
 
 </project>

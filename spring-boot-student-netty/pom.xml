@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>spring-boot-student-banner</artifactId>
+	<artifactId>spring-boot-student-netty</artifactId>
 	<packaging>jar</packaging>
 
-	<name>spring-boot-student-banner</name>
-	<description>定制Banner</description>
+	<name>spring-boot-student-netty</name>
+	<description>Netty 网络编程模块</description>
 
 	<parent>
 		<groupId>com.xiaolyuh</groupId>
@@ -20,6 +20,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
+
 	</dependencies>
 
 </project>

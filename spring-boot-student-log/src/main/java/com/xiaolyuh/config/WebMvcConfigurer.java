@@ -1,6 +1,6 @@
 package com.xiaolyuh.config;
 
-import com.xiaolyuh.interceptors.LogInterceptor;
+import com.xiaolyuh.interceptors.TrackInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,7 +22,7 @@ public class WebMvcConfigurer extends WebMvcConfigurerAdapter {
      */
     @Bean
     public HandlerInterceptor logInterceptor() {
-        return new LogInterceptor();
+        return new TrackInterceptor();
     }
 
     /**

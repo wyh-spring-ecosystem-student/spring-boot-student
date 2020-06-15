@@ -1,6 +1,6 @@
 package com.xiaolyuh.core;
 
-import com.wlqq.etc.common.log.constants.MdcConstant;
+import com.xiaolyuh.constants.MdcConstant;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.spi.LocationAwareLogger;
