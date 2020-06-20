@@ -29,14 +29,13 @@ public abstract class RedisHelper {
      */
     public static Set<String> scan(RedisTemplate<String, Object> redisTemplate, String pattern) throws NoSuchFieldException {
 
-        RedisConnection redisConnection = redisTemplate.getConnectionFactory().getConnection();
-        if (redisConnection instanceof RedisClusterConnection) {
-            //集群模式
-            return redisTemplate.keys(pattern);
-        }
-
-        // 单机模式
         return redisTemplate.execute((RedisCallback<Set<String>>) connection -> {
+            if (connection instanceof RedisClusterConnection) {
+                //集群模式
+                return redisTemplate.keys(pattern);
+            }
+
+            // 单机模式
             Set<String> keysTmp = new HashSet<>();
             try (Cursor<byte[]> cursor = connection.scan(new ScanOptions.ScanOptionsBuilder()
                     .match(pattern)
@@ -46,7 +45,6 @@ public abstract class RedisHelper {
                     keysTmp.add(new String(cursor.next(), "Utf-8"));
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
                 throw new RuntimeException(e);
             }
             return keysTmp;
