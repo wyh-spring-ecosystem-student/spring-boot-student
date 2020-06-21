@@ -9,6 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * @author olafwang
@@ -24,7 +26,8 @@ public class SocketServer {
                 //使用accept()阻塞等待客户请求，有客户, 请求到来则产生一个Socket对象，并继续执行
                 Socket socket = server.accept();
 
-                new Thread(() -> {
+                ExecutorService executor = Executors.newFixedThreadPool(10);
+                executor.submit(() -> {
                     try (//由Socket对象得到输入流，并构造相应的BufferedReader对象
                          BufferedReader is = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                          //由Socket对象得到输出流，并构造PrintWriter对象
@@ -43,10 +46,10 @@ public class SocketServer {
                         }
                         // 关闭连接
                         socket.close();
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
-                }).start();
+                });
             }
         } catch (Exception e) {
             logger.error(e.getMessage(), e);
