@@ -34,7 +34,7 @@ public class SocketServer {
                          PrintWriter os = new PrintWriter(socket.getOutputStream());) {
 
                         String line = is.readLine();
-                        while (!"bye".equals(line)) {
+                        while (!"bye".equals(line) && line != null) {
                             //在标准输出上打印从客户端读入的字符串
                             System.out.println(Thread.currentThread().getName() + " 收到客户端信息:" + line);
 
