@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 public class AioServerRunnable implements Runnable {
 
     private AsynchronousServerSocketChannel socketChannel;
-    private CountDownLatch latch = new CountDownLatch(1);
+    private CountDownLatch latch;
 
     public AioServerRunnable(AsynchronousServerSocketChannel socketChannel) {
         this.socketChannel = socketChannel;
@@ -18,6 +18,7 @@ public class AioServerRunnable implements Runnable {
 
     @Override
     public void run() {
+        latch = new CountDownLatch(1);
         //用于接收客户端的连接，异步操作，
         // 需要实现了CompletionHandler接口的处理器处理和客户端的连接操作
         socketChannel.accept(this, new AioAcceptHandler());

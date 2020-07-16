@@ -96,6 +96,10 @@ public class AioReadHandler implements CompletionHandler<Integer, ByteBuffer> {
 
     @Override
     public void failed(Throwable exc, ByteBuffer attachment) {
-
+        try {
+            this.channel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
