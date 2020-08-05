@@ -49,6 +49,7 @@ public class PersonServiceImpl implements PersonService {
         return Result.success(person);
     }
 
+    // com.netflix.hystrix.HystrixCommandProperties  查看所有配置
     @HystrixCommand(groupKey = "hystrixThreadTestGroupKey", commandKey = "hystrixThreadTestCommandKey",
             fallbackMethod = "fallbackMethodThread",
             commandProperties = {
@@ -63,17 +64,17 @@ public class PersonServiceImpl implements PersonService {
                     @HystrixProperty(name = "execution.isolation.strategy", value = "THREAD"),
                     // 如果并发数达到该设置值，请求会被拒绝和抛出异常并且fallback不会被调用。默认10
                     @HystrixProperty(name = "fallback.isolation.semaphore.maxConcurrentRequests", value = "100"),
-                    //设置rolling percentile window的时间，默认60000
-                    @HystrixProperty(name = "metrics.rollingPercentile.timeInMilliseconds", value = "600000")
+                    // 统计错误率的一个滑动窗口的时间，默认10000ms， 10秒
+                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "10000"),
+                    // 生成统计数据时滑动窗口拆分的桶数，metrics.rollingStats.timeInMilliseconds % metrics .rollingStats.numBuckets 必须为0
+                    @HystrixProperty(name = "metrics.rollingStats.numBuckets", value = "5")
             },
+            // HystrixThreadPoolProperties
             threadPoolProperties = {
                     @HystrixProperty(name = "coreSize", value = "10"),
                     @HystrixProperty(name = "maxQueueSize", value = "100"),
-                    @HystrixProperty(name = "keepAliveTimeMinutes", value = "2"),
-                    @HystrixProperty(name = "metrics.rollingStats.numBuckets", value = "12"),
-                    @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "1440")
+                    @HystrixProperty(name = "keepAliveTimeMinutes", value = "2")
             }
-
     )
     @Override
     public Result thread(String arg) {
