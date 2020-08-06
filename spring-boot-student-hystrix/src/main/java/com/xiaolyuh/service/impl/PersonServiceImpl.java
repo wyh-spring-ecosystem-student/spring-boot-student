@@ -71,9 +71,10 @@ public class PersonServiceImpl implements PersonService {
             },
             // HystrixThreadPoolProperties
             threadPoolProperties = {
-                    @HystrixProperty(name = "coreSize", value = "10"),
-                    @HystrixProperty(name = "maxQueueSize", value = "100"),
-                    @HystrixProperty(name = "keepAliveTimeMinutes", value = "2")
+                    @HystrixProperty(name = "coreSize", value = "100"),
+                    @HystrixProperty(name = "maxQueueSize", value = "1000"),
+                    @HystrixProperty(name = "queueSizeRejectionThreshold", value = "800"),
+                    @HystrixProperty(name = "keepAliveTimeMinutes", value = "1")
             }
     )
     @Override
