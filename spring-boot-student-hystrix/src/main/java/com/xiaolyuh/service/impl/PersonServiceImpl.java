@@ -1,6 +1,8 @@
 package com.xiaolyuh.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.netflix.hystrix.HystrixCircuitBreaker;
+import com.netflix.hystrix.HystrixCommandKey;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import com.xiaolyuh.entity.Person;
@@ -90,12 +92,18 @@ public class PersonServiceImpl implements PersonService {
     }
 
     public Result fallbackMethodSemaphore(String arg, Throwable throwable) {
-        logger.info("熔断降级");
-        return Result.error("熔断降级");
+        // 获取断路器状态
+        HystrixCircuitBreaker circuitBreaker = HystrixCircuitBreaker.Factory.getInstance(
+                HystrixCommandKey.Factory.asKey("hystrixThreadTestCommandKey"));
+        logger.info("熔断降级 Circuit is open {}", !circuitBreaker.allowRequest());
+        return Result.error(String.format("熔断降级 Circuit is open %s", !circuitBreaker.allowRequest()));
     }
 
     public Result fallbackMethodThread(String arg) {
-        logger.info("熔断降级");
-        return Result.error("熔断降级");
+        // 获取断路器状态
+        HystrixCircuitBreaker circuitBreaker = HystrixCircuitBreaker.Factory.getInstance(
+                HystrixCommandKey.Factory.asKey("hystrixThreadTestCommandKey"));
+        logger.info("熔断降级 Circuit is open {}", !circuitBreaker.allowRequest());
+        return Result.error(String.format("熔断降级 Circuit is open %s", !circuitBreaker.allowRequest()));
     }
 }
