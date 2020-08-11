@@ -3,6 +3,7 @@ package com.xiaolyuh.service.impl;
 import com.alibaba.csp.sentinel.Entry;
 import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
+import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
 import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
@@ -48,7 +49,7 @@ public class PersonServiceImpl implements PersonService {
         try {
             entry = SphU.entry(resourceName, EntryType.IN);
             Thread.sleep(time);
-            if (time > 100) {
+            if (time > 690) {
                 throw new RuntimeException("耗时太长啦");
             }
 
@@ -58,6 +59,8 @@ public class PersonServiceImpl implements PersonService {
             retVal = "blocked";
         } catch (Exception e) {
 //            logger.error("异常 {}", e.getMessage(), e);
+            // 异常数统计埋点
+            Tracer.trace(e);
             throw new RuntimeException(e);
         } finally {
             if (entry != null) {
