@@ -141,6 +141,8 @@
         <module>spring-boot-student-jvm</module>
         <!-- netty 网络编程模块  -->
         <module>spring-boot-student-netty</module>
+        <!-- netty 网络编程模块  -->
+        <module>spring-boot-student-sentinel</module>
     </modules>
 
 </project>
