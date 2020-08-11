@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InMemDegradeRuleStore extends InMemoryRuleRepositoryAdapter<DegradeRuleEntity> {
 
-    private static AtomicLong ids = new AtomicLong(0);
+    private static AtomicLong ids = new AtomicLong(System.currentTimeMillis());
 
     @Override
     protected long nextId() {

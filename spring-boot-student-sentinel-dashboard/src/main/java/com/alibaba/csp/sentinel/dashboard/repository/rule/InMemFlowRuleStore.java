@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class InMemFlowRuleStore extends InMemoryRuleRepositoryAdapter<FlowRuleEntity> {
 
-    private static AtomicLong ids = new AtomicLong(0);
+    private static AtomicLong ids = new AtomicLong(System.currentTimeMillis());
 
     @Override
     protected long nextId() {

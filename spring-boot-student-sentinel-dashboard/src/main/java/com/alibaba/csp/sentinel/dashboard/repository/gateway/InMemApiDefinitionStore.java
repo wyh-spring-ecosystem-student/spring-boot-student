@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Component
 public class InMemApiDefinitionStore extends InMemoryRuleRepositoryAdapter<ApiDefinitionEntity> {
 
-    private static AtomicLong ids = new AtomicLong(0);
+    private static AtomicLong ids = new AtomicLong(System.currentTimeMillis());
 
     @Override
     protected long nextId() {
