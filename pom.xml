@@ -141,8 +141,10 @@
         <module>spring-boot-student-jvm</module>
         <!-- netty 网络编程模块  -->
         <module>spring-boot-student-netty</module>
-        <!-- netty 网络编程模块  -->
+        <!--Alibaba Sentinel 使用ZooKeeper集中管理和推送规则  -->
         <module>spring-boot-student-sentinel</module>
+        <!-- Alibaba Sentinel 使用ZooKeeper集中管理和推送规则  -->
+        <module>spring-boot-student-sentinel-dashboard</module>
     </modules>
 
 </project>
