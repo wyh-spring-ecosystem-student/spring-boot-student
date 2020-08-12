@@ -5,7 +5,6 @@ import com.alibaba.csp.sentinel.EntryType;
 import com.alibaba.csp.sentinel.SphU;
 import com.alibaba.csp.sentinel.Tracer;
 import com.alibaba.csp.sentinel.annotation.SentinelResource;
-import com.alibaba.csp.sentinel.context.ContextUtil;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.xiaolyuh.entity.Person;
@@ -43,7 +42,6 @@ public class PersonServiceImpl implements PersonService {
     public Result thread(String arg) {
         String resourceName = "testSentinel";
         int time = random.nextInt(700);
-        ContextUtil.enter("entrance1", "appA");
         Entry entry = null;
         String retVal;
         try {
