@@ -40,6 +40,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Result thread(String arg) {
+        // 资源的唯一标识
         String resourceName = "testSentinel";
         int time = random.nextInt(700);
         Entry entry = null;
