@@ -20,10 +20,13 @@ import org.springframework.ui.Model;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -158,23 +161,15 @@ public class LogAspect {
      */
     private String getPrefix(Log log, Method method) {
         return prefixMap.computeIfAbsent(method.getDeclaringClass().getName() + "." + method.getName(), s -> {
-            // 获取类注解
-            RequestMapping classRequestMapping = AnnotationUtils.findAnnotation(method.getDeclaringClass(), RequestMapping.class);
-            // 获取方法注解
-            RequestMapping methodRequestMapping = AnnotationUtils.findAnnotation(method, RequestMapping.class);
-
             // 日志格式：流水号 + 注解的日志前缀 + 请求地址 + 方法的全类名
             StringBuilder sb = new StringBuilder();
             sb.append(log.prefix());
             sb.append(" ");
 
             sb.append("/");
-            if (Objects.nonNull(classRequestMapping) && classRequestMapping.value().length > 0) {
-                sb.append(classRequestMapping.value()[0]);
-                sb.append("/");
-            }
-            if (Objects.nonNull(methodRequestMapping) && methodRequestMapping.value().length > 0) {
-                sb.append(methodRequestMapping.value()[0]);
+            if (Objects.nonNull(RequestContextHolder.getRequestAttributes())) {
+                HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                sb.append(request.getRequestURI());
             }
 
             sb.append(" ");
