@@ -3,6 +3,12 @@ layering-cache是一个支持分布式环境的多级缓存框架，使用方式
 
 [https://github.com/xiaolyuh/layering-cache](https://github.com/xiaolyuh/layering-cache)
 
+# 作者信息
+- 作者博客：https://xiaolyuh.blog.csdn.net/
+
+- 作者邮箱： xiaolyuh@163.com
+
+- github 地址：https://github.com/xiaolyuh/layering-cache
 
 # 捐赠
 项目的发展离不开你的支持，请作者喝杯咖啡吧！
