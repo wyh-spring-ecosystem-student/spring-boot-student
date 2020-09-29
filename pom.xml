@@ -145,6 +145,8 @@
         <module>spring-boot-student-sentinel</module>
         <!-- Alibaba Sentinel 使用ZooKeeper集中管理和推送规则  -->
         <module>spring-boot-student-sentinel-dashboard</module>
+        <!-- 原生 Kafka  -->
+        <module>spring-boot-student-kafka</module>
     </modules>
 
 </project>
