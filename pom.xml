@@ -147,6 +147,8 @@
         <module>spring-boot-student-sentinel-dashboard</module>
         <!-- 原生 Kafka  -->
         <module>spring-boot-student-kafka</module>
+        <!-- 文件导出  -->
+        <module>spring-boot-student-export</module>
     </modules>
 
 </project>
