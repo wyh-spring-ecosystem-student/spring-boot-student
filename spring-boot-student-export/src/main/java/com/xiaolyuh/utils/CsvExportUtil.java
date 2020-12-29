@@ -39,7 +39,7 @@ public class CsvExportUtil {
             for (List<Object> data : dataList) {
                 for (int i = 0; i < data.size(); i++) {
                     buf.append(data.get(i));
-                    if (i < titles.size() - 1) {
+                    if (i < data.size() - 1) {
                         buf.append(CSV_TAB).append(CSV_COLUMN_SEPARATOR);
                     }
                 }

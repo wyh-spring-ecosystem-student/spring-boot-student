@@ -65,5 +65,6 @@ public class ExprotController {
         OutputStream os = response.getOutputStream();
         CsvExportUtil.responseSetProperties(fileName, response);
         CsvExportUtil.doExportByList(dataList, titles, os);
+        CsvExportUtil.doExportByList(dataList, null, os);
     }
 }
