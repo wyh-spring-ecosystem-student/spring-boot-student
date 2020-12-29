@@ -23,7 +23,7 @@ public class CsvExportUtil {
     private static final String CSV_TAB = "\t";
 
     public static void doExportByList(List<List<Object>> dataList, List<String> titles, OutputStream os) throws IOException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         if (CollectionUtils.isNotEmpty(titles)) {
             for (int i = 0; i < titles.size(); i++) {
                 String title = titles.get(i);
