@@ -17,8 +17,8 @@ import java.util.List;
  *
  * @author olafwang
  */
-public class ExcelUtils {
-    private static Logger log = LoggerFactory.getLogger(ExcelUtils.class);
+public class ExcelExportUtils {
+    private static Logger log = LoggerFactory.getLogger(ExcelExportUtils.class);
 
     /**
      * 导出Excel
