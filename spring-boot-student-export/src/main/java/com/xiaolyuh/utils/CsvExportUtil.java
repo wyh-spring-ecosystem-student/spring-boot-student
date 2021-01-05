@@ -58,6 +58,7 @@ public class CsvExportUtil {
         response.setCharacterEncoding(utf);
         response.setHeader("Pragma", "public");
         response.setHeader("Cache-Control", "max-age=30");
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         response.setHeader("Content-Disposition", "attachment; filename=" + URLEncoder.encode(fn, utf));
         response.setHeader(HttpHeaders.TRANSFER_ENCODING, "chunked");
         response.setContentType("application/vnd.ms-excel;charset=UTF-8");

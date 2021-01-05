@@ -31,6 +31,7 @@ public class ExcelExportUtils {
     public final static void exportExcel(String fileName, String[] headers, List<String[]> contents, HttpServletResponse response) {
         // 定义输出类型
         response.setContentType("application/msexcel;charset=utf-8");
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition");
         response.setHeader("Content-Disposition", "attachment; filename=" + fileName + ".xls");
         WritableWorkbook workbook = null;
         try {
