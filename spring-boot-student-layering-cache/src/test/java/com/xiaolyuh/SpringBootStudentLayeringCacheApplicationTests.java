@@ -47,7 +47,7 @@ public class SpringBootStudentLayeringCacheApplicationTests {
 
     @Test
     public void testAble() throws Exception {
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             MvcResult result = mockMvc.perform(post("/able").param("id", "2"))
                     .andExpect(status().isOk())// 模拟向testRest发送get请求
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))// 预期返回值的媒体类型text/plain;
