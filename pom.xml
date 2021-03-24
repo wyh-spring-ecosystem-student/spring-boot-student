@@ -151,6 +151,8 @@
         <module>spring-boot-student-export</module>
         <!-- swagger  -->
         <module>spring-boot-student-swagger</module>
+        <!-- rocketmq  -->
+        <module>spring-boot-student-rocketmq</module>
     </modules>
 
 </project>
