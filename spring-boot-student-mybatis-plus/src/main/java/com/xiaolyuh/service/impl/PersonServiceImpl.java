@@ -25,6 +25,15 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public List<Person> findAll() {
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
+        personMapper.findAll();
         return personMapper.findAll();
     }
 
