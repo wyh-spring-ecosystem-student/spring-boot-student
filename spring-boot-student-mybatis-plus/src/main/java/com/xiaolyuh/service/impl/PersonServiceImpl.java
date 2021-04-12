@@ -54,9 +54,7 @@ public class PersonServiceImpl implements PersonService {
     public int updateAge(long id) {
         int result = personMapper.updateAge(id);
         int i = atomicInteger.getAndIncrement();
-        if (i > 990) {
-            System.out.println(i);
-        }
+        System.out.println(i);
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
