@@ -58,7 +58,7 @@ public class PersonServiceImpl implements PersonService {
                     //指定多久超时，单位毫秒。超时进fallback
                     @HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "500"),
                     //判断熔断的最少请求数，默认是10；只有在一个统计窗口内处理的请求数量达到这个阈值，才会进行熔断与否的判断
-                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "10"),
+                    @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "5"),
                     //判断熔断的阈值，默认值50，表示在一个统计窗口内有50%的请求处理失败，会触发熔断
                     @HystrixProperty(name = "circuitBreaker.errorThresholdPercentage", value = "50"),
                     //熔断多少毫秒后开始尝试请求 默认5000ms

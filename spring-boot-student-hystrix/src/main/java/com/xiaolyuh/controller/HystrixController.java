@@ -25,7 +25,7 @@ public class HystrixController {
 
     @RequestMapping("/thread")
     public Result thread() {
-        return personService.thread("");
+        return personService.thread("测试");
     }
 
 }
