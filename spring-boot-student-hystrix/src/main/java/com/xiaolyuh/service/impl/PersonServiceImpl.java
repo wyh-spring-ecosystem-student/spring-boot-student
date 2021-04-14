@@ -84,7 +84,7 @@ public class PersonServiceImpl implements PersonService {
         redisTemplate.opsForValue().get("thread");
         Person person = new Person();
         person.setAge(18);
-        person.setId(2L);
+        person.setId(3L);
         person.setName("名称thread-1");
         person.setAddress("地址thread-1");
         logger.info(JSON.toJSONString(person));
