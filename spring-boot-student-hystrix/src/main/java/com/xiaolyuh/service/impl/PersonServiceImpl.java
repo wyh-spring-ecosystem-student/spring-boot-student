@@ -85,8 +85,8 @@ public class PersonServiceImpl implements PersonService {
         Person person = new Person();
         person.setAge(18);
         person.setId(2L);
-        person.setName("名称thread");
-        person.setAddress("地址thread");
+        person.setName("名称thread-1");
+        person.setAddress("地址thread-1");
         logger.info(JSON.toJSONString(person));
         return Result.success(person);
     }
