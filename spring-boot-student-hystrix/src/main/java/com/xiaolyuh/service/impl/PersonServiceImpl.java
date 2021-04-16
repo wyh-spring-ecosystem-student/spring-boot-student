@@ -81,12 +81,21 @@ public class PersonServiceImpl implements PersonService {
     )
     @Override
     public Result thread(String arg) {
+        redisTemplate.opsForValue().get("thread2");
+        Person person1 = new Person();
+        person1.setAge(23);
+        person1.setId(5L);
+        person1.setName("名称thread-2");
+        person1.setAddress("地址thread-3");
+
         redisTemplate.opsForValue().get("thread");
         Person person = new Person();
         person.setAge(18);
         person.setId(3L);
         person.setName("名称thread-1");
         person.setAddress("地址thread-1");
+
+
         logger.info(JSON.toJSONString(person));
         return Result.success(person);
     }
