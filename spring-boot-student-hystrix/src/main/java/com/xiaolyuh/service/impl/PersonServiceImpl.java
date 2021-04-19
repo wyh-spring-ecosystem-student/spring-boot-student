@@ -95,6 +95,7 @@ public class PersonServiceImpl implements PersonService {
         person.setName("名称thread-1");
         person.setAddress("地址thread-1");
 
+        fallbackMethodSemaphore("", null);
 
         logger.info(JSON.toJSONString(person));
         return Result.success(person);
