@@ -21,8 +21,6 @@ public class LogController {
     @Log(prefix = "日志测试接口", value = LogTypeEnum.ALL)
     public Object sendMsg() {
         logService.log();
-        logService.log();
-        logService.log();
         return "发送成";
     }
 
