@@ -18,7 +18,7 @@ public class LogController {
     private LogService logService;
 
     @RequestMapping(value = "log", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    @Log(prefix = "日志测试接口", value = LogTypeEnum.ALL)
+    @Log(prefix = "日志测试接口", value = LogTypeEnum.PARAMETER)
     public Object sendMsg() {
         logService.log();
         return "发送成";
