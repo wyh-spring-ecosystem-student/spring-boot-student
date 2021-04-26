@@ -24,4 +24,11 @@ public class LogController {
         return "发送成";
     }
 
+    @RequestMapping(value = "log", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    @Log(prefix = "日志测试接口", value = LogTypeEnum.RESULT)
+    public Object sendResultMsg() {
+        logService.log();
+        return "发送成";
+    }
+
 }
