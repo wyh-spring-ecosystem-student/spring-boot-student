@@ -14,19 +14,19 @@ public class DataController {
     private PersonRepository personRepository;
 
     @RequestMapping(value = "set", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public void set(){
-        Person person = new Person("1","wyf", 32);
+    public void set() {
+        Person person = new Person("1", "wyf", 32);
         personRepository.save(person);
         personRepository.stringRedisTemplateDemo();
     }
 
-    @RequestMapping(value = "getStr", produces = MediaType.APPLICATION_JSON_UTF8_VALUE) //2
-    public String getStr(){
+    @RequestMapping(value = "get-str", produces = MediaType.APPLICATION_JSON_UTF8_VALUE) //2
+    public String getStr() {
         return personRepository.getString();
     }
 
-    @RequestMapping(value = "getPerson", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public Person getPerson(){
+    @RequestMapping(value = "get-person", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public Person getPerson() {
         return personRepository.getPerson();
     }
 
