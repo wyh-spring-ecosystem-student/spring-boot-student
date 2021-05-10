@@ -28,5 +28,6 @@ public class ExecutorsTest {
 
         ExecutorService workStealingPool = Executors.newWorkStealingPool();
 
+        fixedThreadPool.submit(() -> System.out.println(Thread.currentThread().getName() + "-fixedThreadPool"));
     }
 }
