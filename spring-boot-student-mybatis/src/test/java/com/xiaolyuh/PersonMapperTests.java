@@ -33,6 +33,7 @@ public class PersonMapperTests {
 		person.setAddress("address");
 		person.setAge(10);
 		personService.insert(person);
+		personService.updateAge(person.getId());
 
 		Assert.assertNotNull(person.getId());
 		logger.debug(JSON.toJSONString(person));
