@@ -1,5 +1,6 @@
 package com.xiaolyuh.mybatis;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.plugin.Interceptor;
@@ -29,7 +30,7 @@ public class EditPlugin implements Interceptor {
         Object[] args = invocation.getArgs();
         MappedStatement statement = (MappedStatement) args[0];
         String sql = statement.getBoundSql(args[1]).getSql();
-        System.out.println("--------intercept method： " + statement.getId() + "-----sql： " + sql);
+        System.out.println("--------intercept method： " + statement.getId() + "\n-----sql： " + sql + "\n------args: " + JSON.toJSONString(args[1]));
         //执行目标方法
         return invocation.proceed();
     }
