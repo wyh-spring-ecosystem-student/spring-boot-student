@@ -153,6 +153,8 @@
         <module>spring-boot-student-swagger</module>
         <!-- rocketmq  -->
         <module>spring-boot-student-rocketmq</module>
+        <!-- 计算JAVA对象占用空间大小  -->
+        <module>spring-boot-student-jol</module>
     </modules>
 
 </project>
