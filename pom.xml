@@ -155,6 +155,8 @@
         <module>spring-boot-student-rocketmq</module>
         <!-- 计算JAVA对象占用空间大小  -->
         <module>spring-boot-student-jol</module>
+        <!-- skywalking demo -->
+        <module>spring-boot-student-skywalking</module>
     </modules>
 
 </project>
