@@ -1,0 +1,11 @@
+version: "3.1"
+services:
+  jenkins:
+    image: jenkins/jenkins:2.346.3-2-lts-jdk11
+    container_name: jenkins
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+      # 将jenkins的工作目录映射到宿主机的data目录
+      - ./data/:/var/jenkins_home/
