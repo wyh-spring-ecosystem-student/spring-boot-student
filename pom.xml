@@ -159,6 +159,8 @@
         <module>spring-boot-student-skywalking</module>
         <!-- websocket demo -->
         <module>spring-boot-student-websocket</module>
+        <!-- devops demo -->
+        <module>spring-boot-student-devops</module>
     </modules>
 
 </project>
