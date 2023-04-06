@@ -9,7 +9,7 @@ public class EnhancerTest {
     @Test
     public void contextTest() {
         // 输出cglib的代理的class到磁盘。
-        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "D:\\class");
+        System.setProperty(DebuggingClassWriter.DEBUG_LOCATION_PROPERTY, "/Users/admin/Desktop");
         Enhancer enhancer = new Enhancer();
         enhancer.setSuperclass(EnhancerDemo.class);
         enhancer.setCallback(new MethodInterceptorImpl());
