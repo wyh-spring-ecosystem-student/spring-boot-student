@@ -11,5 +11,11 @@ public class MainTest {
         }
         int i = 0;
         System.gc();
+
+
+        String url = "http://jira.longhu.net/";
+        String substring = url.substring(url.indexOf("://") + 3, url.length() - 1);
+        System.out.println(substring);
     }
+
 }
