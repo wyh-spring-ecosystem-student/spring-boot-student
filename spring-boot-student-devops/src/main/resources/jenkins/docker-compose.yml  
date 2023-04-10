@@ -9,3 +9,7 @@ services:
     volumes:
       # 将jenkins的工作目录映射到宿主机的data目录
       - ./data/:/var/jenkins_home/
+      # 将宿主机的docker映射到jenkins容器
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/docker/daemon.json:/etc/docker/daemon.json
