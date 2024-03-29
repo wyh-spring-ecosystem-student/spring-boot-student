@@ -15,7 +15,7 @@ public class MainTest {
 
         String url = "http://jira.longhu.net/";
         String substring = url.substring(url.indexOf("://") + 3, url.length() - 1);
-        System.out.println(substring);
+        System.out.println(NumberUtil.div(10 * 100.0, 0 * 1.0, 2));
     }
 
 }
