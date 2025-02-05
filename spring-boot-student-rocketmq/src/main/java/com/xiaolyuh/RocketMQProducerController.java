@@ -29,7 +29,7 @@ public class RocketMQProducerController {
      */
     @RequestMapping("/ProducerMq1")
     public void ProducerMQ1() {
-        String stringTopic = "test-topic";
+        String stringTopic = "test-topic:tag1";
         String payloadStr = "Hello, RocketMQ!";
         SendReceipt sendResult = rocketMQTemplate.syncSendNormalMessage(stringTopic, payloadStr);
         log.info("MQ同步发送:{},返回结果:{}", stringTopic, sendResult);
