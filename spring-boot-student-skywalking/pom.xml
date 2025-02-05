@@ -70,6 +70,10 @@
             <artifactId>layering-cache-starter</artifactId>
             <version>3.4.6</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-websocket</artifactId>
+        </dependency>
 
     </dependencies>
 
